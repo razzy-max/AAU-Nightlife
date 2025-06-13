@@ -8,7 +8,7 @@ export default function Jobs() {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/jobs')
+    fetch('https://aau-nightlife-production.up.railway.app/api/jobs')
       .then(res => res.json())
       .then(data => {
         setJobs(data);
@@ -24,7 +24,7 @@ export default function Jobs() {
     e.preventDefault();
     setStatus('Adding...');
     try {
-      const res = await fetch('http://localhost:5000/api/jobs', {
+      const res = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -33,7 +33,7 @@ export default function Jobs() {
         setStatus('Job added!');
         setForm({ title: '', sector: '', type: '', description: '', email: '', phone: '' });
         // Refresh jobs
-        const updated = await fetch('http://localhost:5000/api/jobs').then(r => r.json());
+        const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs').then(r => r.json());
         setJobs(updated);
       } else {
         setStatus('Failed to add job.');
@@ -48,7 +48,7 @@ export default function Jobs() {
     if (!window.confirm('Delete this job posting?')) return;
     const updatedJobs = jobs.filter((_, i) => i !== idx);
     setJobs(updatedJobs);
-    await fetch('http://localhost:5000/api/jobs', {
+    await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedJobs)
@@ -71,7 +71,7 @@ export default function Jobs() {
     const updatedJobs = jobs.map((job, i) => i === editIdx ? editForm : job);
     setJobs(updatedJobs);
     setEditIdx(null);
-    await fetch('http://localhost:5000/api/jobs', {
+    await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedJobs)

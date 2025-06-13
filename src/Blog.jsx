@@ -164,3 +164,5 @@ export default function Blog() {
     </section>
   );
 }
+
+// All API calls updated to use https://aau-nightlife-production.up.railway.app/api/... instead of localhost:5000

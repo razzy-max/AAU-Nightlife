@@ -71,3 +71,6 @@ function App() {
 }
 
 export default App;
+
+// Replace all API URLs from localhost:5000 to the deployed Railway backend
+// Example: fetch('https://aau-nightlife-production.up.railway.app/api/events')

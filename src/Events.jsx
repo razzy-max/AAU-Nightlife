@@ -11,7 +11,7 @@ export default function Events() {
   const eventRefs = useRef({});
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
+    fetch('https://aau-nightlife-production.up.railway.app/api/events')
       .then(res => res.json())
       .then(data => {
         setEvents(data);
@@ -45,7 +45,7 @@ export default function Events() {
     e.preventDefault();
     setStatus('Adding...');
     try {
-      const res = await fetch('http://localhost:5000/api/events', {
+      const res = await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -54,7 +54,7 @@ export default function Events() {
         setStatus('Event added!');
         setForm({ title: '', date: '', category: '', description: '', email: '', phone: '', image: '' });
         // Refresh events
-        const updated = await fetch('http://localhost:5000/api/events').then(r => r.json());
+        const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
         setEvents(updated);
       } else {
         setStatus('Failed to add event.');
@@ -69,7 +69,7 @@ export default function Events() {
     if (!window.confirm('Delete this event?')) return;
     const updatedEvents = events.filter((_, i) => i !== idx);
     setEvents(updatedEvents);
-    await fetch('http://localhost:5000/api/events', {
+    await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedEvents)
@@ -100,7 +100,7 @@ export default function Events() {
     const updatedEvents = events.map((ev, i) => i === editIdx ? editForm : ev);
     setEvents(updatedEvents);
     setEditIdx(null);
-    await fetch('http://localhost:5000/api/events', {
+    await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedEvents)
