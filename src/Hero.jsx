@@ -8,6 +8,7 @@ export default function Hero() {
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ image: '' });
+  const [pendingImages, setPendingImages] = useState([]);
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
 
   useEffect(() => {
@@ -28,34 +29,38 @@ export default function Hero() {
   }, [heroImages.length]);
 
   const handleChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        setForm(f => ({ ...f, image: ev.target.result }));
-      };
-      reader.readAsDataURL(e.target.files[0]);
+    if (e.target.name === 'image' && e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      const readers = files.map(file => {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = ev => resolve(ev.target.result);
+          reader.readAsDataURL(file);
+        });
+      });
+      Promise.all(readers).then(imgs => setPendingImages(imgs));
     }
   };
 
-  const handleSubmit = async e => {
+  const handleSave = async e => {
     e.preventDefault();
-    setStatus('Adding...');
+    setStatus('Saving...');
     try {
-      const newImages = [...heroImages, form.image];
+      const newImages = [...heroImages, ...pendingImages];
       const res = await fetch('/api/hero-images', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newImages)
       });
       if (res.ok) {
-        setStatus('Image added!');
-        setForm({ image: '' });
+        setStatus('Images saved!');
+        setPendingImages([]);
         setHeroImages(newImages);
       } else {
-        setStatus('Failed to add image.');
+        setStatus('Failed to save images.');
       }
     } catch {
-      setStatus('Failed to add image.');
+      setStatus('Failed to save images.');
     }
   };
 
@@ -108,12 +113,19 @@ export default function Hero() {
               {showForm ? 'Hide Image Form' : 'Add Hero Image'}
             </button>
             {showForm && (
-              <form className="hero-form" onSubmit={handleSubmit} style={{marginBottom: '2rem'}}>
+              <form className="hero-form" onSubmit={handleSave} style={{marginBottom: '2rem'}}>
                 <label>
-                  Image:
-                  <input type="file" name="image" accept="image/*" onChange={handleChange} required />
+                  Images:
+                  <input type="file" name="image" accept="image/*" onChange={handleChange} multiple required />
                 </label>
-                <button type="submit">Add Image</button>
+                {pendingImages.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, margin: '8px 0' }}>
+                    {pendingImages.map((img, idx) => (
+                      <img key={idx} src={img} alt="Preview" style={{ width: 60, height: 45, objectFit: 'contain', background: '#222', borderRadius: 4, border: '1px solid #fff' }} />
+                    ))}
+                  </div>
+                )}
+                <button type="submit">Save</button>
               </form>
             )}
             {status && <p>{status}</p>}
