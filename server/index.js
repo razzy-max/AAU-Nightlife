@@ -11,6 +11,7 @@ app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to sup
 // Data file paths
 const eventsPath = path.join(__dirname, 'data', 'events.json');
 const jobsPath = path.join(__dirname, 'data', 'jobs.json');
+const heroImagesPath = path.join(__dirname, 'data', 'heroImages.json');
 
 // Helper to read data
 function readData(filePath) {
@@ -34,6 +35,15 @@ app.post('/api/events', (req, res) => {
 });
 app.put('/api/events', (req, res) => {
   writeData(eventsPath, req.body);
+  res.status(200).json({ success: true });
+});
+
+// Hero Images endpoints
+app.get('/api/hero-images', (req, res) => {
+  res.json(readData(heroImagesPath));
+});
+app.put('/api/hero-images', (req, res) => {
+  writeData(heroImagesPath, req.body);
   res.status(200).json({ success: true });
 });
 
