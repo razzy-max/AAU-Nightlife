@@ -90,7 +90,6 @@ export default function Hero() {
           animation: 'spin 1s linear infinite',
           margin: '0 auto 12px auto'
         }} />
-        <p style={{ color: '#7bffb6', fontWeight: 500 }}>Loading hero images...</p>
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
