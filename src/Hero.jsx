@@ -142,17 +142,6 @@ export default function Hero() {
             </div>
           </>
         )}
-        {/* Only show thumbnails in admin mode */}
-        {!isAdmin && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8, justifyContent: 'center' }}>
-            {heroImages.map((img, idx) => (
-              <div key={idx} style={{ position: 'relative', width: 80, height: 60 }}>
-                <img src={img} alt={`Hero ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#222', borderRadius: 6, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', display: 'block', margin: '0 auto', maxWidth: 80, maxHeight: 60 }} />
-                <button onClick={() => setImgIdx(idx)} style={{ position: 'absolute', left: 4, bottom: 4, fontSize: 10, background: '#7bffb6', border: 'none', borderRadius: 4, padding: '2px 6px', cursor: 'pointer' }}>Show</button>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
       <style>{`
         @media (max-width: 600px) {
