@@ -83,7 +83,7 @@ export default function Hero() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8, justifyContent: 'center' }}>
               {heroImages.map((img, idx) => (
                 <div key={idx} style={{ position: 'relative', width: 80, height: 60 }}>
-                  <img src={img} alt={`Hero ${idx + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: imgIdx === idx ? '2px solid #7bffb6' : '2px solid #fff' }} />
+                  <img src={img} alt={`Hero ${idx + 1}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, border: imgIdx === idx ? '2px solid #7bffb6' : '2px solid #fff', background: '#222', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
                   <button onClick={() => setImgIdx(idx)} style={{ position: 'absolute', left: 4, bottom: 4, fontSize: 10, background: '#7bffb6', border: 'none', borderRadius: 4, padding: '2px 6px', cursor: 'pointer' }}>Show</button>
                   <button onClick={() => handleDelete(idx)} style={{ position: 'absolute', right: 4, top: 4, fontSize: 10, background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 6px', cursor: 'pointer' }}>Delete</button>
                 </div>
