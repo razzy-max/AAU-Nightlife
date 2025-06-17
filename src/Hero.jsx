@@ -78,7 +78,28 @@ export default function Hero() {
     if (imgIdx >= updatedImages.length) setImgIdx(0);
   };
 
-  if (loading) return <section className="hero-section"><div className="hero-content"><p>Loading hero images...</p></div></section>;
+  if (loading) return (
+    <section className="hero-section" style={{ minHeight: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="hero-content" style={{ textAlign: 'center' }}>
+        <div className="spinner" style={{
+          width: 48,
+          height: 48,
+          border: '5px solid #eee',
+          borderTop: '5px solid #7bffb6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 12px auto'
+        }} />
+        <p style={{ color: '#7bffb6', fontWeight: 500 }}>Loading hero images...</p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    </section>
+  );
 
   return (
     <section
@@ -143,28 +164,6 @@ export default function Hero() {
           </>
         )}
       </div>
-      <style>{`
-        @media (max-width: 600px) {
-          .hero-title {
-            font-size: 2.2rem !important;
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
-          }
-          .hero-content {
-            padding: 0.5rem;
-          }
-          .hero-section .hero-bg-anim {
-            min-height: 180px;
-          }
-          .hero-section .admin-hero-thumbs {
-            gap: 6px !important;
-          }
-          .hero-section .admin-hero-thumbs img {
-            max-width: 48px !important;
-            max-height: 36px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
