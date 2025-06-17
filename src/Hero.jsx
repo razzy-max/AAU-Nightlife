@@ -166,7 +166,7 @@ export default function Hero() {
       <style>{`
         @media (max-width: 600px) {
           .hero-title {
-            font-size: 1.4rem !important;
+            font-size: 2rem !important;
             padding-left: 0.5rem !important;
             padding-right: 0.5rem !important;
             line-height: 1.2;
