@@ -83,7 +83,7 @@ export default function Hero() {
         <h1
           className="hero-title"
           style={{
-            color: '#2d2d6e',
+            color: 'white',
             fontSize: '5.5rem',
             fontWeight: 'bold',
             textTransform: 'uppercase',
