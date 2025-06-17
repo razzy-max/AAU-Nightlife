@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
+const API_URL = 'https://aau-nightlife-production.up.railway.app';
+
 export default function Hero() {
   const [heroImages, setHeroImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ export default function Hero() {
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
 
   useEffect(() => {
-    fetch('/api/hero-images')
+    fetch(`${API_URL}/api/hero-images`)
       .then(res => res.json())
       .then(data => {
         setHeroImages(Array.isArray(data) ? data : []);
@@ -47,7 +49,7 @@ export default function Hero() {
     setStatus('Saving...');
     try {
       const newImages = [...heroImages, ...pendingImages];
-      const res = await fetch('/api/hero-images', {
+      const res = await fetch(`${API_URL}/api/hero-images`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newImages)
@@ -68,7 +70,7 @@ export default function Hero() {
     if (!window.confirm('Delete this image?')) return;
     const updatedImages = heroImages.filter((_, i) => i !== idx);
     setHeroImages(updatedImages);
-    await fetch('/api/hero-images', {
+    await fetch(`${API_URL}/api/hero-images`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedImages)
