@@ -163,6 +163,23 @@ export default function Hero() {
           </>
         )}
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .hero-title {
+            font-size: 1.4rem !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            line-height: 1.2;
+            word-break: break-word;
+          }
+          .hero-content {
+            padding: 0.5rem;
+          }
+          .hero-section .hero-bg-anim {
+            min-height: 140px;
+          }
+        }
+      `}</style>
     </section>
   );
 }
