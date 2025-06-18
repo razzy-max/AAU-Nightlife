@@ -107,11 +107,12 @@ app.put('/api/jobs', async (req, res) => {
   }
 });
 
-// Hero Images endpoints (MongoDB)
+// Hero Images endpoints (MongoDB, returns array of image strings)
 app.get('/api/hero-images', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    const images = await db.collection('heroImages').find().toArray();
+    const docs = await db.collection('heroImages').find().toArray();
+    const images = docs.map(doc => doc.image);
     res.json(images);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch hero images' });
@@ -123,7 +124,8 @@ app.put('/api/hero-images', async (req, res) => {
   try {
     await db.collection('heroImages').deleteMany({});
     if (Array.isArray(req.body) && req.body.length > 0) {
-      await db.collection('heroImages').insertMany(req.body);
+      const docs = req.body.map(image => ({ image }));
+      await db.collection('heroImages').insertMany(docs);
     }
     res.status(200).json({ success: true });
   } catch (err) {
