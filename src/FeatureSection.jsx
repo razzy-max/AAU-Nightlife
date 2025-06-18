@@ -37,7 +37,18 @@ const features = [
 export default function FeatureSection() {
   return (
     <section className="feature-section" id="features">
+      {/* Mobile Carousel */}
       <div className="feature-carousel-mobile">
+        {features.map((f, i) => (
+          <div className="feature-card small-feature-card" key={i}>
+            <div className="feature-icon" style={{ fontSize: '2rem' }}>{f.icon}</div>
+            <h3 className="feature-title" style={{ fontSize: '1.1rem' }}>{f.title}</h3>
+            <p className="feature-desc" style={{ fontSize: '0.95rem' }}>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+      {/* Desktop Grid */}
+      <div className="feature-grid responsive-feature-grid feature-desktop-grid">
         {features.map((f, i) => (
           <div className="feature-card small-feature-card" key={i}>
             <div className="feature-icon" style={{ fontSize: '2rem' }}>{f.icon}</div>
@@ -60,6 +71,9 @@ export default function FeatureSection() {
             box-sizing: border-box;
             background: transparent;
           }
+          .feature-desktop-grid {
+            display: none !important;
+          }
           .feature-card.small-feature-card {
             min-width: 70vw;
             max-width: 85vw;
@@ -74,7 +88,10 @@ export default function FeatureSection() {
         }
         @media (min-width: 701px) {
           .feature-carousel-mobile {
-            display: grid;
+            display: none !important;
+          }
+          .feature-desktop-grid {
+            display: grid !important;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 2.5rem;
             max-width: 1000px;
