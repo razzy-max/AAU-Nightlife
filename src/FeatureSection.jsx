@@ -37,7 +37,7 @@ const features = [
 export default function FeatureSection() {
   return (
     <section className="feature-section" id="features">
-      <div className="feature-grid responsive-feature-grid feature-carousel-mobile">
+      <div className="feature-carousel-mobile">
         {features.map((f, i) => (
           <div className="feature-card small-feature-card" key={i}>
             <div className="feature-icon" style={{ fontSize: '2rem' }}>{f.icon}</div>
@@ -48,10 +48,8 @@ export default function FeatureSection() {
       </div>
       <style>{`
         @media (max-width: 700px) {
-          .feature-grid,
-          .responsive-feature-grid,
           .feature-carousel-mobile {
-            display: flex !important;
+            display: flex;
             flex-direction: row;
             overflow-x: auto;
             gap: 1.2rem;
@@ -60,10 +58,11 @@ export default function FeatureSection() {
             -webkit-overflow-scrolling: touch;
             width: 100vw;
             box-sizing: border-box;
+            background: transparent;
           }
           .feature-card.small-feature-card {
-            min-width: 80vw;
-            max-width: 90vw;
+            min-width: 70vw;
+            max-width: 85vw;
             flex: 0 0 auto;
             scroll-snap-align: start;
             margin-left: 0 !important;
@@ -71,6 +70,30 @@ export default function FeatureSection() {
           }
           .feature-carousel-mobile::-webkit-scrollbar {
             display: none;
+          }
+        }
+        @media (min-width: 701px) {
+          .feature-carousel-mobile {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+          }
+          .feature-card.small-feature-card {
+            min-width: 150px;
+            max-width: 180px;
+            flex: 1 1 0;
+            padding: 1.1rem 0.7rem;
+            background: #23243a;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            text-align: center;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 0.5rem;
           }
         }
       `}</style>
