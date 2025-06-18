@@ -55,10 +55,9 @@ export default function FeatureSection() {
             flex-direction: row;
             overflow-x: auto;
             gap: 1.2rem;
-            padding-bottom: 0.5rem;
+            padding: 0 1rem 0.5rem 1rem;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
-            scroll-padding-left: 1rem;
           }
           .feature-card.small-feature-card {
             min-width: 80vw;
