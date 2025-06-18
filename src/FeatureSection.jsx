@@ -56,12 +56,18 @@ export default function FeatureSection() {
             padding-bottom: 0.5rem;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
+            scroll-padding-left: 1rem;
           }
           .feature-card.small-feature-card {
             min-width: 80vw;
             max-width: 90vw;
             flex: 0 0 auto;
             scroll-snap-align: start;
+            margin-left: 0;
+            margin-right: 0;
+          }
+          .feature-carousel-mobile::-webkit-scrollbar {
+            display: none;
           }
         }
       `}</style>
