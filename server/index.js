@@ -2,8 +2,19 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const { MongoClient, ObjectId } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
+
+let db;
+
+MongoClient.connect(MONGO_URI)
+  .then(client => {
+    db = client.db();
+    console.log('Connected to MongoDB');
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to support base64 images
@@ -133,33 +144,35 @@ app.post('/api/contact', (req, res) => {
   res.status(200).json({ success: true });
 });
 
-// Advertisers endpoints
-app.get('/api/advertisers', (req, res) => {
-  res.json(readData(advertisersPath));
+// Advertisers endpoints (MongoDB)
+app.get('/api/advertisers', async (req, res) => {
+  try {
+    const advertisers = await db.collection('advertisers').find().toArray();
+    res.json(advertisers);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch advertisers' });
+  }
 });
-app.post('/api/advertisers', (req, res) => {
+
+app.post('/api/advertisers', async (req, res) => {
   const { name, logo, link } = req.body;
   if (!name || !logo || !link) return res.status(400).json({ error: 'Missing fields' });
-  const advertisers = readData(advertisersPath);
-  const newAdvertiser = {
-    id: Date.now().toString(),
-    name,
-    logo, // Accept base64 or URL
-    link
-  };
-  advertisers.push(newAdvertiser);
-  writeData(advertisersPath, advertisers);
-  res.status(201).json(newAdvertiser);
-});
-app.delete('/api/advertisers/:id', (req, res) => {
-  const { id } = req.params;
-  let advertisers = readData(advertisersPath);
-  const filtered = advertisers.filter(a => a.id !== id);
-  if (filtered.length === advertisers.length) {
-    return res.status(404).json({ error: 'Advertiser not found' });
+  try {
+    const result = await db.collection('advertisers').insertOne({ name, logo, link });
+    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, name, logo, link });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add advertiser' });
   }
-  writeData(advertisersPath, filtered);
-  res.json({ success: true });
+});
+
+app.delete('/api/advertisers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.collection('advertisers').deleteOne({ _id: new ObjectId(id) });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete advertiser' });
+  }
 });
 
 app.listen(PORT, () => {
