@@ -134,7 +134,7 @@ export default function AdvertisersSection() {
       ) : (
         <div className="advertisers-list">
           {advertisers.map((adv) => (
-            <div className="advertiser-card" key={adv.id}>
+            <div className="advertiser-card" key={adv._id || adv.id}>
               <a href={adv.link} target="_blank" rel="noopener noreferrer">
                 <img src={adv.logo} alt={adv.name} className="advertiser-logo" />
                 <div className="advertiser-name">{adv.name}</div>
@@ -142,7 +142,7 @@ export default function AdvertisersSection() {
               {isAdmin() && (
                 <button
                   className="advertiser-delete-btn"
-                  onClick={() => handleDeleteAdvertiser(adv.id)}
+                  onClick={() => handleDeleteAdvertiser(adv._id || adv.id)}
                   title="Delete advertiser"
                 >
                   &times;
