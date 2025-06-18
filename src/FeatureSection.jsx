@@ -48,6 +48,8 @@ export default function FeatureSection() {
       </div>
       <style>{`
         @media (max-width: 700px) {
+          .feature-grid,
+          .responsive-feature-grid,
           .feature-carousel-mobile {
             display: flex !important;
             flex-direction: row;
@@ -56,14 +58,16 @@ export default function FeatureSection() {
             padding: 0 1rem 0.5rem 1rem;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
+            width: 100vw;
+            box-sizing: border-box;
           }
           .feature-card.small-feature-card {
             min-width: 80vw;
             max-width: 90vw;
             flex: 0 0 auto;
             scroll-snap-align: start;
-            margin-left: 0;
-            margin-right: 0;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
           .feature-carousel-mobile::-webkit-scrollbar {
             display: none;
