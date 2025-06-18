@@ -7,6 +7,7 @@ import Contact from './Contact';
 import Blog from './Blog';
 import { BlogProvider } from './BlogContext';
 import './App.css';
+import AdvertisersSection from './AdvertisersSection';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +39,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/blog/:id" element={<Blog />} />
           </Routes>
+          <AdvertisersSection />
         </main>
         <footer>
           <div style={{maxWidth: 700, margin: '0 auto'}}>

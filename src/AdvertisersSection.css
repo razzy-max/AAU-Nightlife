@@ -1,0 +1,158 @@
+.advertisers-section {
+  background: #f8f9fa;
+  padding: 2rem 0 2.5rem 0;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.advertisers-section h2 {
+  color: #222;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.advertisers-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.advertiser-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 1rem 1.5rem 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  max-width: 180px;
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+
+.advertiser-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+}
+
+.advertiser-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 0.7rem;
+  border-radius: 0.5rem;
+  background: #f1f1f1;
+  border: 1px solid #e0e0e0;
+}
+
+.advertiser-name {
+  color: #222;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  word-break: break-word;
+}
+
+.advertiser-card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.advertiser-delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.7rem;
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 1.7rem;
+  height: 1.7rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.advertiser-delete-btn:hover {
+  background: #d9363e;
+}
+
+.advertiser-add-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+  margin-top: 1.2rem;
+}
+
+.advertiser-add-form input {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+}
+
+.advertiser-add-form button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.advertiser-add-form button:disabled {
+  background: #b3d7ff;
+  cursor: not-allowed;
+}
+
+.advertisers-loading, .advertisers-error {
+  color: #d9363e;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-logout-btn {
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.4rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.admin-logout-btn:hover {
+  background: #d9363e;
+}
+
+@media (max-width: 600px) {
+  .advertisers-list {
+    gap: 1rem;
+  }
+  .advertiser-card {
+    min-width: 120px;
+    max-width: 140px;
+    padding: 0.7rem 0.7rem 1rem 0.7rem;
+  }
+  .advertiser-logo {
+    width: 50px;
+    height: 50px;
+  }
+  .advertiser-name {
+    font-size: 1rem;
+  }
+}
