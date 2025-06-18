@@ -91,11 +91,15 @@ export default function FeatureSection() {
             display: none !important;
           }
           .feature-desktop-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2.5rem;
+            display: flex !important;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 1.2rem;
             max-width: 1000px;
             margin: 0 auto;
+            width: 100%;
+            overflow-x: auto;
           }
           .feature-card.small-feature-card {
             min-width: 150px;
@@ -110,7 +114,7 @@ export default function FeatureSection() {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 0 0.5rem;
+            margin: 0;
           }
         }
       `}</style>
