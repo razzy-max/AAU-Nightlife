@@ -146,6 +146,7 @@ app.post('/api/contact', (req, res) => {
 
 // Advertisers endpoints (MongoDB)
 app.get('/api/advertisers', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const advertisers = await db.collection('advertisers').find().toArray();
     res.json(advertisers);
@@ -155,6 +156,7 @@ app.get('/api/advertisers', async (req, res) => {
 });
 
 app.post('/api/advertisers', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
   const { name, logo, link } = req.body;
   if (!name || !logo || !link) return res.status(400).json({ error: 'Missing fields' });
   try {
@@ -166,6 +168,7 @@ app.post('/api/advertisers', async (req, res) => {
 });
 
 app.delete('/api/advertisers/:id', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;
     await db.collection('advertisers').deleteOne({ _id: new ObjectId(id) });
