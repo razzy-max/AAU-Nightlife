@@ -35,12 +35,10 @@ const features = [
 ];
 
 export default function FeatureSection() {
-  // Duplicate features for infinite scroll effect on mobile
-  const mobileFeatures = features.concat(features);
   return (
     <section className="feature-section" id="features">
       <div className="feature-grid responsive-feature-grid feature-carousel-mobile">
-        {mobileFeatures.map((f, i) => (
+        {features.map((f, i) => (
           <div className="feature-card small-feature-card" key={i}>
             <div className="feature-icon" style={{ fontSize: '2rem' }}>{f.icon}</div>
             <h3 className="feature-title" style={{ fontSize: '1.1rem' }}>{f.title}</h3>
