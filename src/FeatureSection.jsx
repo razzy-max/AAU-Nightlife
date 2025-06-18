@@ -37,7 +37,7 @@ const features = [
 export default function FeatureSection() {
   return (
     <section className="feature-section" id="features">
-      <div className="feature-grid responsive-feature-grid">
+      <div className="feature-grid responsive-feature-grid feature-carousel-mobile">
         {features.map((f, i) => (
           <div className="feature-card small-feature-card" key={i}>
             <div className="feature-icon" style={{ fontSize: '2rem' }}>{f.icon}</div>
@@ -46,6 +46,25 @@ export default function FeatureSection() {
           </div>
         ))}
       </div>
+      <style>{`
+        @media (max-width: 700px) {
+          .feature-carousel-mobile {
+            display: flex !important;
+            flex-direction: row;
+            overflow-x: auto;
+            gap: 1.2rem;
+            padding-bottom: 0.5rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+          }
+          .feature-card.small-feature-card {
+            min-width: 80vw;
+            max-width: 90vw;
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+          }
+        }
+      `}</style>
     </section>
   );
 }
