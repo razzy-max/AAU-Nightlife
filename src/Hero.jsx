@@ -104,11 +104,14 @@ export default function Hero() {
     <section
       className="hero-section"
       style={{
-        backgroundImage: heroImages.length ? `url(${heroImages[imgIdx]})` : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        transition: 'background-image 0.7s ease-in-out',
+        background: '#23244a', // fallback background color
         position: 'relative',
+        minHeight: '60vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '5rem 1rem 3rem 1rem',
+        overflow: 'hidden',
       }}
     >
       {/* Overlay for better text contrast */}
@@ -125,6 +128,39 @@ export default function Hero() {
           pointerEvents: 'none',
         }}
       />
+      {/* Image container for full image display */}
+      {heroImages.length > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            background: '#23244a',
+          }}
+        >
+          <img
+            src={heroImages[imgIdx]}
+            alt="Hero"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              background: '#23244a',
+              display: 'block',
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          />
+        </div>
+      )}
       <div className="hero-bg-anim" style={{ position: 'relative', zIndex: 2 }} />
       <div className="hero-content" style={{ position: 'relative', zIndex: 3 }}>
         <h1
