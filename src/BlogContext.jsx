@@ -1,39 +1,70 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const initialBlogPosts = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
-    title: 'Top 5 Nightlife Spots in Ekpoma',
-    content: 'Full article content for Top 5 Nightlife Spots in Ekpoma. Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students. (Add more content as needed.)',
-    excerpt: 'Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students.'
-  },
-  // ...copy the rest of your initial posts here, including excerpt fields
-];
-
 const BlogContext = createContext();
+const API_URL = 'https://aau-nightlife-production.up.railway.app';
 
 export function BlogProvider({ children }) {
-  // Load posts from localStorage or use initial
-  const [posts, setPosts] = useState(() => {
-    const saved = localStorage.getItem('aau_blog_posts');
-    return saved ? JSON.parse(saved) : initialBlogPosts;
-  });
-  // Comments: { [blogId]: [ {name, text}, ... ] }
-  const [comments, setComments] = useState(() => {
-    const saved = localStorage.getItem('aau_blog_comments');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState({});
 
+  // Fetch posts from server
   useEffect(() => {
-    localStorage.setItem('aau_blog_posts', JSON.stringify(posts));
-  }, [posts]);
+    fetch(`${API_URL}/api/blog-posts`)
+      .then(res => res.json())
+      .then(data => setPosts(Array.isArray(data) ? data : []));
+  }, []);
+
+  // Fetch comments from server
   useEffect(() => {
-    localStorage.setItem('aau_blog_comments', JSON.stringify(comments));
-  }, [comments]);
+    fetch(`${API_URL}/api/blog-comments`)
+      .then(res => res.json())
+      .then(data => setComments(data || {}));
+  }, []);
+
+  // Add new post and sync to server
+  const addPost = async (post) => {
+    const res = await fetch(`${API_URL}/api/blog-posts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+    if (res.ok) {
+      setPosts(prev => [post, ...prev]);
+    }
+  };
+
+  // Add new comment and sync to server
+  const addComment = async (blogId, comment) => {
+    const res = await fetch(`${API_URL}/api/blog-comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ blogId, comment })
+    });
+    if (res.ok) {
+      setComments(prev => ({
+        ...prev,
+        [blogId]: [...(prev[blogId] || []), comment]
+      }));
+    }
+  };
+
+  // Remove post locally (admin only)
+  const removePost = (id) => {
+    setPosts(prev => prev.filter(p => p.id !== id));
+    // Optionally, add a DELETE endpoint for full sync
+  };
+
+  // Remove comment locally (admin only)
+  const removeComment = (blogId, idx) => {
+    setComments(prev => ({
+      ...prev,
+      [blogId]: prev[blogId].filter((_, i) => i !== idx)
+    }));
+    // Optionally, add a PUT endpoint for full sync
+  };
 
   return (
-    <BlogContext.Provider value={{ posts, setPosts, comments, setComments }}>
+    <BlogContext.Provider value={{ posts, addPost, removePost, comments, addComment, removeComment }}>
       {children}
     </BlogContext.Provider>
   );
@@ -42,5 +73,3 @@ export function BlogProvider({ children }) {
 export function useBlog() {
   return useContext(BlogContext);
 }
-
-// All API calls updated to use https://aau-nightlife-production.up.railway.app/api/... instead of localhost:5000

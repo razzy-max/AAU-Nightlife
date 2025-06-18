@@ -5,42 +5,42 @@ import { useBlog } from './BlogContext';
 
 export default function Blog() {
   const { id } = useParams();
-  const { posts, setPosts, comments, setComments } = useBlog();
+  const { posts, addPost, removePost, comments, addComment, removeComment } = useBlog();
   const blog = posts.find(post => post.id === Number(id));
   const [input, setInput] = useState('');
   const [name, setName] = useState('');
   const [anonymous, setAnonymous] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '' });
   const [showForm, setShowForm] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({ title: '', image: '', content: '' });
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
   const blogComments = comments[blog?.id] || [];
 
   if (!blog) return <div className="blog-detail-container">Blog post not found.</div>;
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     if (input.trim()) {
       const newComment = {
         name: anonymous ? 'Anonymous' : (name.trim() || 'Anonymous'),
         text: input.trim(),
       };
-      setComments(prev => ({
-        ...prev,
-        [blog.id]: [...(prev[blog.id] || []), newComment],
-      }));
+      await addComment(blog.id, newComment);
       setInput('');
       setName('');
       setAnonymous(false);
     }
   };
 
-  const handleDeleteComment = idx => {
+  const handleDeleteComment = async idx => {
     if (!window.confirm('Delete this comment?')) return;
-    setComments(prev => ({
-      ...prev,
-      [blog.id]: prev[blog.id].filter((_, i) => i !== idx),
-    }));
+    // Sync delete to backend
+    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-comments/${blog.id}/${idx}`, {
+      method: 'DELETE'
+    });
+    removeComment(blog.id, idx);
   };
 
   const handleFormChange = e => {
@@ -55,27 +55,55 @@ export default function Blog() {
     }
   };
 
-  const handlePostSubmit = e => {
+  const handleEditFormChange = e => {
+    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        setEditForm(f => ({ ...f, image: ev.target.result }));
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handlePostSubmit = async e => {
     e.preventDefault();
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    setPosts([
-      { ...form, id: Date.now(), excerpt, timestamp: Date.now() },
-      ...posts,
-    ]);
+    const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
+    await addPost(newPost);
     setForm({ title: '', image: '', content: '' });
     setShowForm(false);
   };
 
-  const handleDeletePost = () => {
+  const handleDeletePost = async () => {
     if (!window.confirm('Delete this blog post?')) return;
-    setPosts(posts.filter(p => p.id !== blog.id));
-    // Remove comments for this post too
-    setComments(prev => {
-      const copy = { ...prev };
-      delete copy[blog.id];
-      return copy;
+    // Sync delete to backend
+    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-posts/${blog.id}`, {
+      method: 'DELETE'
     });
+    removePost(blog.id);
     navigate('/');
+  };
+
+  const startEdit = () => {
+    setEditForm({ title: blog.title, image: blog.image, content: blog.content });
+    setEditMode(true);
+  };
+
+  const handleEditSubmit = async e => {
+    e.preventDefault();
+    const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
+    const updated = { ...blog, ...editForm, excerpt };
+    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-posts/${blog.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
+    // Update locally
+    removePost(blog.id);
+    addPost(updated);
+    setEditMode(false);
   };
 
   return (
@@ -90,6 +118,9 @@ export default function Blog() {
             </button>
             <button onClick={handleDeletePost} style={{marginLeft:8, marginBottom:'1rem', background:'#d9534f', color:'#fff', border:'none', borderRadius:6, padding:'6px 16px', cursor:'pointer'}}>
               Delete This Post
+            </button>
+            <button onClick={startEdit} style={{marginLeft:8, marginBottom:'1rem', background:'#0074D9', color:'#fff', border:'none', borderRadius:6, padding:'6px 16px', cursor:'pointer'}}>
+              Edit This Post
             </button>
             {showForm && (
               <form className="blog-form" onSubmit={handlePostSubmit} style={{marginBottom: '2rem'}}>
@@ -106,6 +137,24 @@ export default function Blog() {
                   <textarea name="content" value={form.content} onChange={handleFormChange} required></textarea>
                 </label>
                 <button type="submit">Add Blog Post</button>
+              </form>
+            )}
+            {editMode && (
+              <form className="blog-form" onSubmit={handleEditSubmit} style={{marginBottom: '2rem'}}>
+                <label>
+                  Title:
+                  <input type="text" name="title" value={editForm.title} onChange={handleEditFormChange} required />
+                </label>
+                <label>
+                  Image:
+                  <input type="file" name="image" accept="image/*" onChange={handleEditFormChange} />
+                </label>
+                <label>
+                  Content:
+                  <textarea name="content" value={editForm.content} onChange={handleEditFormChange} required></textarea>
+                </label>
+                <button type="submit">Save Changes</button>
+                <button type="button" onClick={() => setEditMode(false)} style={{marginLeft:8}}>Cancel</button>
               </form>
             )}
           </>
