@@ -9,8 +9,9 @@ export default function AdvertisersSection() {
   const [advertisers, setAdvertisers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [newAdvertiser, setNewAdvertiser] = useState({ name: '', logo: '', link: '' });
+  const [form, setForm] = useState({ name: '', logo: '', link: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const fetchAdvertisers = async () => {
     setLoading(true);
@@ -31,8 +32,16 @@ export default function AdvertisersSection() {
     fetchAdvertisers();
   }, []);
 
-  const handleInputChange = (e) => {
-    setNewAdvertiser({ ...newAdvertiser, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    if (e.target.name === 'logo' && e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setForm((f) => ({ ...f, logo: ev.target.result }));
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   const handleAddAdvertiser = async (e) => {
@@ -42,10 +51,11 @@ export default function AdvertisersSection() {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newAdvertiser),
+        body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error('Failed to add advertiser');
-      setNewAdvertiser({ name: '', logo: '', link: '' });
+      setForm({ name: '', logo: '', link: '' });
+      setShowForm(false);
       fetchAdvertisers();
     } catch (err) {
       setError(err.message);
@@ -70,44 +80,50 @@ export default function AdvertisersSection() {
       <h2>Our Advertisers</h2>
       {isAdmin() && (
         <>
-          <form className="advertiser-add-form" onSubmit={handleAddAdvertiser}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Advertiser Name"
-              value={newAdvertiser.name}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="url"
-              name="logo"
-              placeholder="Logo Image URL"
-              value={newAdvertiser.logo}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="url"
-              name="link"
-              placeholder="Advertiser Link"
-              value={newAdvertiser.link}
-              onChange={handleInputChange}
-              required
-            />
-            <button type="submit" disabled={submitting}>
-              {submitting ? 'Adding...' : 'Add Advertiser'}
-            </button>
-          </form>
           <button
-            className="admin-logout-btn"
-            onClick={() => {
-              localStorage.removeItem('aau_admin');
-              window.location.reload();
-            }}
+            onClick={() => setShowForm((f) => !f)}
+            style={{ marginBottom: '1rem' }}
           >
-            Logout Admin
+            {showForm ? 'Hide Add Advertiser' : 'Add Advertiser'}
           </button>
+          {showForm && (
+            <form className="advertiser-add-form" onSubmit={handleAddAdvertiser}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Advertiser Name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="url"
+                name="link"
+                placeholder="Advertiser Link"
+                value={form.link}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="file"
+                name="logo"
+                accept="image/*"
+                onChange={handleChange}
+                required
+              />
+              {form.logo && (
+                <img
+                  src={form.logo}
+                  alt="Preview"
+                  className="advertiser-logo"
+                  style={{ marginBottom: 8, maxHeight: 60 }}
+                />
+              )}
+              <button type="submit" disabled={submitting}>
+                {submitting ? 'Adding...' : 'Add Advertiser'}
+              </button>
+            </form>
+          )}
         </>
       )}
       {loading ? (
