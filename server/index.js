@@ -14,6 +14,8 @@ const jobsPath = path.join(__dirname, 'data', 'jobs.json');
 const heroImagesPath = path.join(__dirname, 'data', 'heroImages.json');
 const blogPostsPath = path.join(__dirname, 'data', 'blogPosts.json');
 const blogCommentsPath = path.join(__dirname, 'data', 'blogComments.json');
+// --- Advertisers API ---
+const advertisersPath = path.join(__dirname, 'data', 'advertisers.json');
 
 // Helper to read data
 function readData(filePath) {
@@ -129,6 +131,35 @@ app.delete('/api/blog-comments/:blogId/:idx', (req, res) => {
 app.post('/api/contact', (req, res) => {
   console.log('Contact form submission:', req.body);
   res.status(200).json({ success: true });
+});
+
+// Advertisers endpoints
+app.get('/api/advertisers', (req, res) => {
+  res.json(readData(advertisersPath));
+});
+app.post('/api/advertisers', (req, res) => {
+  const { name, logo, link } = req.body;
+  if (!name || !logo || !link) return res.status(400).json({ error: 'Missing fields' });
+  const advertisers = readData(advertisersPath);
+  const newAdvertiser = {
+    id: Date.now().toString(),
+    name,
+    logo, // Accept base64 or URL
+    link
+  };
+  advertisers.push(newAdvertiser);
+  writeData(advertisersPath, advertisers);
+  res.status(201).json(newAdvertiser);
+});
+app.delete('/api/advertisers/:id', (req, res) => {
+  const { id } = req.params;
+  let advertisers = readData(advertisersPath);
+  const filtered = advertisers.filter(a => a.id !== id);
+  if (filtered.length === advertisers.length) {
+    return res.status(404).json({ error: 'Advertiser not found' });
+  }
+  writeData(advertisersPath, filtered);
+  res.json({ success: true });
 });
 
 app.listen(PORT, () => {
