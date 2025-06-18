@@ -78,6 +78,7 @@ export default function AdvertisersSection() {
   return (
     <section className="advertisers-section">
       <h2>Our Advertisers</h2>
+      <p className="advertisers-subtext">Click any advertiser below to learn more or visit their website.</p>
       {isAdmin() && (
         <>
           <button
