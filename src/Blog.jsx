@@ -3,6 +3,31 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
 
+// Helper to convert [text](url) to clickable links
+function renderContentWithLinks(content) {
+  // Convert markdown-style [text](url) to anchor tags
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+  while ((match = regex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(content.slice(lastIndex, match.index));
+    }
+    parts.push(
+      <a href={match[2]} target="_blank" rel="noopener noreferrer" key={key++} style={{ color: '#0074D9', textDecoration: 'underline' }}>
+        {match[1]}
+      </a>
+    );
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < content.length) {
+    parts.push(content.slice(lastIndex));
+  }
+  return parts;
+}
+
 export default function Blog() {
   const { id } = useParams();
   const { posts, addPost, removePost, comments, addComment, removeComment } = useBlog();
@@ -166,7 +191,7 @@ export default function Blog() {
         </div>
         <div className="blog-detail-body">
           {blog.content.split(/\r?\n/).map((para, idx) =>
-            para.trim() ? <p key={idx}>{para}</p> : <br key={idx} />
+            para.trim() ? <p key={idx}>{renderContentWithLinks(para)}</p> : <br key={idx} />
           )}
         </div>
         <div className="blog-comments">
