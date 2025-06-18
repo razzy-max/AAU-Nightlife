@@ -38,19 +38,39 @@ function writeData(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
-// Events endpoints
-app.get('/api/events', (req, res) => {
-  res.json(readData(eventsPath));
+// Events endpoints (MongoDB)
+app.get('/api/events', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    const events = await db.collection('events').find().toArray();
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
 });
-app.post('/api/events', (req, res) => {
-  const events = readData(eventsPath);
-  events.push(req.body);
-  writeData(eventsPath, events);
-  res.status(201).json({ success: true });
+
+app.post('/api/events', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    const result = await db.collection('events').insertOne(req.body);
+    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...req.body });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add event' });
+  }
 });
-app.put('/api/events', (req, res) => {
-  writeData(eventsPath, req.body);
-  res.status(200).json({ success: true });
+
+app.put('/api/events', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    // req.body should be an array of events (for bulk update)
+    await db.collection('events').deleteMany({});
+    if (Array.isArray(req.body) && req.body.length > 0) {
+      await db.collection('events').insertMany(req.body);
+    }
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update events' });
+  }
 });
 
 // Hero Images endpoints
