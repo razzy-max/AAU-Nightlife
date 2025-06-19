@@ -167,11 +167,12 @@ app.put('/api/blog-posts', async (req, res) => {
   }
 });
 
-// Blog Comments endpoints (MongoDB)
-app.get('/api/blog-comments', async (req, res) => {
+// Blog Comments endpoints (MongoDB, by blogId)
+app.get('/api/blog-comments/:blogId', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    const comments = await db.collection('blogComments').find().toArray();
+    const blogId = req.params.blogId;
+    const comments = await db.collection('blogComments').find({ blogId }).toArray();
     res.json(comments);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch blog comments' });
@@ -181,6 +182,7 @@ app.get('/api/blog-comments', async (req, res) => {
 app.post('/api/blog-comments', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
+    // expects { blogId, ...commentData }
     const result = await db.collection('blogComments').insertOne(req.body);
     res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...req.body });
   } catch (err) {
@@ -188,16 +190,14 @@ app.post('/api/blog-comments', async (req, res) => {
   }
 });
 
-app.put('/api/blog-comments', async (req, res) => {
+app.delete('/api/blog-comments/:id', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    await db.collection('blogComments').deleteMany({});
-    if (Array.isArray(req.body) && req.body.length > 0) {
-      await db.collection('blogComments').insertMany(req.body);
-    }
-    res.status(200).json({ success: true });
+    const { id } = req.params;
+    await db.collection('blogComments').deleteOne({ _id: new ObjectId(id) });
+    res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update blog comments' });
+    res.status(500).json({ error: 'Failed to delete blog comment' });
   }
 });
 
