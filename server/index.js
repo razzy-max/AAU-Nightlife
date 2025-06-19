@@ -205,6 +205,28 @@ app.delete('/api/blog-posts/:id', async (req, res) => {
   }
 });
 
+// Add this PUT endpoint for updating a single blog post by _id
+app.put('/api/blog-posts/:id', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    const { id } = req.params;
+    const update = { ...req.body };
+    delete update._id; // Don't overwrite the _id
+    const result = await db.collection('blogPosts').findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: update },
+      { returnDocument: 'after' }
+    );
+    if (result.value) {
+      res.json(result.value);
+    } else {
+      res.status(404).json({ error: 'Blog post not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update blog post' });
+  }
+});
+
 // Blog Comments endpoints (MongoDB, by blogId)
 app.get('/api/blog-comments/:blogId', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
