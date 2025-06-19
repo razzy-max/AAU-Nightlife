@@ -29,7 +29,9 @@ export function BlogProvider({ children }) {
       body: JSON.stringify(post)
     });
     if (res.ok) {
-      setPosts(prev => [post, ...prev]);
+      const created = await res.json();
+      setPosts(prev => [created, ...prev]);
+      return created;
     }
   };
 

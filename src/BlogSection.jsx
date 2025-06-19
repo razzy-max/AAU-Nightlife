@@ -25,15 +25,15 @@ export default function BlogSection() {
   const handlePostSubmit = async e => {
     e.preventDefault();
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
-    await addPost(newPost);
+    const newPost = { ...form, excerpt, timestamp: Date.now() };
+    const created = await addPost(newPost); // get the backend response
     setForm({ title: '', image: '', content: '' });
     setShowForm(false);
   };
 
   // Always show the first blog post if none exist
   const defaultPost = {
-    id: 1,
+    _id: 1,
     image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
     title: 'Top 5 Nightlife Spots in Ekpoma',
     content: 'Full article content for Top 5 Nightlife Spots in Ekpoma. Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students. (Add more content as needed.)',
@@ -68,12 +68,12 @@ export default function BlogSection() {
       )}
       <div className="blog-cards">
         {blogPosts.map(post => (
-          <div className="blog-card" key={post.id}>
+          <div className="blog-card" key={post._id || post.id}>
             <img src={post.image} alt={post.title} className="blog-card-img" />
             <div className="blog-card-body">
               <h3 className="blog-card-title">{post.title}</h3>
               <p className="blog-card-excerpt">{post.excerpt || (post.content && post.content.slice(0, 90) + '...')}</p>
-              <Link to={`/blog/${post.id}`} className="blog-card-btn">Read More</Link>
+              <Link to={`/blog/${post._id || post.id}`} className="blog-card-btn">Read More</Link>
             </div>
           </div>
         ))}
