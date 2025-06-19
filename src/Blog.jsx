@@ -54,7 +54,7 @@ export default function Blog() {
         name: anonymous ? 'Anonymous' : (name.trim() || 'Anonymous'),
         text: input.trim(),
       };
-      await addComment(blog.id, newComment);
+      await addComment(blog._id, newComment);
       setInput('');
       setName('');
       setAnonymous(false);
