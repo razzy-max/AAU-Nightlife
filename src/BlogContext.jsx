@@ -41,14 +41,14 @@ export function BlogProvider({ children }) {
       body: JSON.stringify(updated)
     });
     if (res.ok) {
-      setPosts(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
+      setPosts(prev => prev.map(p => p._id === id ? { ...p, ...updated } : p));
     }
   };
 
   // Remove post and sync to server
   const removePost = async (id) => {
     await fetch(`${API_URL}/api/blog-posts/${id}`, { method: 'DELETE' });
-    setPosts(prev => prev.filter(p => p.id !== id));
+    setPosts(prev => prev.filter(p => p._id !== id));
   };
 
   // Add new comment and sync to server
