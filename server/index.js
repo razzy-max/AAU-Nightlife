@@ -189,6 +189,22 @@ app.put('/api/blog-posts', async (req, res) => {
   }
 });
 
+// Add this DELETE endpoint for blog posts
+app.delete('/api/blog-posts/:id', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    const { id } = req.params;
+    const result = await db.collection('blogPosts').deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 1) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Blog post not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete blog post' });
+  }
+});
+
 // Blog Comments endpoints (MongoDB, by blogId)
 app.get('/api/blog-comments/:blogId', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
