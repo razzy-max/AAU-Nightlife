@@ -1,22 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import './EventSection.css';
 
-export default function EventSection() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [current, setCurrent] = useState(0);
+export default function EventSection({ events, loading }) {
+  // Carousel state
+  const [current, setCurrent] = React.useState(0);
   const cardsToShow = 3;
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch('/api/events') // Adjust this path if needed
-      .then(res => res.json())
-      .then(data => {
-        setEvents(data);
-        setLoading(false);
-      });
-  }, []);
 
   // Carousel navigation
   const handlePrev = () => {
