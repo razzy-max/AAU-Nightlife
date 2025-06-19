@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EventSection.css';
 
 export default function EventSection() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [current, setCurrent] = useState(0);
+  const intervalRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,29 +18,36 @@ export default function EventSection() {
       });
   }, []);
 
+  // Carousel logic
+  useEffect(() => {
+    if (events.length > 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrent(prev => (prev + 1) % Math.min(events.length, 6));
+      }, 3000);
+      return () => clearInterval(intervalRef.current);
+    }
+  }, [events]);
+
   return (
     <section className="event-section">
       <h2 className="event-section-title">Featured Upcoming Events</h2>
       <div className="event-cards">
         {loading ? <p>Loading events...</p> : (
           events.length === 0 ? <p>No events yet.</p> : (
-            events.slice(0, 6).map(event => (
-              <div className="event-card" key={event.title + event.date}>
-                {event.image && (
-                  <img src={event.image} alt={event.title} className="event-card-img" />
-                )}
-                <div className="event-card-body">
-                  <h3 className="event-card-title">{event.title}</h3>
-                  <p className="event-card-desc">{event.description}</p>
-                  <button
-                    className="event-card-btn"
-                    onClick={() => navigate(`/events?event=${encodeURIComponent(event.title)}`)}
-                  >
-                    Read More
-                  </button>
-                </div>
+            <div className="event-card" key={events[current]?.title + events[current]?.date}>
+              {events[current]?.image && (
+                <img src={events[current].image} alt={events[current].title} className="event-card-img" />
+              )}
+              <div className="event-card-body">
+                <h3 className="event-card-title">{events[current]?.title}</h3>
+                <button
+                  className="event-card-btn"
+                  onClick={() => navigate(`/events?event=${encodeURIComponent(events[current]?.title)}`)}
+                >
+                  Read More
+                </button>
               </div>
-            ))
+            </div>
           )
         )}
       </div>
