@@ -1,82 +1,93 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './App.css';
 import './BlogSection.css';
-import { useBlog } from './BlogContext';
 
 export default function BlogSection() {
-  const { posts, addPost } = useBlog();
+  // Blog posts state (empty initially)
+  const [posts, setPosts] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', image: '', content: '' });
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
+  const [editIndex, setEditIndex] = useState(null);
+  const [form, setForm] = useState({ title: '', content: '' });
 
-  const handleFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        setForm(f => ({ ...f, image: ev.target.result }));
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
+  // Open add form
+  const handleAdd = () => {
+    setForm({ title: '', content: '' });
+    setEditIndex(null);
+    setShowForm(true);
+  };
+
+  // Open edit form
+  const handleEdit = (idx) => {
+    setForm(posts[idx]);
+    setEditIndex(idx);
+    setShowForm(true);
+  };
+
+  // Delete post
+  const handleDelete = (idx) => {
+    if (window.confirm('Delete this post?')) {
+      setPosts(posts.filter((_, i) => i !== idx));
     }
   };
 
-  const handlePostSubmit = async e => {
+  // Handle form submit
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
-    await addPost(newPost);
-    setForm({ title: '', image: '', content: '' });
+    if (!form.title.trim() || !form.content.trim()) return;
+    if (editIndex !== null) {
+      // Edit
+      setPosts(posts.map((p, i) => (i === editIndex ? form : p)));
+    } else {
+      // Add
+      setPosts([{ ...form, date: new Date().toLocaleDateString() }, ...posts]);
+    }
     setShowForm(false);
+    setForm({ title: '', content: '' });
+    setEditIndex(null);
   };
-
-  // Always show the first blog post if none exist
-  const defaultPost = {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
-    title: 'Top 5 Nightlife Spots in Ekpoma',
-    content: 'Full article content for Top 5 Nightlife Spots in Ekpoma. Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students. (Add more content as needed.)',
-    excerpt: 'Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students.'
-  };
-  const blogPosts = posts.length === 0 ? [defaultPost] : posts;
 
   return (
     <section className="blog-section">
-      <h2 className="blog-section-title">Latest from Our Blog</h2>
-      {isAdmin && (
-        <button onClick={() => setShowForm(f => !f)} style={{marginBottom: '1rem'}}>
-          {showForm ? 'Hide Blog Form' : 'Add Blog Post'}
-        </button>
-      )}
+      <div className="blog-header">
+        <h2>AAU Nightlife Blog</h2>
+        <button className="blog-add-btn" onClick={handleAdd}>Add Blog Post</button>
+      </div>
       {showForm && (
-        <form className="blog-form" onSubmit={handlePostSubmit} style={{marginBottom: '2rem'}}>
-          <label>
-            Title:
-            <input type="text" name="title" value={form.title} onChange={handleFormChange} required />
-          </label>
-          <label>
-            Image:
-            <input type="file" name="image" accept="image/*" onChange={handleFormChange} required />
-          </label>
-          <label>
-            Content:
-            <textarea name="content" value={form.content} onChange={handleFormChange} required></textarea>
-          </label>
-          <button type="submit">Add Blog Post</button>
+        <form className="blog-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Title"
+            value={form.title}
+            onChange={e => setForm({ ...form, title: e.target.value })}
+            required
+          />
+          <textarea
+            placeholder="Content"
+            value={form.content}
+            onChange={e => setForm({ ...form, content: e.target.value })}
+            required
+          />
+          <div className="blog-form-actions">
+            <button type="submit">{editIndex !== null ? 'Update' : 'Post'}</button>
+            <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
+          </div>
         </form>
       )}
-      <div className="blog-cards">
-        {blogPosts.map(post => (
-          <div className="blog-card" key={post.id}>
-            <img src={post.image} alt={post.title} className="blog-card-img" />
-            <div className="blog-card-body">
-              <h3 className="blog-card-title">{post.title}</h3>
-              <p className="blog-card-excerpt">{post.excerpt || (post.content && post.content.slice(0, 90) + '...')}</p>
-              <Link to={`/blog/${post.id}`} className="blog-card-btn">Read More</Link>
+      <div className="blog-list">
+        {posts.length === 0 ? (
+          <p className="blog-empty">No blog posts yet.</p>
+        ) : (
+          posts.map((post, idx) => (
+            <div className="blog-post" key={idx}>
+              <h3>{post.title}</h3>
+              <p className="blog-date">{post.date}</p>
+              <p>{post.content}</p>
+              <div className="blog-admin-actions">
+                <button onClick={() => handleEdit(idx)}>Edit</button>
+                <button onClick={() => handleDelete(idx)}>Delete</button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </section>
   );
