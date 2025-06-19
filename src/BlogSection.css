@@ -3,6 +3,10 @@
   padding: 3rem 1rem;
   background: #181a2a; /* matches hero-section background */
   position: relative;
+  max-width: 700px;
+  margin: 2rem auto;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
 }
 .blog-section-title {
   text-align: center;
@@ -181,6 +185,109 @@
   margin-bottom: 0.7rem;
   font-size: 1rem;
 }
+.blog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.blog-header h2 {
+  font-size: 2rem;
+  color: #0074D9;
+  margin: 0;
+}
+.blog-add-btn {
+  background: #0074D9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.blog-add-btn:hover {
+  background: #005fa3;
+}
+.blog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+.blog-form input,
+.blog-form textarea {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 1rem;
+  resize: none;
+}
+.blog-form textarea {
+  min-height: 100px;
+}
+.blog-form-actions {
+  display: flex;
+  gap: 1rem;
+}
+.blog-form-actions button {
+  background: #0074D9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.blog-form-actions button[type="button"] {
+  background: #aaa;
+}
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.blog-post {
+  background: #f8faff;
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  position: relative;
+}
+.blog-post h3 {
+  margin: 0 0 0.3rem 0;
+  color: #23243a;
+  font-size: 1.2rem;
+}
+.blog-date {
+  font-size: 0.9rem;
+  color: #0074D9;
+  margin-bottom: 0.7rem;
+}
+.blog-admin-actions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+}
+.blog-admin-actions button {
+  background: #0074D9;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.blog-admin-actions button:hover {
+  background: #005fa3;
+}
+.blog-empty {
+  color: #888;
+  text-align: center;
+  margin-top: 2rem;
+}
 @media (max-width: 600px) {
   .blog-section-title {
     font-size: 2rem;
@@ -190,6 +297,12 @@
   }
 }
 @media (max-width: 700px) {
+  .blog-section {
+    padding: 1.2rem 0.3rem 2rem 0.3rem;
+  }
+  .blog-header h2 {
+    font-size: 1.3rem;
+  }
   .blog-detail-content {
     padding: 1rem 0.3rem;
   }
