@@ -75,6 +75,15 @@
   background: #005fa3;
   box-shadow: 0 4px 16px #0074d955;
 }
+.event-divider {
+  border: none;
+  border-top: 1.5px solid #e0e0e0;
+  margin: 2.2rem 0;
+  width: 100%;
+  max-width: 600px;
+  align-self: center;
+  opacity: 0.7;
+}
 @media (max-width: 900px) {
   .event-card {
     width: 48vw;

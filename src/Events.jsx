@@ -194,51 +194,54 @@ export default function Events() {
         events.length === 0 ? <p>No events yet.</p> : (
           <ul>
             {events.map((event, idx) => (
-              <li key={idx} ref={el => eventRefs.current[event.title] = el}>
-                {event.image && (
-                  <img
-                    src={event.image}
-                    alt={event.title + ' banner'}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      maxWidth: '600px',
-                      height: 'auto',
-                      maxHeight: '350px',
-                      objectFit: 'contain',
-                      margin: '0 auto 16px',
-                      borderRadius: 12,
-                      boxShadow: '0 2px 12px rgba(44,44,44,0.10)'
-                    }}
-                  />
-                )}
-                <strong>{event.title}</strong> <br />
-                <span>{event.date} | {event.venue}</span>
-                {event.description && event.description.split(/\r?\n/).map((para, i) =>
-                  para.trim() ? <p key={i}>{para}</p> : <br key={i} />
-                )}
-                <p>Contact: <a href={`mailto:${event.email}`}>{event.email}</a> | <a href={`tel:${event.phone}`}>{event.phone}</a></p>
-                {isAdmin && editIdx === idx ? (
-                  <form onSubmit={handleEditSubmit} className="event-form" style={{marginBottom: '1rem'}}>
-                    <label>Title: <input type="text" name="title" value={editForm.title} onChange={handleEditChange} required /></label>
-                    <label>Date: <input type="date" name="date" value={editForm.date} onChange={handleEditChange} required /></label>
-                    <label>Venue: <input type="text" name="venue" value={editForm.venue} onChange={handleEditChange} required /></label>
-                    <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
-                    <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} required /></label>
-                    <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} required /></label>
-                    <label>Banner/Poster Image:
-                      <input type="file" name="image" accept="image/*" onChange={handleEditChange} />
-                    </label>
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={() => setEditIdx(null)}>Cancel</button>
-                  </form>
-                ) : isAdmin && (
-                  <>
-                    <button onClick={() => startEdit(idx)}>Edit</button>
-                    <button onClick={() => handleDelete(idx)} style={{marginLeft: '0.5rem'}}>Delete</button>
-                  </>
-                )}
-              </li>
+              <>
+                <li key={idx} ref={el => eventRefs.current[event.title] = el}>
+                  {event.image && (
+                    <img
+                      src={event.image}
+                      alt={event.title + ' banner'}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        maxWidth: '600px',
+                        height: 'auto',
+                        maxHeight: '350px',
+                        objectFit: 'contain',
+                        margin: '0 auto 16px',
+                        borderRadius: 12,
+                        boxShadow: '0 2px 12px rgba(44,44,44,0.10)'
+                      }}
+                    />
+                  )}
+                  <strong>{event.title}</strong> <br />
+                  <span>{event.date} | {event.venue}</span>
+                  {event.description && event.description.split(/\r?\n/).map((para, i) =>
+                    para.trim() ? <p key={i}>{para}</p> : <br key={i} />
+                  )}
+                  <p>Contact: <a href={`mailto:${event.email}`}>{event.email}</a> | <a href={`tel:${event.phone}`}>{event.phone}</a></p>
+                  {isAdmin && editIdx === idx ? (
+                    <form onSubmit={handleEditSubmit} className="event-form" style={{marginBottom: '1rem'}}>
+                      <label>Title: <input type="text" name="title" value={editForm.title} onChange={handleEditChange} required /></label>
+                      <label>Date: <input type="date" name="date" value={editForm.date} onChange={handleEditChange} required /></label>
+                      <label>Venue: <input type="text" name="venue" value={editForm.venue} onChange={handleEditChange} required /></label>
+                      <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
+                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} required /></label>
+                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} required /></label>
+                      <label>Banner/Poster Image:
+                        <input type="file" name="image" accept="image/*" onChange={handleEditChange} />
+                      </label>
+                      <button type="submit">Save</button>
+                      <button type="button" onClick={() => setEditIdx(null)}>Cancel</button>
+                    </form>
+                  ) : isAdmin && (
+                    <>
+                      <button onClick={() => startEdit(idx)}>Edit</button>
+                      <button onClick={() => handleDelete(idx)} style={{marginLeft: '0.5rem'}}>Delete</button>
+                    </>
+                  )}
+                </li>
+                {idx !== events.length - 1 && <hr className="event-divider" />}
+              </>
             ))}
           </ul>
         )
