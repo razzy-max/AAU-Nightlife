@@ -43,7 +43,8 @@ export function BlogProvider({ children }) {
       body: JSON.stringify(updated)
     });
     if (res.ok) {
-      setPosts(prev => prev.map(p => p._id === id ? { ...p, ...updated } : p));
+      const updatedPost = await res.json();
+      setPosts(prev => prev.map(p => String(p._id) === String(id) ? updatedPost : p));
     }
   };
 
