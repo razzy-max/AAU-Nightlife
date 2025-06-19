@@ -42,8 +42,16 @@ function writeData(filePath, data) {
 app.get('/api/events', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
+    // Map 'category' to 'venue' for backward compatibility
     const events = await db.collection('events').find().toArray();
-    res.json(events);
+    const migrated = events.map(ev => {
+      if (ev.category && !ev.venue) {
+        ev.venue = ev.category;
+        delete ev.category;
+      }
+      return ev;
+    });
+    res.json(migrated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch events' });
   }
@@ -52,8 +60,14 @@ app.get('/api/events', async (req, res) => {
 app.post('/api/events', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    const result = await db.collection('events').insertOne(req.body);
-    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...req.body });
+    // Accept both 'venue' and legacy 'category' for compatibility
+    const event = { ...req.body };
+    if (event.category && !event.venue) {
+      event.venue = event.category;
+      delete event.category;
+    }
+    const result = await db.collection('events').insertOne(event);
+    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...event });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add event' });
   }
@@ -65,7 +79,15 @@ app.put('/api/events', async (req, res) => {
     // req.body should be an array of events (for bulk update)
     await db.collection('events').deleteMany({});
     if (Array.isArray(req.body) && req.body.length > 0) {
-      await db.collection('events').insertMany(req.body);
+      // Accept both 'venue' and legacy 'category' for compatibility
+      const events = req.body.map(ev => {
+        if (ev.category && !ev.venue) {
+          ev.venue = ev.category;
+          delete ev.category;
+        }
+        return ev;
+      });
+      await db.collection('events').insertMany(events);
     }
     res.status(200).json({ success: true });
   } catch (err) {

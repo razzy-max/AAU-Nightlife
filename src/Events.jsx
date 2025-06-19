@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ title: '', date: '', category: '', description: '', email: '', phone: '', image: '' });
+  const [form, setForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
   const location = useLocation();
@@ -52,7 +52,7 @@ export default function Events() {
       });
       if (res.ok) {
         setStatus('Event added!');
-        setForm({ title: '', date: '', category: '', description: '', email: '', phone: '', image: '' });
+        setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
         // Refresh events
         const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
         setEvents(updated);
@@ -78,7 +78,7 @@ export default function Events() {
 
   // Edit event
   const [editIdx, setEditIdx] = useState(null);
-  const [editForm, setEditForm] = useState({ title: '', date: '', category: '', description: '', email: '', phone: '', image: '' });
+  const [editForm, setEditForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
 
   const startEdit = idx => {
     setEditIdx(idx);
@@ -165,8 +165,8 @@ export default function Events() {
                 <input type="date" name="date" value={form.date} onChange={handleChange} required />
               </label>
               <label>
-                Category:
-                <input type="text" name="category" value={form.category} onChange={handleChange} required />
+                Venue:
+                <input type="text" name="venue" value={form.venue} onChange={handleChange} required />
               </label>
               <label>
                 Description:
@@ -213,7 +213,7 @@ export default function Events() {
                   />
                 )}
                 <strong>{event.title}</strong> <br />
-                <span>{event.date} | {event.category}</span>
+                <span>{event.date} | {event.venue}</span>
                 {event.description && event.description.split(/\r?\n/).map((para, i) =>
                   para.trim() ? <p key={i}>{para}</p> : <br key={i} />
                 )}
@@ -222,7 +222,7 @@ export default function Events() {
                   <form onSubmit={handleEditSubmit} className="event-form" style={{marginBottom: '1rem'}}>
                     <label>Title: <input type="text" name="title" value={editForm.title} onChange={handleEditChange} required /></label>
                     <label>Date: <input type="date" name="date" value={editForm.date} onChange={handleEditChange} required /></label>
-                    <label>Category: <input type="text" name="category" value={editForm.category} onChange={handleEditChange} required /></label>
+                    <label>Venue: <input type="text" name="venue" value={editForm.venue} onChange={handleEditChange} required /></label>
                     <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
                     <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} required /></label>
                     <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} required /></label>
