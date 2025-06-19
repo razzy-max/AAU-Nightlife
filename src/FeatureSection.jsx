@@ -47,7 +47,7 @@ export default function FeatureSection() {
           </div>
         ))}
       </div>
-      {/* Desktop Grid */}
+      {/* Desktop Carousel/Grid */}
       <div className="feature-grid responsive-feature-grid feature-desktop-grid">
         {features.map((f, i) => (
           <div className="feature-card small-feature-card" key={i}>
@@ -93,18 +93,24 @@ export default function FeatureSection() {
           .feature-desktop-grid {
             display: flex !important;
             flex-direction: row;
-            justify-content: space-between;
-            align-items: stretch;
             gap: 1.2rem;
             max-width: 1000px;
             margin: 0 auto;
             width: 100%;
             overflow-x: auto;
+            /* Only show up to 4 cards at a time, allow horizontal scroll for more */
+            /* Hide scrollbar for aesthetics */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .feature-desktop-grid::-webkit-scrollbar {
+            display: none;
           }
           .feature-card.small-feature-card {
-            min-width: 150px;
-            max-width: 180px;
-            flex: 1 1 0;
+            min-width: 220px;
+            max-width: 240px;
+            flex: 0 0 24%;
+            /* 4 cards per view, adjust for gap */
             padding: 1.1rem 0.7rem;
             background: #23243a;
             border-radius: 14px;
@@ -115,6 +121,13 @@ export default function FeatureSection() {
             flex-direction: column;
             align-items: center;
             margin: 0;
+          }
+        }
+        @media (min-width: 1200px) {
+          .feature-card.small-feature-card {
+            min-width: 220px;
+            max-width: 240px;
+            flex: 0 0 22%;
           }
         }
       `}</style>
