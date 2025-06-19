@@ -92,25 +92,20 @@ export default function FeatureSection() {
           }
           .feature-desktop-grid {
             display: flex !important;
+            flex-wrap: wrap;
             flex-direction: row;
             gap: 1.2rem;
-            max-width: 1000px;
-            margin: 0 auto;
             width: 100%;
-            overflow-x: auto;
-            /* Only show up to 4 cards at a time, allow horizontal scroll for more */
-            /* Hide scrollbar for aesthetics */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          .feature-desktop-grid::-webkit-scrollbar {
-            display: none;
+            justify-content: center;
+            align-items: stretch;
+            margin: 0 auto;
+            overflow: visible;
+            max-width: 1200px;
           }
           .feature-card.small-feature-card {
             min-width: 220px;
             max-width: 240px;
-            flex: 0 0 24%;
-            /* 4 cards per view, adjust for gap */
+            flex: 1 1 220px;
             padding: 1.1rem 0.7rem;
             background: #23243a;
             border-radius: 14px;
@@ -127,7 +122,7 @@ export default function FeatureSection() {
           .feature-card.small-feature-card {
             min-width: 220px;
             max-width: 240px;
-            flex: 0 0 22%;
+            flex: 1 1 220px;
           }
         }
       `}</style>
