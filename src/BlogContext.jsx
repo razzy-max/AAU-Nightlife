@@ -8,17 +8,25 @@ export function BlogProvider({ children }) {
   const [comments, setComments] = useState({});
 
   // Fetch posts from server
-  useEffect(() => {
-    fetch(`${API_URL}/api/blog-posts`)
-      .then(res => res.json())
-      .then(data => setPosts(Array.isArray(data) ? data : []));
-  }, []);
+  const fetchPosts = async () => {
+    const res = await fetch(`${API_URL}/api/blog-posts`);
+    const data = await res.json();
+    setPosts(Array.isArray(data) ? data : []);
+  };
 
   // Fetch comments from server
+  const fetchComments = async () => {
+    const res = await fetch(`${API_URL}/api/blog-comments`);
+    const data = await res.json();
+    setComments(data || {});
+  };
+
   useEffect(() => {
-    fetch(`${API_URL}/api/blog-comments`)
-      .then(res => res.json())
-      .then(data => setComments(data || {}));
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    fetchComments();
   }, []);
 
   // Add new post and sync to server
@@ -29,9 +37,8 @@ export function BlogProvider({ children }) {
       body: JSON.stringify(post)
     });
     if (res.ok) {
-      const created = await res.json();
-      setPosts(prev => [created, ...prev]);
-      return created;
+      await fetchPosts();
+      return await res.json();
     }
   };
 
@@ -43,15 +50,14 @@ export function BlogProvider({ children }) {
       body: JSON.stringify(updated)
     });
     if (res.ok) {
-      const updatedPost = await res.json();
-      setPosts(prev => prev.map(p => String(p._id) === String(id) ? updatedPost : p));
+      await fetchPosts();
     }
   };
 
   // Remove post and sync to server
   const removePost = async (id) => {
     await fetch(`${API_URL}/api/blog-posts/${id}`, { method: 'DELETE' });
-    setPosts(prev => prev.filter(p => p._id !== id));
+    await fetchPosts();
   };
 
   // Add new comment and sync to server
@@ -62,21 +68,14 @@ export function BlogProvider({ children }) {
       body: JSON.stringify({ blogId, ...comment })
     });
     if (res.ok) {
-      const created = await res.json();
-      setComments(prev => ({
-        ...prev,
-        [blogId]: [...(prev[blogId] || []), created]
-      }));
+      await fetchComments();
     }
   };
 
   // Remove comment and sync to server
   const removeComment = async (blogId, commentId) => {
     await fetch(`${API_URL}/api/blog-comments/${commentId}`, { method: 'DELETE' });
-    setComments(prev => ({
-      ...prev,
-      [blogId]: prev[blogId].filter(c => c._id !== commentId)
-    }));
+    await fetchComments();
   };
 
   return (
