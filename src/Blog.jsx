@@ -42,7 +42,8 @@ export default function Blog() {
   const [editForm, setEditForm] = useState({ title: '', image: '', content: '' });
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
-  const blogComments = comments[blog?.id] || [];
+  // Use _id for comments and update removeComment to use commentId
+  const blogComments = comments[blog?._id] || [];
 
   if (!blog) return <div className="blog-detail-container">Blog post not found.</div>;
 
@@ -60,13 +61,12 @@ export default function Blog() {
     }
   };
 
-  const handleDeleteComment = async idx => {
+  const handleDeleteComment = async commentId => {
     if (!window.confirm('Delete this comment?')) return;
-    // Sync delete to backend
-    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-comments/${blog.id}/${idx}`, {
+    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-comments/${commentId}`, {
       method: 'DELETE'
     });
-    removeComment(blog.id, idx);
+    removeComment(blog._id, commentId);
   };
 
   const handleFormChange = e => {
@@ -215,10 +215,10 @@ export default function Blog() {
           </form>
           <ul className="blog-comment-list">
             {blogComments.map((c, i) => (
-              <li key={i} className="blog-comment-item">
+              <li key={c._id || i} className="blog-comment-item">
                 <strong>{c.name}:</strong> {c.text}
                 {isAdmin && (
-                  <button style={{marginLeft:8, color:'#fff', background:'#d9534f', border:'none', borderRadius:6, padding:'2px 8px', cursor:'pointer'}} onClick={() => handleDeleteComment(i)} title="Delete comment">Delete</button>
+                  <button style={{marginLeft:8, color:'#fff', background:'#d9534f', border:'none', borderRadius:6, padding:'2px 8px', cursor:'pointer'}} onClick={() => handleDeleteComment(c._id)} title="Delete comment">Delete</button>
                 )}
               </li>
             ))}

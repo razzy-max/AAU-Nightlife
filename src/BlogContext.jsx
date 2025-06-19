@@ -69,11 +69,11 @@ export function BlogProvider({ children }) {
   };
 
   // Remove comment and sync to server
-  const removeComment = async (blogId, idx) => {
-    // Optionally, you can sync with backend if you have comment IDs
+  const removeComment = async (blogId, commentId) => {
+    await fetch(`${API_URL}/api/blog-comments/${commentId}`, { method: 'DELETE' });
     setComments(prev => ({
       ...prev,
-      [blogId]: prev[blogId].filter((_, i) => i !== idx)
+      [blogId]: prev[blogId].filter(c => c._id !== commentId)
     }));
   };
 
