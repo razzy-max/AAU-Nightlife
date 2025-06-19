@@ -31,15 +31,7 @@ export default function BlogSection() {
     setShowForm(false);
   };
 
-  // Always show the first blog post if none exist
-  const defaultPost = {
-    _id: 1,
-    image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
-    title: 'Top 5 Nightlife Spots in Ekpoma',
-    content: 'Full article content for Top 5 Nightlife Spots in Ekpoma. Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students. (Add more content as needed.)',
-    excerpt: 'Discover the best places to unwind and have fun in Ekpoma. From clubs to lounges, here are our top picks for students.'
-  };
-  const blogPosts = posts.length === 0 ? [defaultPost] : posts;
+  const blogPosts = posts;
 
   return (
     <section className="blog-section">
@@ -67,16 +59,20 @@ export default function BlogSection() {
         </form>
       )}
       <div className="blog-cards">
-        {blogPosts.map(post => (
-          <div className="blog-card" key={post._id || post.id}>
-            <img src={post.image} alt={post.title} className="blog-card-img" />
-            <div className="blog-card-body">
-              <h3 className="blog-card-title">{post.title}</h3>
-              <p className="blog-card-excerpt">{post.excerpt || (post.content && post.content.slice(0, 90) + '...')}</p>
-              <Link to={`/blog/${post._id || post.id}`} className="blog-card-btn">Read More</Link>
+        {blogPosts.length === 0 ? (
+          <div style={{color:'#aaa', textAlign:'center', marginTop:'2rem'}}>No blog posts yet.</div>
+        ) : (
+          blogPosts.map(post => (
+            <div className="blog-card" key={post._id || post.id}>
+              <img src={post.image} alt={post.title} className="blog-card-img" />
+              <div className="blog-card-body">
+                <h3 className="blog-card-title">{post.title}</h3>
+                <p className="blog-card-excerpt">{post.excerpt || (post.content && post.content.slice(0, 90) + '...')}</p>
+                <Link to={`/blog/${post._id || post.id}`} className="blog-card-btn">Read More</Link>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </section>
   );
