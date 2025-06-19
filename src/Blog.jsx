@@ -96,7 +96,11 @@ export default function Blog() {
 
   // Edit post (like events: optimistic, then refresh)
   const startEdit = () => {
-    setEditForm({ title: blog.title, image: blog.image, content: blog.content });
+    setEditForm({
+      title: blog.title || '',
+      image: blog.image || '',
+      content: blog.content || ''
+    });
     setEditMode(true);
   };
 
