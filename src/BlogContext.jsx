@@ -14,12 +14,21 @@ export function BlogProvider({ children }) {
       .then(data => setPosts(Array.isArray(data) ? data : []));
   }, []);
 
-  // Fetch comments from server
+  // Fetch comments from server (persist per blogId)
   useEffect(() => {
-    fetch(`${API_URL}/api/blog-comments`)
-      .then(res => res.json())
-      .then(data => setComments(data || {}));
-  }, []);
+    async function fetchAllComments() {
+      const res = await fetch(`${API_URL}/api/blog-posts`);
+      const blogs = await res.json();
+      const commentsObj = {};
+      for (const blog of blogs) {
+        const resC = await fetch(`${API_URL}/api/blog-comments/${blog._id}`);
+        const blogComments = await resC.json();
+        commentsObj[blog._id] = blogComments;
+      }
+      setComments(commentsObj);
+    }
+    fetchAllComments();
+  }, [posts]);
 
   // Add new post and sync to server
   const addPost = async (post) => {
@@ -63,20 +72,20 @@ export function BlogProvider({ children }) {
     });
     if (res.ok) {
       const created = await res.json();
-      setComments(prev => ({
-        ...prev,
-        [blogId]: [...(prev[blogId] || []), created]
-      }));
+      // Re-fetch comments for this blog to ensure persistence
+      const resC = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
+      const blogComments = await resC.json();
+      setComments(prev => ({ ...prev, [blogId]: blogComments }));
     }
   };
 
   // Remove comment and sync to server
   const removeComment = async (blogId, commentId) => {
     await fetch(`${API_URL}/api/blog-comments/${commentId}`, { method: 'DELETE' });
-    setComments(prev => ({
-      ...prev,
-      [blogId]: prev[blogId].filter(c => c._id !== commentId)
-    }));
+    // Re-fetch comments for this blog to ensure persistence
+    const resC = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
+    const blogComments = await resC.json();
+    setComments(prev => ({ ...prev, [blogId]: blogComments }));
   };
 
   return (
