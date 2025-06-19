@@ -59,7 +59,7 @@ function App() {
                 Gmail: eraskid6@gmail.com
               </a>
               <span className="footer-address">
-                Address: 123 Main Street, Ekpoma, Edo State
+                Address: Ekpoma, Edo State
               </span>
             </div>
             <div className="footer-copy">

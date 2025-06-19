@@ -68,7 +68,7 @@ export function BlogProvider({ children }) {
     const res = await fetch(`${API_URL}/api/blog-comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blogId, ...comment })
+      body: JSON.stringify({ blogId: String(blogId), ...comment })
     });
     if (res.ok) {
       const created = await res.json();
