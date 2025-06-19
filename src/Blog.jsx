@@ -40,6 +40,7 @@ export default function Blog() {
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', image: '', content: '' });
+  const [status, setStatus] = useState('');
   const navigate = useNavigate();
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
   // Use _id for comments and update removeComment to use commentId
@@ -47,8 +48,10 @@ export default function Blog() {
 
   if (!blog) return <div className="blog-detail-container">Blog post not found.</div>;
 
+  // Add comment (like events: optimistic, then refresh)
   const handleSubmit = async e => {
     e.preventDefault();
+    setStatus('Posting...');
     if (input.trim()) {
       const newComment = {
         name: anonymous ? 'Anonymous' : (name.trim() || 'Anonymous'),
@@ -58,56 +61,40 @@ export default function Blog() {
       setInput('');
       setName('');
       setAnonymous(false);
+      setStatus('');
     }
   };
 
+  // Delete comment (like events: optimistic, then refresh)
   const handleDeleteComment = async commentId => {
     if (!window.confirm('Delete this comment?')) return;
-    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-comments/${commentId}`, {
-      method: 'DELETE'
-    });
-    removeComment(blog._id, commentId);
+    setStatus('Deleting...');
+    await removeComment(blog._id, commentId);
+    setStatus('');
   };
 
-  const handleFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        setForm(f => ({ ...f, image: ev.target.result }));
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    } else {
-      setForm({ ...form, [e.target.name]: e.target.value });
-    }
-  };
-
-  const handleEditFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        setEditForm(f => ({ ...f, image: ev.target.result }));
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    } else {
-      setEditForm({ ...editForm, [e.target.name]: e.target.value });
-    }
-  };
-
+  // Add post (like events: optimistic, then refresh)
   const handlePostSubmit = async e => {
     e.preventDefault();
+    setStatus('Adding...');
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
+    const newPost = { ...form, excerpt, timestamp: Date.now() };
     await addPost(newPost);
     setForm({ title: '', image: '', content: '' });
     setShowForm(false);
+    setStatus('');
   };
 
+  // Delete post (like events: optimistic, then refresh)
   const handleDeletePost = async () => {
     if (!window.confirm('Delete this blog post?')) return;
+    setStatus('Deleting...');
     await removePost(blog._id);
+    setStatus('');
     navigate('/');
   };
 
+  // Edit post (like events: optimistic, then refresh)
   const startEdit = () => {
     setEditForm({ title: blog.title, image: blog.image, content: blog.content });
     setEditMode(true);
@@ -115,10 +102,12 @@ export default function Blog() {
 
   const handleEditSubmit = async e => {
     e.preventDefault();
+    setStatus('Saving...');
     const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
     const updated = { ...blog, ...editForm, excerpt };
     await editPost(blog._id, updated);
     setEditMode(false);
+    setStatus('');
   };
 
   return (
