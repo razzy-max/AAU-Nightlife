@@ -8,6 +8,8 @@ export default function EventSection() {
   const [current, setCurrent] = useState(0);
   const [cardsToShow, setCardsToShow] = useState(3);
   const intervalRef = useRef(null);
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,10 +57,42 @@ export default function EventSection() {
     setCurrent(prev => (prev + cardsToShow) % visibleEvents.length);
   };
 
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e) => {
+    if (cardsToShow === 1 && e.touches && e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+    }
+  };
+  const handleTouchMove = (e) => {
+    if (cardsToShow === 1 && e.touches && e.touches.length === 1) {
+      touchEndX.current = e.touches[0].clientX;
+    }
+  };
+  const handleTouchEnd = () => {
+    if (cardsToShow === 1 && touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (diff > 50) {
+        // Swipe left, next card
+        handleNext();
+      } else if (diff < -50) {
+        // Swipe right, previous card
+        handlePrev();
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <section className="event-section">
       <h2 className="event-section-title">Featured Upcoming Events</h2>
-      <div className="event-cards-carousel" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem'}}>
+      <div
+        className="event-cards-carousel"
+        style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem'}}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {visibleEvents.length > cardsToShow && (
           <button className="carousel-arrow left" onClick={handlePrev} aria-label="Previous" style={{fontSize: 28, background: 'none', border: 'none', cursor: 'pointer'}}>&#8592;</button>
         )}
