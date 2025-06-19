@@ -33,6 +33,24 @@ export function BlogProvider({ children }) {
     }
   };
 
+  // Edit post and sync to server
+  const editPost = async (id, updated) => {
+    const res = await fetch(`${API_URL}/api/blog-posts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
+    if (res.ok) {
+      setPosts(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
+    }
+  };
+
+  // Remove post and sync to server
+  const removePost = async (id) => {
+    await fetch(`${API_URL}/api/blog-posts/${id}`, { method: 'DELETE' });
+    setPosts(prev => prev.filter(p => p.id !== id));
+  };
+
   // Add new comment and sync to server
   const addComment = async (blogId, comment) => {
     const res = await fetch(`${API_URL}/api/blog-comments`, {
@@ -48,23 +66,17 @@ export function BlogProvider({ children }) {
     }
   };
 
-  // Remove post locally (admin only)
-  const removePost = (id) => {
-    setPosts(prev => prev.filter(p => p.id !== id));
-    // Optionally, add a DELETE endpoint for full sync
-  };
-
-  // Remove comment locally (admin only)
-  const removeComment = (blogId, idx) => {
+  // Remove comment and sync to server
+  const removeComment = async (blogId, idx) => {
+    // Optionally, you can sync with backend if you have comment IDs
     setComments(prev => ({
       ...prev,
       [blogId]: prev[blogId].filter((_, i) => i !== idx)
     }));
-    // Optionally, add a PUT endpoint for full sync
   };
 
   return (
-    <BlogContext.Provider value={{ posts, addPost, removePost, comments, addComment, removeComment }}>
+    <BlogContext.Provider value={{ posts, addPost, editPost, removePost, comments, addComment, removeComment }}>
       {children}
     </BlogContext.Provider>
   );
