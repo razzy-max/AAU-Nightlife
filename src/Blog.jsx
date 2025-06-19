@@ -30,8 +30,9 @@ function renderContentWithLinks(content) {
 
 export default function Blog() {
   const { id } = useParams();
-  const { posts, addPost, removePost, comments, addComment, removeComment } = useBlog();
-  const blog = posts.find(post => post.id === Number(id));
+  const { posts, editPost, removePost, comments, addComment, removeComment } = useBlog();
+  // Find by _id for MongoDB
+  const blog = posts.find(post => String(post._id) === String(id));
   const [input, setInput] = useState('');
   const [name, setName] = useState('');
   const [anonymous, setAnonymous] = useState(false);
@@ -103,11 +104,7 @@ export default function Blog() {
 
   const handleDeletePost = async () => {
     if (!window.confirm('Delete this blog post?')) return;
-    // Sync delete to backend
-    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-posts/${blog.id}`, {
-      method: 'DELETE'
-    });
-    removePost(blog.id);
+    await removePost(blog._id);
     navigate('/');
   };
 
@@ -120,14 +117,7 @@ export default function Blog() {
     e.preventDefault();
     const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
     const updated = { ...blog, ...editForm, excerpt };
-    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-posts/${blog.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated)
-    });
-    // Update locally
-    removePost(blog.id);
-    addPost(updated);
+    await editPost(blog._id, updated);
     setEditMode(false);
   };
 
