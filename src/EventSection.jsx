@@ -52,10 +52,38 @@ export default function EventSection() {
     setCurrent(prev => (prev + 1) % (events.length - cardsToShow + 1));
   };
 
+  // Swipe gesture handlers for mobile
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = () => {
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 50) { // threshold
+        if (diff > 0) handleNext(); // swipe left
+        else handlePrev(); // swipe right
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <section className="event-section">
       <h2 className="event-section-title">Featured Upcoming Events</h2>
-      <div className="event-carousel-desktop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '0 auto', maxWidth: 1100 }}>
+      <div
+        className="event-carousel-desktop"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '0 auto', maxWidth: 1100 }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {events.length > cardsToShow && (
           <button className="carousel-arrow left" onClick={handlePrev} aria-label="Previous" style={{fontSize: 32, background: 'none', border: 'none', cursor: 'pointer'}}>&#8592;</button>
         )}
@@ -63,7 +91,7 @@ export default function EventSection() {
           {loading ? <p>Loading events...</p> : (
             visibleEvents.length === 0 ? <p>No events yet.</p> : (
               visibleEvents.map(event => event && (
-                <div className="event-card" key={event.title + event.date} style={{ width: 320, borderRadius: 16, overflow: 'hidden', background: '#23243a', color: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.10)', textAlign: 'center', flex: '0 0 320px' }}>
+                <div className="event-card" key={event.title + event.date} style={{ width: 320, borderRadius: 16, overflow: 'hidden', background: '#fff', color: '#0074D9', boxShadow: '0 2px 16px rgba(0,0,0,0.10)', textAlign: 'center', flex: '0 0 320px' }}>
                   {event.image && (
                     <img src={event.image} alt={event.title} style={{ width: '100%', height: 180, objectFit: 'cover' }} />
                   )}
@@ -91,6 +119,7 @@ export default function EventSection() {
           .event-carousel-desktop { flex-direction: column; gap: 1rem; }
           .event-cards-desktop { flex-direction: row; overflow-x: auto; }
           .event-card { min-width: 70vw !important; max-width: 85vw !important; }
+          .carousel-arrow { display: none !important; }
         }
       `}</style>
     </section>
