@@ -511,7 +511,7 @@ footer {
 .footer-socials-label {
   font-size: 1.08rem;
   font-weight: 500;
-  color: #333; /* revert to former, more legible color */
+  color: #bbb; /* revert to former, more legible color */
   margin-bottom: 0.2rem;
   text-align: center;
 }
@@ -572,7 +572,7 @@ footer {
 .footer-address {
   margin-top: 0.5rem;
   font-size: 0.98rem;
-  color: #555;
+  color: #bbb;
 }
 .footer-copy {
   color: #bbb;
