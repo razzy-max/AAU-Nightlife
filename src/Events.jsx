@@ -107,6 +107,30 @@ export default function Events() {
     });
   };
 
+  // Helper to convert [text](url) to clickable links
+  function renderContentWithLinks(content) {
+    const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+    while ((match = regex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(content.slice(lastIndex, match.index));
+      }
+      parts.push(
+        <a href={match[2]} target="_blank" rel="noopener noreferrer" key={key++} style={{ color: '#0074D9', textDecoration: 'underline' }}>
+          {match[1]}
+        </a>
+      );
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < content.length) {
+      parts.push(content.slice(lastIndex));
+    }
+    return parts;
+  }
+
   // Simple admin toggle (replace with real auth in production)
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
 
@@ -216,7 +240,7 @@ export default function Events() {
                   <strong>{event.title}</strong> <br />
                   <span>{event.date} | {event.venue}</span>
                   {event.description && event.description.split(/\r?\n/).map((para, i) =>
-                    para.trim() ? <p key={i}>{para}</p> : <br key={i} />
+                    para.trim() ? <p key={i} style={{marginBottom:'1em'}}>{renderContentWithLinks(para)}</p> : null
                   )}
                   <p>Contact: <a href={`mailto:${event.email}`}>{event.email}</a> | <a href={`tel:${event.phone}`}>{event.phone}</a></p>
                   {isAdmin && editIdx === idx ? (
