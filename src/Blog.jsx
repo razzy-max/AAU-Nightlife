@@ -116,12 +116,11 @@ export default function Blog() {
 
   const handleEditSubmit = async e => {
     e.preventDefault();
-    // Optimistically update UI
-    const updated = { ...blog, ...editForm };
-    // Update backend
+    // Always update excerpt from new content
+    const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
+    const updated = { ...blog, ...editForm, excerpt };
     await editPost(blog._id, updated);
     setEditMode(false);
-    // Optionally, re-fetch posts here if needed
   };
 
   return (
