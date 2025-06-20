@@ -45,18 +45,34 @@ function App() {
           <div style={{maxWidth: 700, margin: '0 auto'}}>
             <div className="footer-row">
               <a
-                href="https://wa.me/message/5W4ZNNNXXO7CJ1"
+                href="https://wa.me/2349037558818"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer-link"
               >
-                WhatsApp: 09065302907
+                WhatsApp: 09037558818
               </a>
               <a
-                href="mailto:eraskid6@gmail.com"
+                href="mailto:aaunightlife@gmail.com"
                 className="footer-link email"
               >
-                Gmail: eraskid6@gmail.com
+                Gmail: aaunightlife@gmail.com
+              </a>
+              <a
+                href="https://www.tiktok.com/@aau_nightlife?_t=ZM-8xN0vouT4cf&_r=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                TikTok: @aau_nightlife
+              </a>
+              <a
+                href="https://www.instagram.com/aau_nightlife?igsh=OXMwdXJwZmcyYmhq&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                Instagram: @aau_nightlife
               </a>
               <span className="footer-address">
                 Address: Ekpoma, Edo State
