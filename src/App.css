@@ -493,11 +493,10 @@ footer {
 }
 .footer-row {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 .footer-link {
   color: #25D366;
@@ -509,9 +508,63 @@ footer {
 .footer-link.email {
   color: #fff;
 }
-.footer-address {
-  color: #bbb;
+.footer-socials-label {
+  font-size: 1.08rem;
   font-weight: 500;
+  color: #222;
+  margin-bottom: 0.2rem;
+  text-align: center;
+}
+.footer-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 0.25rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  color: #444;
+  font-size: 1.2rem;
+  border: none;
+}
+.footer-icon-link:hover, .footer-icon-link:focus {
+  background: #f0f0f0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+  transform: translateY(-2px) scale(1.08);
+  color: #007bff;
+  outline: none;
+}
+.footer-icon-link[aria-label="WhatsApp"] {
+  color: #25D366;
+}
+.footer-icon-link[aria-label="WhatsApp"]:hover {
+  color: #128C7E;
+}
+.footer-icon-link[aria-label="Gmail"] {
+  color: #EA4335;
+}
+.footer-icon-link[aria-label="Gmail"]:hover {
+  color: #B23121;
+}
+.footer-icon-link[aria-label="TikTok"] {
+  color: #010101;
+}
+.footer-icon-link[aria-label="TikTok"]:hover {
+  color: #ff0050;
+}
+.footer-icon-link[aria-label="Instagram"] {
+  color: #C13584;
+}
+.footer-icon-link[aria-label="Instagram"]:hover {
+  color: #E1306C;
+}
+.footer-address {
+  margin-top: 0.5rem;
+  font-size: 0.98rem;
+  color: #555;
 }
 .footer-copy {
   color: #bbb;
