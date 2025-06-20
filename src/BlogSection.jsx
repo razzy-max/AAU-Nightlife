@@ -31,7 +31,8 @@ export default function BlogSection() {
     setShowForm(false);
   };
 
-  const blogPosts = posts;
+  // Sort posts by timestamp descending (newest first)
+  const blogPosts = [...posts].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
   return (
     <section className="blog-section">
