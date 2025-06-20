@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
@@ -45,6 +45,10 @@ export default function Blog() {
   const isAdmin = localStorage.getItem('aau_admin') === 'true';
   // Use _id for comments and update removeComment to use commentId
   const blogComments = comments[blog?._id] || [];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (!blog) return <div className="blog-detail-container">Blog post not found.</div>;
 
