@@ -44,7 +44,7 @@ function App() {
         <footer>
           <div style={{maxWidth: 700, margin: '0 auto'}}>
             <div className="footer-row">
-              <span className="footer-socials-label">Tap and reach us on our various socials:</span>
+              <span className="footer-socials-label">Connect with us instantly on your favorite platforms:</span>
               <a
                 href="https://wa.me/2349037558818"
                 target="_blank"
