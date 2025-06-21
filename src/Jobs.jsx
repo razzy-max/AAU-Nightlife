@@ -191,7 +191,7 @@ export default function Jobs() {
                   )}
                   <strong style={{fontSize: '1.3rem', color: '#7bffb6'}}>{job.title}</strong> <br />
                   <span style={{color: '#d2d6f6'}}>{job.sector} | {job.type}</span>
-                  <p style={{margin: '1rem 0', color: '#fff'}}>{job.description}</p>
+                  <p style={{margin: '1rem 0', color: '#fff', whiteSpace: 'pre-line'}}>{job.description}</p>
                   <p style={{margin: 0}}>
                     <span style={{color: '#7bffb6'}}>Contact:</span> <a href={`mailto:${job.email}`} style={{color: '#7bffb6'}}>{job.email}</a> | <a href={`tel:${job.phone}`} style={{color: '#7bffb6'}}>{job.phone}</a>
                   </p>
