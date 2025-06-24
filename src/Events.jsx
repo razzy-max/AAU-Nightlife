@@ -198,11 +198,11 @@ export default function Events() {
               </label>
               <label>
                 Contact Email:
-                <input type="email" name="email" value={form.email} onChange={handleChange} required />
+                <input type="email" name="email" value={form.email} onChange={handleChange} />
               </label>
               <label>
                 Contact Phone:
-                <input type="tel" name="phone" value={form.phone} onChange={handleChange} required />
+                <input type="tel" name="phone" value={form.phone} onChange={handleChange} />
               </label>
               <label>
                 Banner/Poster Image:
@@ -249,8 +249,8 @@ export default function Events() {
                       <label>Date: <input type="date" name="date" value={editForm.date} onChange={handleEditChange} required /></label>
                       <label>Venue: <input type="text" name="venue" value={editForm.venue} onChange={handleEditChange} required /></label>
                       <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
-                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} required /></label>
-                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} required /></label>
+                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} /></label>
+                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} /></label>
                       <label>Banner/Poster Image:
                         <input type="file" name="image" accept="image/*" onChange={handleEditChange} />
                       </label>
