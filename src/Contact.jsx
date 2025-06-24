@@ -14,7 +14,7 @@ export default function Contact() {
 
     const { name, email, message } = form;
     const phoneNumber = '2349037558818';
-    const text = `Name: ${name}%0AEmail: ${email}%0AMessage: ${message}`;
+    const text = `Hi AAUNightlife. My name is ${name} with email ${email}. Message: ${message}`;
     const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`;
 
     try {
