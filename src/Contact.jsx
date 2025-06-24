@@ -33,8 +33,11 @@ export default function Contact() {
     } catch {
       setStatus('API request failed, redirecting to WhatsApp...');
     } finally {
-      window.open(whatsappURL, '_blank');
-    }
+  setTimeout(() => {
+    window.open(whatsappURL, '_blank');
+  }, 500);
+}
+
   };
 
   return (
