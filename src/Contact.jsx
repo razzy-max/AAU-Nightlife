@@ -11,33 +11,21 @@ export default function Contact() {
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus('Sending...');
-
-    const { name, email, message } = form;
-    const text = `Name: ${name}%0AEmail: ${email}%0AMessage: ${message}`;
-    const phoneNumber = '2349037558818';
-    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`;
-
     try {
       const res = await fetch('https://aau-nightlife-production.up.railway.app/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-
       if (res.ok) {
         setStatus('Message sent!');
         setForm({ name: '', email: '', message: '' });
       } else {
-        setStatus('Failed to send via API, but redirecting to WhatsApp...');
+        setStatus('Failed to send. Try again.');
       }
     } catch {
-      setStatus('API request failed, redirecting to WhatsApp...');
-    } finally {
-  setTimeout(() => {
-    window.open(whatsappURL, '_blank');
-  }, 500);
-}
-
+      setStatus('Failed to send. Try again.');
+    }
   };
 
   return (
@@ -47,36 +35,19 @@ export default function Contact() {
       <form className="contact-form" onSubmit={handleSubmit}>
         <label>
           Name:
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="name" value={form.name} onChange={handleChange} required />
         </label>
         <label>
           Email:
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="email" name="email" value={form.email} onChange={handleChange} required />
         </label>
         <label>
           Message:
-          <textarea
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            required
-          ></textarea>
+          <textarea name="message" value={form.message} onChange={handleChange} required></textarea>
         </label>
         <button type="submit">Send</button>
       </form>
       {status && <p>{status}</p>}
     </section>
   );
-}git
+}
