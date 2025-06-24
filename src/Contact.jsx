@@ -10,44 +10,83 @@ export default function Contact() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setStatus('Sending...');
+    setStatus('Sending…');
+
+    const { name, email, message } = form;
+    const phoneNumber = '2349037558818';
+    const text = `Name: ${name}%0AEmail: ${email}%0AMessage: ${message}`;
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`;
+
     try {
-      const res = await fetch('https://aau-nightlife-production.up.railway.app/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
+      const res = await fetch(
+        'https://aau-nightlife-production.up.railway.app/api/contact',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        }
+      );
+
       if (res.ok) {
-        setStatus('Message sent!');
-        setForm({ name: '', email: '', message: '' });
+        setStatus('Message sent! Redirecting to WhatsApp…');
       } else {
-        setStatus('Failed to send. Try again.');
+        setStatus('API error—redirecting to WhatsApp…');
       }
-    } catch {
-      setStatus('Failed to send. Try again.');
+    } catch (err) {
+      setStatus('Network error—redirecting to WhatsApp…');
+    } finally {
+      // always redirect
+      window.open(whatsappURL, '_blank');
+      // reset form fields
+      setForm({ name: '', email: '', message: '' });
     }
   };
 
   return (
     <section className="event-section">
       <h2>Contact Us</h2>
-      <p>Event organizers can reach out for promotion services using the form below.</p>
+      <p>
+        Event organizers can reach out for promotion services using the form
+        below.
+      </p>
+
       <form className="contact-form" onSubmit={handleSubmit}>
         <label>
           Name:
-          <input type="text" name="name" value={form.name} onChange={handleChange} required />
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
         </label>
+
         <label>
           Email:
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
         </label>
+
         <label>
           Message:
-          <textarea name="message" value={form.message} onChange={handleChange} required></textarea>
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            required
+          />
         </label>
+
         <button type="submit">Send</button>
       </form>
-      {status && <p>{status}</p>}
+
+      {status && <p className="status">{status}</p>}
     </section>
   );
 }
