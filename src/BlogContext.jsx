@@ -22,8 +22,8 @@ export function BlogProvider({ children }) {
       const commentsObj = {};
       for (const blog of blogs) {
         const resC = await fetch(`${API_URL}/api/blog-comments/${blog._id}`);
-        const blogComments = await resC.json();
-        commentsObj[blog._id] = blogComments;
+        let blogComments = await resC.json();
+        commentsObj[blog._id] = blogComments.reverse(); // Reverse to show newest first
       }
       setComments(commentsObj);
     }
@@ -71,21 +71,21 @@ export function BlogProvider({ children }) {
       body: JSON.stringify({ blogId: String(blogId), ...comment })
     });
     if (res.ok) {
-      const created = await res.json();
-      // Re-fetch comments for this blog to ensure persistence
-      const resC = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
-      const blogComments = await resC.json();
-      setComments(prev => ({ ...prev, [blogId]: blogComments }));
+      await fetchCommentsForBlog(blogId); // Re-fetch to update with newest on top
     }
   };
 
   // Remove comment and sync to server
   const removeComment = async (blogId, commentId) => {
     await fetch(`${API_URL}/api/blog-comments/${commentId}`, { method: 'DELETE' });
-    // Re-fetch comments for this blog to ensure persistence
-    const resC = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
-    const blogComments = await resC.json();
-    setComments(prev => ({ ...prev, [blogId]: blogComments }));
+    await fetchCommentsForBlog(blogId); // Re-fetch to update with newest on top
+  };
+
+  // Helper function to fetch and reverse comments for a specific blog
+  const fetchCommentsForBlog = async (blogId) => {
+    const res = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
+    let blogComments = await res.json();
+    setComments(prev => ({ ...prev, [blogId]: blogComments.reverse() }));
   };
 
   return (
