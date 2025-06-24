@@ -144,11 +144,11 @@ export default function Jobs() {
                 </label>
                 <label>
                   Contact Email:
-                  <input type="email" name="email" value={form.email} onChange={handleChange} required />
+                  <input type="email" name="email" value={form.email} onChange={handleChange} />
                 </label>
                 <label>
                   Contact Phone:
-                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} required />
+                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} />
                 </label>
                 <button type="submit">Add Job</button>
               </form>
@@ -178,8 +178,8 @@ export default function Jobs() {
                       <label>Sector: <input type="text" name="sector" value={editForm.sector} onChange={handleEditChange} required /></label>
                       <label>Type: <input type="text" name="type" value={editForm.type} onChange={handleEditChange} required /></label>
                       <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
-                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} required /></label>
-                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} required /></label>
+                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} /></label>
+                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} /></label>
                       <button type="submit">Save</button>
                       <button type="button" onClick={() => setEditIdx(null)}>Cancel</button>
                     </form>
