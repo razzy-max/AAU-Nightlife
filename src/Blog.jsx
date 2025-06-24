@@ -50,7 +50,7 @@ export default function Blog() {
     window.scrollTo(0, 0);
   }, []);
 
-  if (!blog) return <div className="blog-detail-container">Blog post not found.</div>;
+  if (!blog) return <div className="blog-detail-container">Loading blog post...</div>;
 
   const handleSubmit = async e => {
     e.preventDefault();
