@@ -253,7 +253,7 @@ export default function AdvertisersSection() {
     <section className="advertisers-section">
       <div className="advertisers-container">
         <h2 className="advertisers-title">Featured Advertisers</h2>
-        <p className="advertisers-subtext">Discover amazing local businesses and services</p>
+        <p className="advertisers-subtext">Discover amazing Worldclass businesses and services</p>
 
         {/* Admin Controls */}
         {isAdmin() && (
