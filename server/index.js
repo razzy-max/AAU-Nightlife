@@ -280,11 +280,21 @@ app.get('/api/advertisers', async (req, res) => {
 
 app.post('/api/advertisers', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
-  const { name, logo, link } = req.body;
-  if (!name || !logo || !link) return res.status(400).json({ error: 'Missing fields' });
+  const { name, logo, link, description, facebook, instagram, whatsapp } = req.body;
+  if (!name || !logo || !link) return res.status(400).json({ error: 'Missing required fields: name, logo, link' });
   try {
-    const result = await db.collection('advertisers').insertOne({ name, logo, link });
-    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, name, logo, link });
+    const advertiserData = {
+      name,
+      logo,
+      link,
+      description: description || '',
+      facebook: facebook || '',
+      instagram: instagram || '',
+      whatsapp: whatsapp || '',
+      createdAt: new Date()
+    };
+    const result = await db.collection('advertisers').insertOne(advertiserData);
+    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...advertiserData });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add advertiser' });
   }
