@@ -11,7 +11,14 @@ export default function Jobs() {
     fetch('https://aau-nightlife-production.up.railway.app/api/jobs')
       .then(res => res.json())
       .then(data => {
-        setJobs(data);
+        // Sort jobs by _id in descending order (newest first)
+        const sortedJobs = data.sort((a, b) => {
+          if (a._id && b._id) {
+            return b._id.localeCompare(a._id);
+          }
+          return 0;
+        });
+        setJobs(sortedJobs);
         setLoading(false);
       });
   }, []);
@@ -34,7 +41,14 @@ export default function Jobs() {
         setForm({ title: '', sector: '', type: '', description: '', email: '', phone: '' });
         // Refresh jobs
         const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs').then(r => r.json());
-        setJobs(updated);
+        // Sort jobs by _id in descending order (newest first)
+        const sortedJobs = updated.sort((a, b) => {
+          if (a._id && b._id) {
+            return b._id.localeCompare(a._id);
+          }
+          return 0;
+        });
+        setJobs(sortedJobs);
       } else {
         setStatus('Failed to add job.');
       }
