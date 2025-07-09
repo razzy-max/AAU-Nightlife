@@ -280,13 +280,14 @@ app.get('/api/advertisers', async (req, res) => {
 
 app.post('/api/advertisers', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
-  const { name, logo, link, description, facebook, instagram, whatsapp } = req.body;
-  if (!name || !logo || !link) return res.status(400).json({ error: 'Missing required fields: name, logo, link' });
+  const { name, media, link, description, facebook, instagram, whatsapp, mediaType } = req.body;
+  if (!name) return res.status(400).json({ error: 'Missing required field: name' });
   try {
     const advertiserData = {
       name,
-      logo,
-      link,
+      media: media || '', // Changed from 'logo' to 'media' to support both images and videos
+      mediaType: mediaType || 'image', // Track whether it's image or video
+      link: link || '',
       description: description || '',
       facebook: facebook || '',
       instagram: instagram || '',
@@ -297,6 +298,37 @@ app.post('/api/advertisers', async (req, res) => {
     res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...advertiserData });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add advertiser' });
+  }
+});
+
+// Add PUT endpoint for editing advertisers
+app.put('/api/advertisers/:id', async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  const { id } = req.params;
+  const { name, media, link, description, facebook, instagram, whatsapp, mediaType } = req.body;
+  if (!name) return res.status(400).json({ error: 'Missing required field: name' });
+  try {
+    const updateData = {
+      name,
+      media: media || '',
+      mediaType: mediaType || 'image',
+      link: link || '',
+      description: description || '',
+      facebook: facebook || '',
+      instagram: instagram || '',
+      whatsapp: whatsapp || '',
+      updatedAt: new Date()
+    };
+    const result = await db.collection('advertisers').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'Advertiser not found' });
+    }
+    res.json({ success: true, ...updateData });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update advertiser' });
   }
 });
 

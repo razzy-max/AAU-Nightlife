@@ -102,8 +102,14 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.logo-preview {
-  width: 60px;
+.media-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-preview-element {
+  width: 80px;
   height: 60px;
   object-fit: cover;
   border-radius: 0.5rem;
@@ -210,7 +216,7 @@
   position: relative;
 }
 
-.slide-image {
+.slide-media {
   flex: 0 0 40%;
   display: flex;
   align-items: center;
@@ -219,12 +225,42 @@
   padding: 2rem;
 }
 
-.slide-image img {
+.slide-image, .slide-video {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
   border-radius: 1rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.slide-video {
+  background: #000;
+}
+
+.slide-no-media {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-media-placeholder {
+  text-align: center;
+  color: #888;
+  font-size: 1rem;
+}
+
+.no-media-placeholder span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-media-placeholder p {
+  margin: 0;
+  font-style: italic;
 }
 
 .slide-info {
@@ -367,13 +403,88 @@
   transform: scale(1.1);
 }
 
-/* ===== DELETE BUTTON ===== */
-.slide-delete-btn {
+/* ===== EDIT FORM ===== */
+.slide-edit-form {
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.edit-form h3 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.edit-form .form-row {
+  margin-bottom: 1rem;
+}
+
+.edit-form .form-row input {
+  padding: 0.6rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.edit-form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* ===== ADMIN CONTROLS ===== */
+.slide-admin-controls {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #ff4757;
-  color: white;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.slide-edit-btn, .slide-delete-btn {
   border: none;
   border-radius: 50%;
   width: 35px;
@@ -381,10 +492,24 @@
   font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+}
+
+.slide-edit-btn {
+  background: #007bff;
+}
+
+.slide-edit-btn:hover {
+  background: #0056b3;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.slide-delete-btn {
+  background: #ff4757;
 }
 
 .slide-delete-btn:hover {
@@ -447,13 +572,35 @@
     flex-direction: column;
   }
 
-  .slide-image {
+  .slide-media {
     flex: 0 0 auto;
     padding: 1.5rem 1.5rem 1rem 1.5rem;
   }
 
-  .slide-image img {
+  .slide-image, .slide-video {
     max-height: 120px;
+  }
+
+  .slide-no-media {
+    height: 120px;
+  }
+
+  .slide-edit-form {
+    padding: 1rem;
+  }
+
+  .edit-form h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .edit-form-buttons {
+    flex-direction: column;
+  }
+
+  .slide-admin-controls {
+    top: 0.5rem;
+    right: 0.5rem;
   }
 
   .slide-info {
@@ -483,12 +630,10 @@
     right: 0.5rem;
   }
 
-  .slide-delete-btn {
+  .slide-edit-btn, .slide-delete-btn {
     width: 30px;
     height: 30px;
     font-size: 1rem;
-    top: 0.5rem;
-    right: 0.5rem;
   }
 
   .social-link {
@@ -515,12 +660,16 @@
     min-height: 300px;
   }
 
-  .slide-image {
+  .slide-media {
     padding: 1rem;
   }
 
   .slide-info {
     padding: 0.75rem 1rem 1rem 1rem;
+  }
+
+  .slide-edit-form {
+    padding: 0.75rem;
   }
 
   .slide-title {
@@ -543,5 +692,11 @@
   .carousel-nav {
     width: 35px;
     height: 35px;
+  }
+
+  .slide-edit-btn, .slide-delete-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
   }
 }
