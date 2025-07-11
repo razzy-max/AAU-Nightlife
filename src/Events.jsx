@@ -352,14 +352,30 @@ export default function Events() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Image URL</label>
+                  <label className="form-label">Event Image</label>
                   <input
-                    type="url"
-                    value={form.image}
-                    onChange={(e) => setForm({...form, image: e.target.value})}
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleChange}
                     className="form-input"
-                    placeholder="https://example.com/image.jpg"
+                    style={{ padding: '0.5rem' }}
                   />
+                  {form.image && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <img
+                        src={form.image}
+                        alt="Preview"
+                        style={{
+                          maxWidth: '200px',
+                          maxHeight: '150px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid #e5e7eb'
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

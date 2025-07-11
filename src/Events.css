@@ -423,6 +423,26 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-input[type="file"] {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.form-input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.form-input[type="file"]::-webkit-file-upload-button:hover {
+  opacity: 0.9;
+}
+
 .form-textarea {
   resize: vertical;
   min-height: 100px;
