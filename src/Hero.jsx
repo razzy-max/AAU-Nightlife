@@ -12,7 +12,7 @@ export default function Hero() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ image: '' });
   const [pendingImages, setPendingImages] = useState([]);
-  const { isAdmin, authenticatedFetch } = useAuth();
+  const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     fetch(`${API_URL}/api/hero-images`)
@@ -102,6 +102,9 @@ export default function Hero() {
       </div>
     </section>
   );
+
+  // Debug logging
+  console.log('Hero component - isAdmin:', isAdmin, 'authLoading:', authLoading);
 
   return (
     <section

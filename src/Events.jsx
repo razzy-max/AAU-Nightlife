@@ -10,7 +10,7 @@ export default function Events() {
   const [showForm, setShowForm] = useState(false);
   const location = useLocation();
   const eventRefs = useRef({});
-  const { isAdmin, authenticatedFetch } = useAuth();
+  const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     fetch('https://aau-nightlife-production.up.railway.app/api/events')
@@ -141,6 +141,14 @@ export default function Events() {
   }
 
   // Admin authentication now handled by AuthContext
+
+  // Debug logging
+  console.log('Events component - isAdmin:', isAdmin, 'authLoading:', authLoading);
+
+  // Wait for auth check to complete
+  if (authLoading) {
+    return <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+  }
 
   return (
     <section className="event-section" style={{

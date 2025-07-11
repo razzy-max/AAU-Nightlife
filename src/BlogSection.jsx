@@ -7,10 +7,13 @@ import { useAuth } from './AuthContext';
 
 export default function BlogSection() {
   const { posts, addPost } = useBlog();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '' });
   // Admin authentication now handled by AuthContext
+
+  // Debug logging
+  console.log('BlogSection component - isAdmin:', isAdmin, 'authLoading:', authLoading);
 
   const handleFormChange = e => {
     if (e.target.name === 'image' && e.target.files && e.target.files[0]) {

@@ -47,10 +47,10 @@ export default function AdminPortal() {
 
       if (response.ok) {
         setIsAuthenticated(true);
-        // Store admin status in localStorage for UI purposes (not security)
+        // Store admin status in localStorage for immediate UI update
         localStorage.setItem('aau_admin', 'true');
-        // Redirect to home page
-        navigate('/', { replace: true });
+        // Force a page reload to ensure all components recognize admin status
+        window.location.href = '/';
       } else {
         setError(data.error || 'Login failed');
       }
