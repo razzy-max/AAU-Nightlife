@@ -8,7 +8,9 @@ import Blog from './Blog';
 import About from './About';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
+import AdminPortal from './AdminPortal';
 import { BlogProvider } from './BlogContext';
+import { AuthProvider } from './AuthContext';
 import './App.css';
 import AdvertisersSection from './AdvertisersSection';
 
@@ -16,8 +18,9 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <BlogProvider>
-      <div className="app-root">
+    <AuthProvider>
+      <BlogProvider>
+        <div className="app-root">
         <header>
           <nav className="main-nav responsive-nav">
             <div className="nav-logo">AAU Nightlife</div>
@@ -44,6 +47,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/admin-portal" element={<AdminPortal />} />
             <Route path="/blog/:id" element={<Blog />} />
           </Routes>
           <AdvertisersSection />
@@ -113,8 +117,9 @@ function App() {
             </div>
           </div>
         </footer>
-      </div>
-    </BlogProvider>
+        </div>
+      </BlogProvider>
+    </AuthProvider>
   );
 }
 

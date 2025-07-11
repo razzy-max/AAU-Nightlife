@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 import './App.css';
 
 const API_URL = 'https://aau-nightlife-production.up.railway.app';
@@ -11,7 +12,7 @@ export default function Hero() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ image: '' });
   const [pendingImages, setPendingImages] = useState([]);
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
+  const { isAdmin, authenticatedFetch } = useAuth();
 
   useEffect(() => {
     fetch(`${API_URL}/api/hero-images`)
@@ -49,9 +50,8 @@ export default function Hero() {
     setStatus('Saving...');
     try {
       const newImages = [...heroImages, ...pendingImages];
-      const res = await fetch(`${API_URL}/api/hero-images`, {
+      const res = await authenticatedFetch(`${API_URL}/api/hero-images`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newImages)
       });
       if (res.ok) {
@@ -61,8 +61,8 @@ export default function Hero() {
       } else {
         setStatus('Failed to save images.');
       }
-    } catch {
-      setStatus('Failed to save images.');
+    } catch (error) {
+      setStatus(error.message || 'Failed to save images.');
     }
   };
 
@@ -70,11 +70,14 @@ export default function Hero() {
     if (!window.confirm('Delete this image?')) return;
     const updatedImages = heroImages.filter((_, i) => i !== idx);
     setHeroImages(updatedImages);
-    await fetch(`${API_URL}/api/hero-images`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedImages)
-    });
+    try {
+      await authenticatedFetch(`${API_URL}/api/hero-images`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedImages)
+      });
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+    }
     if (imgIdx >= updatedImages.length) setImgIdx(0);
   };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -6,6 +7,7 @@ export default function Jobs() {
   const [form, setForm] = useState({ title: '', sector: '', type: '', description: '', email: '', phone: '' });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const { isAdmin, authenticatedFetch } = useAuth();
 
   useEffect(() => {
     fetch('https://aau-nightlife-production.up.railway.app/api/jobs')
@@ -31,9 +33,8 @@ export default function Jobs() {
     e.preventDefault();
     setStatus('Adding...');
     try {
-      const res = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+      const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
       if (res.ok) {
@@ -52,8 +53,8 @@ export default function Jobs() {
       } else {
         setStatus('Failed to add job.');
       }
-    } catch {
-      setStatus('Failed to add job.');
+    } catch (error) {
+      setStatus(error.message || 'Failed to add job.');
     }
   };
 
@@ -62,11 +63,16 @@ export default function Jobs() {
     if (!window.confirm('Delete this job posting?')) return;
     const updatedJobs = jobs.filter((_, i) => i !== idx);
     setJobs(updatedJobs);
-    await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedJobs)
-    });
+    try {
+      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+        method: 'PUT',
+        body: JSON.stringify(updatedJobs)
+      });
+    } catch (error) {
+      console.error('Failed to delete job:', error);
+      // Revert the change if the API call failed
+      setJobs(jobs);
+    }
   };
 
   // Edit job
@@ -85,15 +91,17 @@ export default function Jobs() {
     const updatedJobs = jobs.map((job, i) => i === editIdx ? editForm : job);
     setJobs(updatedJobs);
     setEditIdx(null);
-    await fetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedJobs)
-    });
+    try {
+      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+        method: 'PUT',
+        body: JSON.stringify(updatedJobs)
+      });
+    } catch (error) {
+      console.error('Failed to update job:', error);
+    }
   };
 
-  // Simple admin toggle (replace with real auth in production)
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
+  // Admin authentication now handled by AuthContext
 
   return (
     <section className="jobs-section" style={{

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -9,6 +10,7 @@ export default function Events() {
   const [showForm, setShowForm] = useState(false);
   const location = useLocation();
   const eventRefs = useRef({});
+  const { isAdmin, authenticatedFetch } = useAuth();
 
   useEffect(() => {
     fetch('https://aau-nightlife-production.up.railway.app/api/events')
@@ -45,9 +47,8 @@ export default function Events() {
     e.preventDefault();
     setStatus('Adding...');
     try {
-      const res = await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
+      const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
       if (res.ok) {
@@ -59,8 +60,8 @@ export default function Events() {
       } else {
         setStatus('Failed to add event.');
       }
-    } catch {
-      setStatus('Failed to add event.');
+    } catch (error) {
+      setStatus(error.message || 'Failed to add event.');
     }
   };
 
@@ -69,11 +70,16 @@ export default function Events() {
     if (!window.confirm('Delete this event?')) return;
     const updatedEvents = events.filter((_, i) => i !== idx);
     setEvents(updatedEvents);
-    await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedEvents)
-    });
+    try {
+      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+        method: 'PUT',
+        body: JSON.stringify(updatedEvents)
+      });
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      // Revert the change if the API call failed
+      setEvents(events);
+    }
   };
 
   // Edit event
@@ -100,11 +106,14 @@ export default function Events() {
     const updatedEvents = events.map((ev, i) => i === editIdx ? editForm : ev);
     setEvents(updatedEvents);
     setEditIdx(null);
-    await fetch('https://aau-nightlife-production.up.railway.app/api/events', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedEvents)
-    });
+    try {
+      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+        method: 'PUT',
+        body: JSON.stringify(updatedEvents)
+      });
+    } catch (error) {
+      console.error('Failed to update event:', error);
+    }
   };
 
   // Helper to convert [text](url) to clickable links
@@ -131,8 +140,7 @@ export default function Events() {
     return parts;
   }
 
-  // Simple admin toggle (replace with real auth in production)
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
+  // Admin authentication now handled by AuthContext
 
   return (
     <section className="event-section" style={{

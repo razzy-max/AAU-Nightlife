@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useAuth } from './AuthContext';
 import './AdvertisersSection.css';
 
 const API_URL = 'https://aau-nightlife-production.up.railway.app/api/advertisers';
 
-const isAdmin = () => localStorage.getItem('aau_admin') === 'true';
-
 export default function AdvertisersSection() {
   const [advertisers, setAdvertisers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isAdmin, authenticatedFetch } = useAuth();
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
@@ -125,9 +125,8 @@ export default function AdvertisersSection() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch(API_URL, {
+      const res = await authenticatedFetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error('Failed to add advertiser');
@@ -183,9 +182,8 @@ export default function AdvertisersSection() {
     e.preventDefault();
     setEditSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/${editingId}`, {
+      const res = await authenticatedFetch(`${API_URL}/${editingId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
       });
       if (!res.ok) throw new Error('Failed to update advertiser');
@@ -201,7 +199,7 @@ export default function AdvertisersSection() {
   const handleDeleteAdvertiser = async (id) => {
     if (!window.confirm('Delete this advertiser?')) return;
     try {
-      const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      const res = await authenticatedFetch(`${API_URL}/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete advertiser');
       fetchAdvertisers();
     } catch (err) {
@@ -256,7 +254,7 @@ export default function AdvertisersSection() {
         <p className="advertisers-subtext">Discover amazing Worldclass businesses and services</p>
 
         {/* Admin Controls */}
-        {isAdmin() && (
+        {isAdmin && (
           <div className="admin-controls">
             <button
               className="admin-toggle-btn"
@@ -585,7 +583,7 @@ export default function AdvertisersSection() {
                           </div>
 
                           {/* Admin Controls */}
-                          {isAdmin() && (
+                          {isAdmin && (
                             <div className="slide-admin-controls">
                               <button
                                 className="slide-edit-btn"
