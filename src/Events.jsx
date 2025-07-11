@@ -227,17 +227,17 @@ export default function Events() {
     });
   };
 
-  // Helper function to render description with links
+  // Helper function to render description with links and line breaks
   const renderDescription = (description) => {
     if (!description) return '';
 
-    // Split by newlines and render each paragraph
-    const paragraphs = description.split('\n').filter(p => p.trim());
+    // Split by newlines and render each line
+    const lines = description.split('\n');
 
-    return paragraphs.map((paragraph, index) => (
+    return lines.map((line, index) => (
       <span key={index}>
-        {paragraph}
-        {index < paragraphs.length - 1 && <br />}
+        {line}
+        {index < lines.length - 1 && <br />}
       </span>
     ));
   };
@@ -384,9 +384,24 @@ export default function Events() {
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({...form, description: e.target.value})}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      const textarea = e.target;
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const newValue = form.description.substring(0, start) + '\n' + form.description.substring(end);
+                      setForm({...form, description: newValue});
+                      // Set cursor position after the new line
+                      setTimeout(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                      }, 0);
+                    }
+                  }}
                   required
                   className="form-textarea"
-                  placeholder="Describe your event..."
+                  placeholder="Describe your event... (Press Enter for new line, Shift+Enter for paragraph break)"
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
 

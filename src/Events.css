@@ -237,6 +237,7 @@
   color: #6b7280;
   line-height: 1.6;
   margin-bottom: 1.5rem;
+  white-space: pre-wrap;
 }
 
 .event-contact {
