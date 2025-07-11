@@ -321,9 +321,24 @@ export default function Jobs() {
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({...form, description: e.target.value})}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      const textarea = e.target;
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const newValue = form.description.substring(0, start) + '\n' + form.description.substring(end);
+                      setForm({...form, description: newValue});
+                      // Set cursor position after the new line
+                      setTimeout(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                      }, 0);
+                    }
+                  }}
                   required
                   className="job-form-textarea"
-                  placeholder="Describe the job role and responsibilities..."
+                  placeholder="Describe the job role and responsibilities... (Press Enter for new line, Shift+Enter for paragraph break)"
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
 
@@ -332,8 +347,23 @@ export default function Jobs() {
                 <textarea
                   value={form.requirements}
                   onChange={(e) => setForm({...form, requirements: e.target.value})}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      const textarea = e.target;
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const newValue = form.requirements.substring(0, start) + '\n' + form.requirements.substring(end);
+                      setForm({...form, requirements: newValue});
+                      // Set cursor position after the new line
+                      setTimeout(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                      }, 0);
+                    }
+                  }}
                   className="job-form-textarea"
-                  placeholder="List job requirements, one per line..."
+                  placeholder="List job requirements, one per line... (Press Enter for new line, Shift+Enter for paragraph break)"
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
 
@@ -419,7 +449,9 @@ export default function Jobs() {
                     </div>
                   )}
 
-                  <p className="job-description">{job.description}</p>
+                  <div className="job-description" style={{ whiteSpace: 'pre-wrap' }}>
+                    {job.description}
+                  </div>
 
                   {renderRequirements(job.requirements)}
 
