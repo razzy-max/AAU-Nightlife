@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import './Jobs.css';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ title: '', sector: '', type: '', description: '', email: '', phone: '' });
+  const [form, setForm] = useState({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('');
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -83,6 +86,22 @@ export default function Jobs() {
     setEditIdx(idx);
     setEditForm(jobs[idx]);
   };
+
+  // Handle edit job (for new design)
+  const handleEdit = (index) => {
+    const job = jobs[index];
+    setForm({
+      title: job.title,
+      sector: job.sector,
+      type: job.type,
+      description: job.description,
+      requirements: job.requirements || '',
+      email: job.email || '',
+      phone: job.phone || '',
+      location: job.location || ''
+    });
+    setShowForm(true);
+  };
   const handleEditChange = e => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
@@ -101,137 +120,314 @@ export default function Jobs() {
     }
   };
 
-  // Admin authentication now handled by AuthContext
+  // Filter jobs based on search term and type
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.sector.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  // Debug logging
-  console.log('Jobs component - isAdmin:', isAdmin, 'authLoading:', authLoading);
+    const matchesType = !filterType || job.type.toLowerCase() === filterType.toLowerCase();
+
+    return matchesSearch && matchesType;
+  });
+
+  // Helper function to render requirements
+  const renderRequirements = (requirements) => {
+    if (!requirements) return null;
+
+    const reqList = requirements.split('\n').filter(req => req.trim());
+    if (reqList.length === 0) return null;
+
+    return (
+      <div className="job-requirements">
+        <h4>Requirements:</h4>
+        <ul>
+          {reqList.map((req, index) => (
+            <li key={index}>{req.trim()}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  // Admin authentication now handled by AuthContext
 
   // Wait for auth check to complete
   if (authLoading) {
-    return <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+    return (
+      <div className="jobs-loading">
+        <div className="jobs-loading-spinner"></div>
+        <p>Loading jobs...</p>
+      </div>
+    );
   }
 
   return (
-    <section className="jobs-section" style={{
-      minHeight: '100vh',
-      padding: 0,
-      margin: 0,
-      boxSizing: 'border-box',
-      background: '#fff',
-      color: '#111',
-    }}>
-      <div style={{height: '2.5rem'}} />
-      <div className="jobs-calendar-box" style={{
-        background: 'rgba(35,36,74,0.98)',
-        color: 'white',
-        padding: '2.5rem 1.2rem 2rem 1.2rem',
-        borderRadius: '18px',
-        margin: '0 auto 2.5rem auto',
-        maxWidth: 700,
-        boxShadow: '0 4px 32px #181a2a33',
-        textAlign: 'center',
-      }}>
-        <h2 style={{
-          color: '#7bffb6',
-          fontSize: '2.5rem',
-          fontWeight: 800,
-          marginBottom: '1.1rem',
-          letterSpacing: '1px',
-          textTransform: 'uppercase',
-        }}>Jobs Board</h2>
-        <p style={{
-          color: '#d2d6f6',
-          fontSize: '1.2rem',
-          fontWeight: 400,
-          marginBottom: 0,
-        }}>
-          Discover the latest job opportunities for students in Ekpoma. Find part-time, full-time, and internship positions to support your academic journey!
-        </p>
-      </div>
-      <div style={{maxWidth: 800, margin: '0 auto', padding: '0 1rem'}}>
-        {isAdmin && (
-          <>
-            <button onClick={() => setShowForm(f => !f)} style={{marginBottom: '1rem'}}>
-              {showForm ? 'Hide Job Form' : 'Add Job'}
-            </button>
-            {showForm && (
-              <form className="job-form" onSubmit={handleSubmit} style={{marginBottom: '2rem'}}>
-                <label>
-                  Title:
-                  <input type="text" name="title" value={form.title} onChange={handleChange} required />
-                </label>
-                <label>
-                  Sector:
-                  <input type="text" name="sector" value={form.sector} onChange={handleChange} required />
-                </label>
-                <label>
-                  Type:
-                  <input type="text" name="type" value={form.type} onChange={handleChange} required />
-                </label>
-                <label>
-                  Description:
-                  <textarea name="description" value={form.description} onChange={handleChange} required></textarea>
-                </label>
-                <label>
-                  Contact Email:
-                  <input type="email" name="email" value={form.email} onChange={handleChange} />
-                </label>
-                <label>
-                  Contact Phone:
-                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} />
-                </label>
-                <button type="submit">Add Job</button>
-              </form>
-            )}
-            {status && <p style={{color: '#7bffb6'}}>{status}</p>}
-          </>
-        )}
-        {loading ? <p style={{color: '#fff'}}>Loading jobs...</p> : (
-          jobs.length === 0 ? <p style={{color: '#fff'}}>No jobs yet.</p> : (
-            <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
-              {jobs.map((job, idx) => (
-                <li key={idx} style={{
-                  background: '#23244a',
-                  color: '#fff',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 12px rgba(44,44,44,0.10)',
-                  marginBottom: '2rem',
-                  padding: '2rem 1.5rem',
-                  maxWidth: 700,
-                  marginLeft: 'auto',
-                  marginRight: 'auto',
-                  border: '1px solid #2d2d6e',
-                }}>
-                  {isAdmin && editIdx === idx ? (
-                    <form onSubmit={handleEditSubmit} className="job-form" style={{marginBottom: '1rem'}}>
-                      <label>Title: <input type="text" name="title" value={editForm.title} onChange={handleEditChange} required /></label>
-                      <label>Sector: <input type="text" name="sector" value={editForm.sector} onChange={handleEditChange} required /></label>
-                      <label>Type: <input type="text" name="type" value={editForm.type} onChange={handleEditChange} required /></label>
-                      <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
-                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} /></label>
-                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} /></label>
-                      <button type="submit">Save</button>
-                      <button type="button" onClick={() => setEditIdx(null)}>Cancel</button>
-                    </form>
-                  ) : isAdmin && (
-                    <>
-                      <button onClick={() => startEdit(idx)} style={{marginRight: '0.5rem'}}>Edit</button>
-                      <button onClick={() => handleDelete(idx)} style={{marginLeft: '0.5rem'}}>Delete</button>
-                    </>
+    <div className="modern-jobs-page">
+      {/* Hero Section */}
+      <section className="jobs-hero">
+        <div className="jobs-hero-content">
+          <h1 className="jobs-hero-title">Find Your Dream Job</h1>
+          <p className="jobs-hero-subtitle">Discover exciting career opportunities at AAU and beyond</p>
+
+          {/* Search and Filter Bar */}
+          <div className="jobs-search-filter-bar">
+            <div className="jobs-search-container">
+              <svg className="jobs-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search jobs, companies, or locations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="jobs-search-input"
+              />
+            </div>
+
+            <div className="jobs-filter-container">
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="jobs-type-filter"
+              >
+                <option value="">All Types</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+                <option value="freelance">Freelance</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <main className="jobs-main">
+        <div className="jobs-container">
+          {/* Admin Controls */}
+          {isAdmin && (
+            <div className="jobs-admin-controls">
+              <h2 className="jobs-admin-title">Job Management</h2>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="add-job-btn"
+              >
+                {showForm ? '✕ Cancel' : '+ Add New Job'}
+              </button>
+            </div>
+          )}
+
+          {/* Add Job Form */}
+          {showForm && isAdmin && (
+            <form onSubmit={handleSubmit} className="job-form">
+              <div className="job-form-grid">
+                <div className="job-form-group">
+                  <label className="job-form-label">Job Title</label>
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => setForm({...form, title: e.target.value})}
+                    required
+                    className="job-form-input"
+                    placeholder="Enter job title"
+                  />
+                </div>
+
+                <div className="job-form-group">
+                  <label className="job-form-label">Company/Sector</label>
+                  <input
+                    type="text"
+                    value={form.sector}
+                    onChange={(e) => setForm({...form, sector: e.target.value})}
+                    required
+                    className="job-form-input"
+                    placeholder="Company or sector"
+                  />
+                </div>
+
+                <div className="job-form-group">
+                  <label className="job-form-label">Job Type</label>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm({...form, type: e.target.value})}
+                    required
+                    className="job-form-select"
+                  >
+                    <option value="">Select type</option>
+                    <option value="full-time">Full Time</option>
+                    <option value="part-time">Part Time</option>
+                    <option value="internship">Internship</option>
+                    <option value="contract">Contract</option>
+                    <option value="freelance">Freelance</option>
+                  </select>
+                </div>
+
+                <div className="job-form-group">
+                  <label className="job-form-label">Location</label>
+                  <input
+                    type="text"
+                    value={form.location}
+                    onChange={(e) => setForm({...form, location: e.target.value})}
+                    className="job-form-input"
+                    placeholder="Job location"
+                  />
+                </div>
+              </div>
+
+              <div className="job-form-group">
+                <label className="job-form-label">Job Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  required
+                  className="job-form-textarea"
+                  placeholder="Describe the job role and responsibilities..."
+                />
+              </div>
+
+              <div className="job-form-group">
+                <label className="job-form-label">Requirements (one per line)</label>
+                <textarea
+                  value={form.requirements}
+                  onChange={(e) => setForm({...form, requirements: e.target.value})}
+                  className="job-form-textarea"
+                  placeholder="List job requirements, one per line..."
+                />
+              </div>
+
+              <div className="job-form-grid">
+                <div className="job-form-group">
+                  <label className="job-form-label">Contact Email</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({...form, email: e.target.value})}
+                    className="job-form-input"
+                    placeholder="contact@company.com"
+                  />
+                </div>
+
+                <div className="job-form-group">
+                  <label className="job-form-label">Contact Phone</label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({...form, phone: e.target.value})}
+                    className="job-form-input"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+
+              <div className="job-form-actions">
+                <button type="button" onClick={() => setShowForm(false)} className="job-cancel-btn">
+                  Cancel
+                </button>
+                <button type="submit" className="job-submit-btn">
+                  Post Job
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Status Message */}
+          {status && (
+            <div className={`jobs-status-message ${status.includes('Error') ? 'error' : 'success'}`}>
+              {status}
+            </div>
+          )}
+
+          {/* Jobs Grid */}
+          {loading ? (
+            <div className="jobs-loading">
+              <div className="jobs-loading-spinner"></div>
+              <p>Loading jobs...</p>
+            </div>
+          ) : filteredJobs.length === 0 ? (
+            <div className="jobs-empty-state">
+              <h3>No jobs found</h3>
+              <p>
+                {searchTerm || filterType
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'No jobs are currently available. Check back soon!'}
+              </p>
+            </div>
+          ) : (
+            <div className="jobs-grid">
+              {filteredJobs.map((job, index) => (
+                <div key={job._id || index} className="job-card">
+                  <div className="job-header">
+                    <h3 className="job-title">{job.title}</h3>
+                    <span className="job-type-badge">{job.type}</span>
+                  </div>
+
+                  <div className="job-company">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+                    </svg>
+                    {job.sector}
+                  </div>
+
+                  {job.location && (
+                    <div className="job-location">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                      {job.location}
+                    </div>
                   )}
-                  <strong style={{fontSize: '1.3rem', color: '#7bffb6'}}>{job.title}</strong> <br />
-                  <span style={{color: '#d2d6f6'}}>{job.sector} | {job.type}</span>
-                  <p style={{margin: '1rem 0', color: '#fff', whiteSpace: 'pre-line'}}>{job.description}</p>
-                  <p style={{margin: 0}}>
-                    <span style={{color: '#7bffb6'}}>Contact:</span> <a href={`mailto:${job.email}`} style={{color: '#7bffb6'}}>{job.email}</a> | <a href={`tel:${job.phone}`} style={{color: '#7bffb6'}}>{job.phone}</a>
-                  </p>
-                </li>
+
+                  <p className="job-description">{job.description}</p>
+
+                  {renderRequirements(job.requirements)}
+
+                  {(job.email || job.phone) && (
+                    <div className="job-contact">
+                      {job.email && (
+                        <div className="job-contact-item">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                          </svg>
+                          <a href={`mailto:${job.email}`}>{job.email}</a>
+                        </div>
+                      )}
+                      {job.phone && (
+                        <div className="job-contact-item">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                          </svg>
+                          <a href={`tel:${job.phone}`}>{job.phone}</a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {isAdmin && (
+                    <div className="job-actions">
+                      <button
+                        onClick={() => handleEdit(index)}
+                        className="job-edit-btn"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(index)}
+                        className="job-delete-btn"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))}
-            </ul>
-          )
-        )}
-      </div>
-      <div style={{height: '2.5rem'}} />
-    </section>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
