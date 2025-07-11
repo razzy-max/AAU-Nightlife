@@ -15,12 +15,27 @@ export default function AdminPortal() {
 
   const checkAuthStatus = async () => {
     try {
+      // First check localStorage
+      const localAdmin = localStorage.getItem('aau_admin') === 'true';
+      const loginTime = localStorage.getItem('aau_admin_login_time');
+
+      if (localAdmin && loginTime) {
+        const fourHoursAgo = Date.now() - 14400000;
+        if (parseInt(loginTime) > fourHoursAgo) {
+          setIsAuthenticated(true);
+          navigate('/', { replace: true });
+          return;
+        }
+      }
+
+      // Then check server
       const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/verify', {
         credentials: 'include'
       });
       if (response.ok) {
         setIsAuthenticated(true);
-        // Redirect to home with admin access
+        localStorage.setItem('aau_admin', 'true');
+        localStorage.setItem('aau_admin_login_time', Date.now().toString());
         navigate('/', { replace: true });
       }
     } catch (error) {
