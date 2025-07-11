@@ -49,8 +49,9 @@ export default function AdminPortal() {
         setIsAuthenticated(true);
         // Store admin status in localStorage for immediate UI update
         localStorage.setItem('aau_admin', 'true');
-        // Force a page reload to ensure all components recognize admin status
-        window.location.href = '/';
+        localStorage.setItem('aau_admin_login_time', Date.now().toString());
+        // Navigate to home page
+        navigate('/', { replace: true });
       } else {
         setError(data.error || 'Login failed');
       }
