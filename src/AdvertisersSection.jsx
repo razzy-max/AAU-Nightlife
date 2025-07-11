@@ -7,7 +7,7 @@ const API_URL = 'https://aau-nightlife-production.up.railway.app/api/advertisers
 export default function AdvertisersSection() {
   const [advertisers, setAdvertisers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isAdmin, authenticatedFetch } = useAuth();
+  const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
@@ -246,6 +246,9 @@ export default function AdvertisersSection() {
 
   // Use real data if available, otherwise use placeholder data for demonstration
   const displayData = advertisers.length > 0 ? advertisers : placeholderData;
+
+  // Debug logging
+  console.log('AdvertisersSection component - isAdmin:', isAdmin, 'authLoading:', authLoading);
 
   return (
     <section className="advertisers-section">

@@ -20,12 +20,27 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  // Also check localStorage for immediate UI update
+  useEffect(() => {
+    const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
+    if (localAdminStatus && !authChecked) {
+      setIsAdmin(true);
+    }
+  }, [authChecked]);
+
   const checkAuthStatus = async () => {
     try {
+      // First check localStorage for immediate UI response
+      const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
+      if (localAdminStatus) {
+        setIsAdmin(true);
+      }
+
+      // Then verify with server
       const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/verify', {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
         setIsAdmin(true);
         localStorage.setItem('aau_admin', 'true');
@@ -34,8 +49,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('aau_admin');
       }
     } catch (error) {
-      setIsAdmin(false);
-      localStorage.removeItem('aau_admin');
+      // If server check fails but localStorage says admin, keep admin status temporarily
+      const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
+      if (!localAdminStatus) {
+        setIsAdmin(false);
+        localStorage.removeItem('aau_admin');
+      }
     } finally {
       setIsLoading(false);
       setAuthChecked(true);
