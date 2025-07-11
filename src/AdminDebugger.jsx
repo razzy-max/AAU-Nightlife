@@ -25,13 +25,15 @@ export default function AdminDebugger() {
     }}>
       <strong>ADMIN DEBUG</strong>
       <br />
-      Status: {isLoading ? 'Loading...' : isAdmin ? 'ACTIVE' : 'INACTIVE'}
+      Status: {isLoading ? 'Loading...' : isAdmin ? 'ACTIVE (Emergency)' : 'INACTIVE'}
       <br />
       Auth Checked: {authChecked ? 'YES' : 'NO'}
       <br />
       LocalStorage: {localStorage.getItem('aau_admin') || 'null'}
       <br />
       Login Time: {loginTime ? `${timeSinceLogin}m ago` : 'none'}
+      <br />
+      Mode: Emergency Bypass
       <br />
       <button
         onClick={() => {
