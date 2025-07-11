@@ -218,6 +218,8 @@
   font-weight: 600;
   text-transform: capitalize;
   margin-left: 1rem;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .job-company {
