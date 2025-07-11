@@ -260,9 +260,6 @@ export default function Jobs() {
           {/* Add Job Form */}
           {showForm && isAdmin && (
             <form onSubmit={handleSubmit} className="job-form">
-              <h3 style={{ marginBottom: '1.5rem', color: '#1f2937', fontSize: '1.25rem', fontWeight: '700' }}>
-                {editingJobIndex !== null ? 'Edit Job' : 'Add New Job'}
-              </h3>
               <div className="job-form-grid">
                 <div className="job-form-group">
                   <label className="job-form-label">Job Title</label>
