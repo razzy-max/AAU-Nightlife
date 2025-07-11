@@ -49,7 +49,6 @@ export default function Events() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    console.log('Submit triggered, editingEventId:', editingEventId);
 
     if (editingEventId) {
       // Update existing event
@@ -129,8 +128,6 @@ export default function Events() {
 
   // Handle edit event
   const handleEdit = (event) => {
-    console.log('Editing event:', event);
-
     // Convert date to datetime-local format
     let dateValue = '';
     if (event.date) {
@@ -149,7 +146,6 @@ export default function Events() {
     });
     setEditingEventId(event._id);
     setShowForm(true);
-    console.log('Edit mode set, editingEventId:', event._id);
   };
 
   // Edit event
@@ -319,9 +315,6 @@ export default function Events() {
           {/* Add Event Form */}
           {showForm && isAdmin && (
             <form onSubmit={handleSubmit} className="event-form">
-              <h3 style={{ marginBottom: '1.5rem', color: '#1f2937', fontSize: '1.25rem', fontWeight: '700' }}>
-                {editingEventId ? 'Edit Event' : 'Add New Event'}
-              </h3>
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">Event Title</label>
