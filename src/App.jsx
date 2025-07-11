@@ -5,6 +5,9 @@ import Events from './Events';
 import Jobs from './Jobs';
 import Contact from './Contact';
 import Blog from './Blog';
+import About from './About';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
 import { BlogProvider } from './BlogContext';
 import './App.css';
 import AdvertisersSection from './AdvertisersSection';
@@ -27,6 +30,7 @@ function App() {
               <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
               <Link to="/events" onClick={() => setMenuOpen(false)}>Upcoming Events</Link>
               <Link to="/jobs" onClick={() => setMenuOpen(false)}>Jobs</Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
               <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
             </div>
           </nav>
@@ -36,7 +40,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/blog/:id" element={<Blog />} />
           </Routes>
           <AdvertisersSection />
@@ -95,6 +102,14 @@ function App() {
             </div>
             <div className="footer-copy">
               &copy; {new Date().getFullYear()} AAU Nightlife Ekpoma. All rights reserved.
+              <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                <Link to="/privacy-policy" style={{ color: '#ccc', textDecoration: 'none', marginRight: '1rem' }}>
+                  Privacy Policy
+                </Link>
+                <Link to="/terms-of-service" style={{ color: '#ccc', textDecoration: 'none' }}>
+                  Terms of Service
+                </Link>
+              </div>
             </div>
           </div>
         </footer>
