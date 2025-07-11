@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import './Events.css';
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -8,6 +9,8 @@ export default function Events() {
   const [form, setForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterDate, setFilterDate] = useState('');
   const location = useLocation();
   const eventRefs = useRef({});
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
@@ -66,20 +69,40 @@ export default function Events() {
   };
 
   // Delete event
-  const handleDelete = async idx => {
+  const handleDelete = async (eventId) => {
     if (!window.confirm('Delete this event?')) return;
-    const updatedEvents = events.filter((_, i) => i !== idx);
-    setEvents(updatedEvents);
+
     try {
-      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
-        method: 'PUT',
-        body: JSON.stringify(updatedEvents)
+      const response = await authenticatedFetch(`https://aau-nightlife-production.up.railway.app/api/events/${eventId}`, {
+        method: 'DELETE'
       });
+
+      if (response.ok) {
+        setEvents(events.filter(event => event._id !== eventId));
+        setStatus('Event deleted successfully!');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        throw new Error('Failed to delete event');
+      }
     } catch (error) {
-      console.error('Failed to delete event:', error);
-      // Revert the change if the API call failed
-      setEvents(events);
+      console.error('Error deleting event:', error);
+      setStatus('Failed to delete event.');
+      setTimeout(() => setStatus(''), 3000);
     }
+  };
+
+  // Handle edit event
+  const handleEdit = (event) => {
+    setForm({
+      title: event.title,
+      date: event.date.split('T')[0], // Convert to date input format
+      venue: event.venue,
+      description: event.description,
+      email: event.email || '',
+      phone: event.phone || '',
+      image: event.image || ''
+    });
+    setShowForm(true);
   };
 
   // Edit event
@@ -140,154 +163,302 @@ export default function Events() {
     return parts;
   }
 
-  // Admin authentication now handled by AuthContext
+  // Filter events based on search term and date
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.venue.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-  // Debug logging
-  console.log('Events component - isAdmin:', isAdmin, 'authLoading:', authLoading);
+    const matchesDate = !filterDate || event.date.startsWith(filterDate);
+
+    return matchesSearch && matchesDate;
+  });
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  // Helper function to render description with links
+  const renderDescription = (description) => {
+    if (!description) return '';
+
+    // Split by newlines and render each paragraph
+    const paragraphs = description.split('\n').filter(p => p.trim());
+
+    return paragraphs.map((paragraph, index) => (
+      <span key={index}>
+        {paragraph}
+        {index < paragraphs.length - 1 && <br />}
+      </span>
+    ));
+  };
+
+  // Admin authentication now handled by AuthContext
 
   // Wait for auth check to complete
   if (authLoading) {
-    return <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+    return (
+      <div className="events-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading events...</p>
+      </div>
+    );
   }
 
   return (
-    <section className="event-section" style={{
-      minHeight: '100vh',
-      padding: '0',
-      margin: 0,
-      boxSizing: 'border-box',
-      background: '#fff',
-      color: '#111',
-    }}>
-      <div style={{height: '2.5rem'}} />
-      <div className="event-calendar-box" style={{
-        background: 'rgba(35,36,74,0.98)',
-        color: 'white',
-        padding: '2.5rem 1.2rem 2rem 1.2rem',
-        borderRadius: '18px',
-        margin: '0 auto 2.5rem auto',
-        maxWidth: 700,
-        boxShadow: '0 4px 32px #181a2a33',
-        textAlign: 'center',
-      }}>
-        <h2 style={{
-          color: '#7bffb6',
-          fontSize: '2.5rem',
-          fontWeight: 800,
-          marginBottom: '1.1rem',
-          letterSpacing: '1px',
-          textTransform: 'uppercase',
-        }}>Events Calendar</h2>
-        <p style={{
-          color: '#d2d6f6',
-          fontSize: '1.2rem',
-          fontWeight: 400,
-          marginBottom: 0,
-        }}>
-          Stay up to date with the latest and upcoming student events in Ekpoma. Never miss out on the fun, networking, and opportunities happening around you!
-        </p>
-      </div>
-      {/* Responsive style for event form and list */}
-      <div style={{maxWidth: 800, margin: '0 auto', padding: '0 1rem'}}>
-      {isAdmin && (
-        <>
-          <button onClick={() => setShowForm(f => !f)} style={{marginBottom: '1rem'}}>
-            {showForm ? 'Hide Event Form' : 'Add Event'}
-          </button>
-          {showForm && (
-            <form className="event-form" onSubmit={handleSubmit} style={{marginBottom: '2rem'}}>
-              <label>
-                Title:
-                <input type="text" name="title" value={form.title} onChange={handleChange} required />
-              </label>
-              <label>
-                Date:
-                <input type="date" name="date" value={form.date} onChange={handleChange} required />
-              </label>
-              <label>
-                Venue:
-                <input type="text" name="venue" value={form.venue} onChange={handleChange} required />
-              </label>
-              <label>
-                Description:
-                <textarea name="description" value={form.description} onChange={handleChange} required></textarea>
-              </label>
-              <label>
-                Contact Email:
-                <input type="email" name="email" value={form.email} onChange={handleChange} />
-              </label>
-              <label>
-                Contact Phone:
-                <input type="tel" name="phone" value={form.phone} onChange={handleChange} />
-              </label>
-              <label>
-                Banner/Poster Image:
-                <input type="file" name="image" accept="image/*" onChange={handleChange} required />
-              </label>
-              <button type="submit">Add Event</button>
+    <div className="modern-events-page">
+      {/* Hero Section */}
+      <section className="events-hero">
+        <div className="hero-content">
+          <h1 className="hero-title">Discover Amazing Events</h1>
+          <p className="hero-subtitle">Join the most exciting experiences at AAU</p>
+
+          {/* Search and Filter Bar */}
+          <div className="search-filter-bar">
+            <div className="search-container">
+              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search events, venues, or descriptions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+
+            <div className="filter-container">
+              <input
+                type="month"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="date-filter"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <main className="events-main">
+        <div className="container">
+          {/* Admin Controls */}
+          {isAdmin && (
+            <div className="admin-controls">
+              <h2 className="admin-title">Event Management</h2>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="add-event-btn"
+              >
+                {showForm ? '✕ Cancel' : '+ Add New Event'}
+              </button>
+            </div>
+          )}
+
+          {/* Add Event Form */}
+          {showForm && isAdmin && (
+            <form onSubmit={handleSubmit} className="event-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">Event Title</label>
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => setForm({...form, title: e.target.value})}
+                    required
+                    className="form-input"
+                    placeholder="Enter event title"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    value={form.date}
+                    onChange={(e) => setForm({...form, date: e.target.value})}
+                    required
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Venue</label>
+                  <input
+                    type="text"
+                    value={form.venue}
+                    onChange={(e) => setForm({...form, venue: e.target.value})}
+                    required
+                    className="form-input"
+                    placeholder="Event venue"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Image URL</label>
+                  <input
+                    type="url"
+                    value={form.image}
+                    onChange={(e) => setForm({...form, image: e.target.value})}
+                    className="form-input"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  required
+                  className="form-textarea"
+                  placeholder="Describe your event..."
+                />
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">Contact Email</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({...form, email: e.target.value})}
+                    className="form-input"
+                    placeholder="contact@example.com"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Contact Phone</label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({...form, phone: e.target.value})}
+                    className="form-input"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowForm(false)} className="cancel-btn">
+                  Cancel
+                </button>
+                <button type="submit" className="submit-btn">
+                  Create Event
+                </button>
+              </div>
             </form>
           )}
-          {status && <p>{status}</p>}
-        </>
-      )}
-      {loading ? <p>Loading events...</p> : (
-        events.length === 0 ? <p>No events yet.</p> : (
-          <ul>
-            {events.map((event, idx) => (
-              <>
-                <li key={idx} ref={el => eventRefs.current[event.title] = el}>
+
+          {/* Status Message */}
+          {status && (
+            <div className={`status-message ${status.includes('Error') ? 'error' : 'success'}`}>
+              {status}
+            </div>
+          )}
+
+          {/* Events Grid */}
+          {loading ? (
+            <div className="events-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading events...</p>
+            </div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="empty-state">
+              <h3>No events found</h3>
+              <p>
+                {searchTerm || filterDate
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'No events are currently scheduled. Check back soon!'}
+              </p>
+            </div>
+          ) : (
+            <div className="events-grid">
+              {filteredEvents.map((event) => (
+                <div key={event._id} ref={el => eventRefs.current[event._id] = el} className="event-card">
                   {event.image && (
                     <img
                       src={event.image}
-                      alt={event.title + ' banner'}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        maxWidth: '600px',
-                        height: 'auto',
-                        maxHeight: '350px',
-                        objectFit: 'contain',
-                        margin: '0 auto 16px',
-                        borderRadius: 12,
-                        boxShadow: '0 2px 12px rgba(44,44,44,0.10)'
+                      alt={event.title}
+                      className="event-image"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
                       }}
                     />
                   )}
-                  <strong>{event.title}</strong> <br />
-                  <span>{event.date} | {event.venue}</span>
-                  {event.description && event.description.split(/\r?\n/).map((para, i) =>
-                    para.trim() ? <p key={i} style={{marginBottom:'1em'}}>{renderContentWithLinks(para)}</p> : null
-                  )}
-                  <p>Contact: <a href={`mailto:${event.email}`}>{event.email}</a> | <a href={`tel:${event.phone}`}>{event.phone}</a></p>
-                  {isAdmin && editIdx === idx ? (
-                    <form onSubmit={handleEditSubmit} className="event-form" style={{marginBottom: '1rem'}}>
-                      <label>Title: <input type="text" name="title" value={editForm.title} onChange={handleEditChange} required /></label>
-                      <label>Date: <input type="date" name="date" value={editForm.date} onChange={handleEditChange} required /></label>
-                      <label>Venue: <input type="text" name="venue" value={editForm.venue} onChange={handleEditChange} required /></label>
-                      <label>Description: <textarea name="description" value={editForm.description} onChange={handleEditChange} required /></label>
-                      <label>Contact Email: <input type="email" name="email" value={editForm.email} onChange={handleEditChange} /></label>
-                      <label>Contact Phone: <input type="tel" name="phone" value={editForm.phone} onChange={handleEditChange} /></label>
-                      <label>Banner/Poster Image:
-                        <input type="file" name="image" accept="image/*" onChange={handleEditChange} />
-                      </label>
-                      <button type="submit">Save</button>
-                      <button type="button" onClick={() => setEditIdx(null)}>Cancel</button>
-                    </form>
-                  ) : isAdmin && (
-                    <>
-                      <button onClick={() => startEdit(idx)}>Edit</button>
-                      <button onClick={() => handleDelete(idx)} style={{marginLeft: '0.5rem'}}>Delete</button>
-                    </>
-                  )}
-                </li>
-                {idx !== events.length - 1 && <hr className="event-divider" />}
-              </>
-            ))}
-          </ul>
-        )
-      )}
-      </div>
-      <div style={{height: '2.5rem'}} />
-    </section>
+
+                  <div className="event-date-badge">
+                    {formatDate(event.date)}
+                  </div>
+
+                  <div className="event-content">
+                    <h3 className="event-title">{event.title}</h3>
+
+                    <div className="event-venue">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                      {event.venue}
+                    </div>
+
+                    <p className="event-description">
+                      {renderDescription(event.description)}
+                    </p>
+
+                    {(event.email || event.phone) && (
+                      <div className="event-contact">
+                        {event.email && (
+                          <div className="contact-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                            <a href={`mailto:${event.email}`}>{event.email}</a>
+                          </div>
+                        )}
+                        {event.phone && (
+                          <div className="contact-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <a href={`tel:${event.phone}`}>{event.phone}</a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {isAdmin && (
+                      <div className="event-actions">
+                        <button
+                          onClick={() => handleEdit(event)}
+                          className="edit-btn"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(event._id)}
+                          className="delete-btn"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
