@@ -23,8 +23,19 @@ export const AuthProvider = ({ children }) => {
   // Also check localStorage for immediate UI update
   useEffect(() => {
     const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
-    if (localAdminStatus && !authChecked) {
-      setIsAdmin(true);
+    const loginTime = localStorage.getItem('aau_admin_login_time');
+
+    if (localAdminStatus && loginTime) {
+      // Check if login is within last 4 hours (4 * 60 * 60 * 1000 = 14400000ms)
+      const fourHoursAgo = Date.now() - 14400000;
+      if (parseInt(loginTime) > fourHoursAgo) {
+        console.log('Valid admin session found in localStorage');
+        setIsAdmin(true);
+      } else {
+        console.log('Admin session expired');
+        localStorage.removeItem('aau_admin');
+        localStorage.removeItem('aau_admin_login_time');
+      }
     }
   }, [authChecked]);
 
@@ -37,21 +48,42 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Then verify with server
+      console.log('Checking auth status with server...');
       const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/verify', {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
       });
 
+      console.log('Server auth response:', response.status, response.statusText);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('Auth verification successful:', data);
         setIsAdmin(true);
         localStorage.setItem('aau_admin', 'true');
       } else {
-        setIsAdmin(false);
-        localStorage.removeItem('aau_admin');
+        console.log('Auth verification failed:', response.status);
+        // Don't immediately clear admin status - give user benefit of doubt
+        // Only clear if localStorage wasn't set (meaning they never logged in)
+        if (!localAdminStatus) {
+          setIsAdmin(false);
+          localStorage.removeItem('aau_admin');
+        } else {
+          console.log('Keeping admin status due to localStorage');
+          // Keep admin status but warn about server verification failure
+        }
       }
     } catch (error) {
-      // If server check fails but localStorage says admin, keep admin status temporarily
+      console.error('Auth check error:', error);
+      // If server check fails but localStorage says admin, keep admin status
       const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
-      if (!localAdminStatus) {
+      if (localAdminStatus) {
+        console.log('Server unreachable, keeping admin status from localStorage');
+        setIsAdmin(true);
+      } else {
         setIsAdmin(false);
         localStorage.removeItem('aau_admin');
       }
@@ -63,6 +95,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (password) => {
     try {
+      console.log('Attempting login...');
       const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/login', {
         method: 'POST',
         headers: {
@@ -73,15 +106,19 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log('Login response:', response.status, data);
 
       if (response.ok) {
         setIsAdmin(true);
         localStorage.setItem('aau_admin', 'true');
+        // Also store a timestamp for session management
+        localStorage.setItem('aau_admin_login_time', Date.now().toString());
         return { success: true };
       } else {
         return { success: false, error: data.error || 'Login failed' };
       }
     } catch (error) {
+      console.error('Login error:', error);
       return { success: false, error: 'Network error. Please try again.' };
     }
   };

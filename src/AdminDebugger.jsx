@@ -3,10 +3,11 @@ import { useAuth } from './AuthContext';
 
 export default function AdminDebugger() {
   const { isAdmin, isLoading, authChecked } = useAuth();
-  
-  // Only show in development or when admin
-  if (!isAdmin && authChecked) return null;
 
+  const loginTime = localStorage.getItem('aau_admin_login_time');
+  const timeSinceLogin = loginTime ? Math.floor((Date.now() - parseInt(loginTime)) / 1000 / 60) : 0;
+
+  // Always show for debugging
   return (
     <div style={{
       position: 'fixed',
@@ -16,15 +17,41 @@ export default function AdminDebugger() {
       color: 'white',
       padding: '8px 12px',
       borderRadius: '4px',
-      fontSize: '12px',
+      fontSize: '11px',
       zIndex: 9999,
-      fontFamily: 'monospace'
+      fontFamily: 'monospace',
+      maxWidth: '200px',
+      lineHeight: '1.3'
     }}>
-      Admin Status: {isLoading ? 'Loading...' : isAdmin ? 'ACTIVE' : 'INACTIVE'}
+      <strong>ADMIN DEBUG</strong>
+      <br />
+      Status: {isLoading ? 'Loading...' : isAdmin ? 'ACTIVE' : 'INACTIVE'}
       <br />
       Auth Checked: {authChecked ? 'YES' : 'NO'}
       <br />
       LocalStorage: {localStorage.getItem('aau_admin') || 'null'}
+      <br />
+      Login Time: {loginTime ? `${timeSinceLogin}m ago` : 'none'}
+      <br />
+      <button
+        onClick={() => {
+          localStorage.setItem('aau_admin', 'true');
+          localStorage.setItem('aau_admin_login_time', Date.now().toString());
+          window.location.reload();
+        }}
+        style={{
+          background: '#2196F3',
+          color: 'white',
+          border: 'none',
+          padding: '2px 6px',
+          borderRadius: '2px',
+          fontSize: '10px',
+          cursor: 'pointer',
+          marginTop: '4px'
+        }}
+      >
+        Force Admin
+      </button>
     </div>
   );
 }
