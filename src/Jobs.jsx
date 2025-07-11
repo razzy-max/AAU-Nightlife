@@ -10,6 +10,7 @@ export default function Jobs() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('');
+  const [editingJobIndex, setEditingJobIndex] = useState(null);
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -34,30 +35,58 @@ export default function Jobs() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setStatus('Adding...');
-    try {
-      const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
-        method: 'POST',
-        body: JSON.stringify(form)
-      });
-      if (res.ok) {
-        setStatus('Job added!');
-        setForm({ title: '', sector: '', type: '', description: '', email: '', phone: '' });
-        // Refresh jobs
-        const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs').then(r => r.json());
-        // Sort jobs by _id in descending order (newest first)
-        const sortedJobs = updated.sort((a, b) => {
-          if (a._id && b._id) {
-            return b._id.localeCompare(a._id);
-          }
-          return 0;
+
+    if (editingJobIndex !== null) {
+      // Update existing job
+      setStatus('Updating...');
+      try {
+        const updatedJobs = [...jobs];
+        updatedJobs[editingJobIndex] = form;
+
+        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+          method: 'PUT',
+          body: JSON.stringify(updatedJobs)
         });
-        setJobs(sortedJobs);
-      } else {
-        setStatus('Failed to add job.');
+        if (res.ok) {
+          setStatus('Job updated!');
+          setJobs(updatedJobs);
+          setForm({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
+          setShowForm(false);
+          setEditingJobIndex(null);
+        } else {
+          setStatus('Failed to update job.');
+        }
+      } catch (error) {
+        setStatus(error.message || 'Failed to update job.');
       }
-    } catch (error) {
-      setStatus(error.message || 'Failed to add job.');
+    } else {
+      // Add new job
+      setStatus('Adding...');
+      try {
+        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+          method: 'POST',
+          body: JSON.stringify(form)
+        });
+        if (res.ok) {
+          setStatus('Job added!');
+          setForm({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
+          setShowForm(false);
+          // Refresh jobs
+          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs').then(r => r.json());
+          // Sort jobs by _id in descending order (newest first)
+          const sortedJobs = updated.sort((a, b) => {
+            if (a._id && b._id) {
+              return b._id.localeCompare(a._id);
+            }
+            return 0;
+          });
+          setJobs(sortedJobs);
+        } else {
+          setStatus('Failed to add job.');
+        }
+      } catch (error) {
+        setStatus(error.message || 'Failed to add job.');
+      }
     }
   };
 
@@ -100,6 +129,7 @@ export default function Jobs() {
       phone: job.phone || '',
       location: job.location || ''
     });
+    setEditingJobIndex(index);
     setShowForm(true);
   };
   const handleEditChange = e => {
@@ -213,7 +243,13 @@ export default function Jobs() {
             <div className="jobs-admin-controls">
               <h2 className="jobs-admin-title">Job Management</h2>
               <button
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => {
+                  setShowForm(!showForm);
+                  if (showForm) {
+                    setEditingJobIndex(null);
+                    setForm({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
+                  }
+                }}
                 className="add-job-btn"
               >
                 {showForm ? '✕ Cancel' : '+ Add New Job'}
@@ -328,7 +364,7 @@ export default function Jobs() {
                   Cancel
                 </button>
                 <button type="submit" className="job-submit-btn">
-                  Post Job
+                  {editingJobIndex !== null ? 'Update Job' : 'Post Job'}
                 </button>
               </div>
             </form>

@@ -11,6 +11,7 @@ export default function Events() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  const [editingEventId, setEditingEventId] = useState(null);
   const location = useLocation();
   const eventRefs = useRef({});
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
@@ -48,23 +49,50 @@ export default function Events() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setStatus('Adding...');
-    try {
-      const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
-        method: 'POST',
-        body: JSON.stringify(form)
-      });
-      if (res.ok) {
-        setStatus('Event added!');
-        setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
-        // Refresh events
-        const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
-        setEvents(updated);
-      } else {
-        setStatus('Failed to add event.');
+
+    if (editingEventId) {
+      // Update existing event
+      setStatus('Updating...');
+      try {
+        const res = await authenticatedFetch(`https://aau-nightlife-production.up.railway.app/api/events/${editingEventId}`, {
+          method: 'PUT',
+          body: JSON.stringify(form)
+        });
+        if (res.ok) {
+          setStatus('Event updated!');
+          setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+          setShowForm(false);
+          setEditingEventId(null);
+          // Refresh events
+          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
+          setEvents(updated);
+        } else {
+          setStatus('Failed to update event.');
+        }
+      } catch (error) {
+        setStatus(error.message || 'Failed to update event.');
       }
-    } catch (error) {
-      setStatus(error.message || 'Failed to add event.');
+    } else {
+      // Add new event
+      setStatus('Adding...');
+      try {
+        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+          method: 'POST',
+          body: JSON.stringify(form)
+        });
+        if (res.ok) {
+          setStatus('Event added!');
+          setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+          setShowForm(false);
+          // Refresh events
+          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
+          setEvents(updated);
+        } else {
+          setStatus('Failed to add event.');
+        }
+      } catch (error) {
+        setStatus(error.message || 'Failed to add event.');
+      }
     }
   };
 
@@ -102,6 +130,7 @@ export default function Events() {
       phone: event.phone || '',
       image: event.image || ''
     });
+    setEditingEventId(event._id);
     setShowForm(true);
   };
 
@@ -255,7 +284,13 @@ export default function Events() {
             <div className="admin-controls">
               <h2 className="admin-title">Event Management</h2>
               <button
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => {
+                  setShowForm(!showForm);
+                  if (showForm) {
+                    setEditingEventId(null);
+                    setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+                  }
+                }}
                 className="add-event-btn"
               >
                 {showForm ? '✕ Cancel' : '+ Add New Event'}
@@ -354,7 +389,7 @@ export default function Events() {
                   Cancel
                 </button>
                 <button type="submit" className="submit-btn">
-                  Create Event
+                  {editingEventId ? 'Update Event' : 'Create Event'}
                 </button>
               </div>
             </form>

@@ -34,12 +34,12 @@ export default function AdminLogout() {
       onClick={handleLogout}
       style={{
         position: 'fixed',
-        top: '10px',
-        right: '10px',
+        bottom: '20px',
+        left: '20px',
         zIndex: 9999,
         background: 'linear-gradient(135deg, #ff4757 0%, #ff3742 100%)',
         color: 'white',
-        padding: '10px 20px',
+        padding: '12px 20px',
         borderRadius: '25px',
         fontSize: '14px',
         fontWeight: '600',
