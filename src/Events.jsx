@@ -49,25 +49,33 @@ export default function Events() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    console.log('Submit triggered, editingEventId:', editingEventId);
 
     if (editingEventId) {
       // Update existing event
       setStatus('Updating...');
       try {
-        const res = await authenticatedFetch(`https://aau-nightlife-production.up.railway.app/api/events/${editingEventId}`, {
-          method: 'PUT',
-          body: JSON.stringify(form)
-        });
-        if (res.ok) {
-          setStatus('Event updated!');
-          setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
-          setShowForm(false);
-          setEditingEventId(null);
-          // Refresh events
-          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
-          setEvents(updated);
-        } else {
-          setStatus('Failed to update event.');
+        // Find the event index and update the events array
+        const eventIndex = events.findIndex(event => event._id === editingEventId);
+        if (eventIndex !== -1) {
+          const updatedEvents = [...events];
+          updatedEvents[eventIndex] = { ...updatedEvents[eventIndex], ...form };
+
+          // Send updated events array to backend
+          const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+            method: 'PUT',
+            body: JSON.stringify(updatedEvents)
+          });
+
+          if (res.ok) {
+            setStatus('Event updated!');
+            setEvents(updatedEvents);
+            setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+            setShowForm(false);
+            setEditingEventId(null);
+          } else {
+            setStatus('Failed to update event.');
+          }
         }
       } catch (error) {
         setStatus(error.message || 'Failed to update event.');
@@ -121,9 +129,18 @@ export default function Events() {
 
   // Handle edit event
   const handleEdit = (event) => {
+    console.log('Editing event:', event);
+
+    // Convert date to datetime-local format
+    let dateValue = '';
+    if (event.date) {
+      const date = new Date(event.date);
+      dateValue = date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+    }
+
     setForm({
       title: event.title,
-      date: event.date.split('T')[0], // Convert to date input format
+      date: dateValue,
       venue: event.venue,
       description: event.description,
       email: event.email || '',
@@ -132,6 +149,7 @@ export default function Events() {
     });
     setEditingEventId(event._id);
     setShowForm(true);
+    console.log('Edit mode set, editingEventId:', event._id);
   };
 
   // Edit event
@@ -301,6 +319,9 @@ export default function Events() {
           {/* Add Event Form */}
           {showForm && isAdmin && (
             <form onSubmit={handleSubmit} className="event-form">
+              <h3 style={{ marginBottom: '1.5rem', color: '#1f2937', fontSize: '1.25rem', fontWeight: '700' }}>
+                {editingEventId ? 'Edit Event' : 'Add New Event'}
+              </h3>
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">Event Title</label>
