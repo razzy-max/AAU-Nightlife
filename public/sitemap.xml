@@ -31,4 +31,28 @@
     <changefreq>monthly</changefreq>
     <priority>0.70</priority>
   </url>
+
+  <!-- About Page -->
+  <url>
+    <loc>https://www.aaunightlife.com/about</loc>
+    <lastmod>2025-07-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://www.aaunightlife.com/privacy-policy</loc>
+    <lastmod>2025-07-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.30</priority>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://www.aaunightlife.com/terms-of-service</loc>
+    <lastmod>2025-07-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.30</priority>
+  </url>
 </urlset>
