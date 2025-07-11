@@ -2,10 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const cookieParser = require('cookie-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET || 'aau-nightlife-secret-key-2024';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'; // Default: 'password'
 
 let db;
 
@@ -16,8 +21,12 @@ MongoClient.connect(MONGO_URI)
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://aaunightlife.com', 'https://www.aaunightlife.com'],
+  credentials: true
+}));
 app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to support base64 images
+app.use(cookieParser());
 
 // Data file paths
 const eventsPath = path.join(__dirname, 'data', 'events.json');
@@ -38,6 +47,88 @@ function writeData(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
+// Authentication middleware
+function authenticateAdmin(req, res, next) {
+  const token = req.cookies.adminToken || req.headers.authorization?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.admin = decoded;
+    next();
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid token.' });
+  }
+}
+
+// Admin Authentication Endpoints
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    // Compare password with hash
+    const isValidPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { role: 'admin', loginTime: Date.now() },
+      JWT_SECRET,
+      { expiresIn: '4h' } // Token expires in 4 hours
+    );
+
+    // Set secure cookie
+    res.cookie('adminToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 4 * 60 * 60 * 1000 // 4 hours
+    });
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      expiresIn: '4h'
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  res.clearCookie('adminToken');
+  res.json({ success: true, message: 'Logout successful' });
+});
+
+app.get('/api/admin/verify', authenticateAdmin, (req, res) => {
+  res.json({
+    success: true,
+    admin: req.admin,
+    message: 'Token is valid'
+  });
+});
+
+// Utility endpoint to generate password hash (for development)
+app.post('/api/admin/generate-hash', async (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+  const hash = await bcrypt.hash(password, 10);
+  res.json({ hash });
+});
+
 // Events endpoints (MongoDB)
 app.get('/api/events', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
@@ -57,7 +148,7 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     // Accept both 'venue' and legacy 'category' for compatibility
@@ -73,7 +164,7 @@ app.post('/api/events', async (req, res) => {
   }
 });
 
-app.put('/api/events', async (req, res) => {
+app.put('/api/events', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     // req.body should be an array of events (for bulk update)
@@ -106,7 +197,7 @@ app.get('/api/jobs', async (req, res) => {
   }
 });
 
-app.post('/api/jobs', async (req, res) => {
+app.post('/api/jobs', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const result = await db.collection('jobs').insertOne(req.body);
@@ -116,7 +207,7 @@ app.post('/api/jobs', async (req, res) => {
   }
 });
 
-app.put('/api/jobs', async (req, res) => {
+app.put('/api/jobs', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     await db.collection('jobs').deleteMany({});
@@ -141,7 +232,7 @@ app.get('/api/hero-images', async (req, res) => {
   }
 });
 
-app.put('/api/hero-images', async (req, res) => {
+app.put('/api/hero-images', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     await db.collection('heroImages').deleteMany({});
@@ -166,7 +257,7 @@ app.get('/api/blog-posts', async (req, res) => {
   }
 });
 
-app.post('/api/blog-posts', async (req, res) => {
+app.post('/api/blog-posts', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const result = await db.collection('blogPosts').insertOne(req.body);
@@ -176,7 +267,7 @@ app.post('/api/blog-posts', async (req, res) => {
   }
 });
 
-app.put('/api/blog-posts', async (req, res) => {
+app.put('/api/blog-posts', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     await db.collection('blogPosts').deleteMany({});
@@ -190,7 +281,7 @@ app.put('/api/blog-posts', async (req, res) => {
 });
 
 // Add this DELETE endpoint for blog posts
-app.delete('/api/blog-posts/:id', async (req, res) => {
+app.delete('/api/blog-posts/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;
@@ -206,7 +297,7 @@ app.delete('/api/blog-posts/:id', async (req, res) => {
 });
 
 // Add this PUT endpoint for updating a single blog post by _id
-app.put('/api/blog-posts/:id', async (req, res) => {
+app.put('/api/blog-posts/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;
@@ -239,7 +330,7 @@ app.get('/api/blog-comments/:blogId', async (req, res) => {
   }
 });
 
-app.post('/api/blog-comments', async (req, res) => {
+app.post('/api/blog-comments', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     // expects { blogId, ...commentData }
@@ -250,7 +341,7 @@ app.post('/api/blog-comments', async (req, res) => {
   }
 });
 
-app.delete('/api/blog-comments/:id', async (req, res) => {
+app.delete('/api/blog-comments/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;
@@ -278,7 +369,7 @@ app.get('/api/advertisers', async (req, res) => {
   }
 });
 
-app.post('/api/advertisers', async (req, res) => {
+app.post('/api/advertisers', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   const { name, media, link, description, facebook, instagram, whatsapp, mediaType } = req.body;
   if (!name) return res.status(400).json({ error: 'Missing required field: name' });
@@ -302,7 +393,7 @@ app.post('/api/advertisers', async (req, res) => {
 });
 
 // Add PUT endpoint for editing advertisers
-app.put('/api/advertisers/:id', async (req, res) => {
+app.put('/api/advertisers/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   const { id } = req.params;
   const { name, media, link, description, facebook, instagram, whatsapp, mediaType } = req.body;
@@ -332,7 +423,7 @@ app.put('/api/advertisers/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/advertisers/:id', async (req, res) => {
+app.delete('/api/advertisers/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;

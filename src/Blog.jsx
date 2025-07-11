@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
+import { useAuth } from './AuthContext';
 
 // Helper to convert [text](url) to clickable links
 function renderContentWithLinks(content) {
@@ -31,6 +32,7 @@ function renderContentWithLinks(content) {
 export default function Blog() {
   const { id } = useParams();
   const { posts, editPost, removePost, comments, addComment, removeComment } = useBlog();
+  const { isAdmin } = useAuth();
   // Find by _id for MongoDB
   const blog = posts.find(post => String(post._id) === String(id));
   const [input, setInput] = useState('');
@@ -42,7 +44,6 @@ export default function Blog() {
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', image: '', content: '' });
   const navigate = useNavigate();
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
   // Use _id for comments and update removeComment to use commentId
   const blogComments = comments[blog?._id] || [];
 

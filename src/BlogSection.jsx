@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import './App.css';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
+import { useAuth } from './AuthContext';
 
 export default function BlogSection() {
   const { posts, addPost } = useBlog();
+  const { isAdmin } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '' });
-  const isAdmin = localStorage.getItem('aau_admin') === 'true';
+  // Admin authentication now handled by AuthContext
 
   const handleFormChange = e => {
     if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
