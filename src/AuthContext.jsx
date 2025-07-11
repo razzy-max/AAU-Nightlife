@@ -15,9 +15,26 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Check authentication status on app load
+  // Check authentication status on app load and when localStorage changes
   useEffect(() => {
     checkAuthStatus();
+
+    // Also check localStorage immediately for faster UI response
+    const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
+    if (localAdminStatus) {
+      setIsAdmin(true);
+    }
+  }, []);
+
+  // Listen for localStorage changes (in case admin status is set in another tab/window)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const localAdminStatus = localStorage.getItem('aau_admin') === 'true';
+      setIsAdmin(localAdminStatus);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Also check localStorage for immediate UI update
