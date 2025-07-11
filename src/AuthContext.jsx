@@ -151,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsAdmin(false);
       localStorage.removeItem('aau_admin');
+      localStorage.removeItem('aau_admin_login_time');
     }
   };
 

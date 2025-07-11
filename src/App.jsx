@@ -9,6 +9,7 @@ import About from './About';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import AdminPortal from './AdminPortal';
+import AdminLogout from './AdminLogout';
 import { BlogProvider } from './BlogContext';
 import { AuthProvider } from './AuthContext';
 import './App.css';
@@ -21,6 +22,7 @@ function App() {
     <AuthProvider>
       <BlogProvider>
         <div className="app-root">
+          <AdminLogout />
         <header>
           <nav className="main-nav responsive-nav">
             <div className="nav-logo">AAU Nightlife</div>
