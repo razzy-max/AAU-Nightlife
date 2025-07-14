@@ -718,6 +718,7 @@
   .events-grid-modern {
     grid-template-columns: 1fr;
     gap: var(--space-lg);
+    justify-items: center; /* Ensure cards are centered on mobile */
   }
 
   .event-card-header {
@@ -753,6 +754,11 @@
 
   .events-title-modern {
     font-size: 2.5rem;
+  }
+
+  /* Ensure grid centering on smallest devices */
+  .events-grid-modern {
+    justify-items: center;
   }
 
   /* Improved mobile card padding to match job cards */

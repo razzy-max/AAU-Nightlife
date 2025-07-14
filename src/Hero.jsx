@@ -177,9 +177,7 @@ export default function Hero() {
 
         {/* Modern call-to-action buttons */}
         <div className="hero-actions">
-          <a href="#features" className="hero-btn primary">
-            Explore Features
-          </a>
+          
           <a href="/events" className="hero-btn secondary">
             View All Events
           </a>
