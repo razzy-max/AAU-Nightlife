@@ -522,9 +522,13 @@
 /* Modern Events Grid */
 .events-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: var(--space-xl);
   margin-top: var(--space-2xl);
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
 }
 
 .event-card-modern {
@@ -647,6 +651,35 @@
   font-weight: 500;
 }
 
+/* Event Description with Improved Text Contrast */
+.event-description {
+  color: #e2e8f0; /* High contrast for readability - same as job descriptions */
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: var(--space-lg);
+  white-space: pre-wrap;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Desktop specific improvements for better centering */
+@media (min-width: 1024px) {
+  .events-grid-modern {
+    justify-items: center;
+    padding: 0 var(--space-lg);
+  }
+
+  .events-container-modern {
+    padding: 0 var(--space-xl);
+  }
+}
+
+@media (min-width: 1440px) {
+  .events-container-modern {
+    padding: 0 var(--space-2xl);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .events-hero-modern {
@@ -720,6 +753,11 @@
 
   .events-title-modern {
     font-size: 2.5rem;
+  }
+
+  /* Improved mobile card padding to match job cards */
+  .event-content-modern {
+    padding: var(--space-lg) var(--space-lg) var(--space-xl) var(--space-lg);
   }
 }
 
