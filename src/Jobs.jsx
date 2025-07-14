@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 import './Jobs.css';
 
 export default function Jobs() {
@@ -14,7 +15,7 @@ export default function Jobs() {
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetch('https://aau-nightlife-production.up.railway.app/api/jobs')
+    fetch(API_ENDPOINTS.jobs)
       .then(res => res.json())
       .then(data => {
         // Sort jobs by _id in descending order (newest first)
@@ -43,7 +44,7 @@ export default function Jobs() {
         const updatedJobs = [...jobs];
         updatedJobs[editingJobIndex] = form;
 
-        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+        const res = await authenticatedFetch(API_ENDPOINTS.jobs, {
           method: 'PUT',
           body: JSON.stringify(updatedJobs)
         });
@@ -63,7 +64,7 @@ export default function Jobs() {
       // Add new job
       setStatus('Adding...');
       try {
-        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+        const res = await authenticatedFetch(API_ENDPOINTS.jobs, {
           method: 'POST',
           body: JSON.stringify(form)
         });
@@ -72,7 +73,7 @@ export default function Jobs() {
           setForm({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
           setShowForm(false);
           // Refresh jobs
-          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/jobs').then(r => r.json());
+          const updated = await fetch(API_ENDPOINTS.jobs).then(r => r.json());
           // Sort jobs by _id in descending order (newest first)
           const sortedJobs = updated.sort((a, b) => {
             if (a._id && b._id) {
@@ -96,7 +97,7 @@ export default function Jobs() {
     const updatedJobs = jobs.filter((_, i) => i !== idx);
     setJobs(updatedJobs);
     try {
-      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+      await authenticatedFetch(API_ENDPOINTS.jobs, {
         method: 'PUT',
         body: JSON.stringify(updatedJobs)
       });
@@ -141,7 +142,7 @@ export default function Jobs() {
     setJobs(updatedJobs);
     setEditIdx(null);
     try {
-      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/jobs', {
+      await authenticatedFetch(API_ENDPOINTS.jobs, {
         method: 'PUT',
         body: JSON.stringify(updatedJobs)
       });

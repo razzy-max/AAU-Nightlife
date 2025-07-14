@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 import './AdvertisersSection.css';
-
-const API_URL = 'https://aau-nightlife-production.up.railway.app/api/advertisers';
 
 export default function AdvertisersSection() {
   const [advertisers, setAdvertisers] = useState([]);
@@ -44,7 +43,7 @@ export default function AdvertisersSection() {
   const fetchAdvertisers = async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(API_ENDPOINTS.advertisers);
       if (!res.ok) throw new Error('Failed to fetch advertisers');
       const data = await res.json();
       setAdvertisers(data);
@@ -125,7 +124,7 @@ export default function AdvertisersSection() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await authenticatedFetch(API_URL, {
+      const res = await authenticatedFetch(API_ENDPOINTS.advertisers, {
         method: 'POST',
         body: JSON.stringify(form),
       });
@@ -182,7 +181,7 @@ export default function AdvertisersSection() {
     e.preventDefault();
     setEditSubmitting(true);
     try {
-      const res = await authenticatedFetch(`${API_URL}/${editingId}`, {
+      const res = await authenticatedFetch(`${API_ENDPOINTS.advertisers}/${editingId}`, {
         method: 'PUT',
         body: JSON.stringify(editForm),
       });
@@ -199,7 +198,7 @@ export default function AdvertisersSection() {
   const handleDeleteAdvertiser = async (id) => {
     if (!window.confirm('Delete this advertiser?')) return;
     try {
-      const res = await authenticatedFetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      const res = await authenticatedFetch(`${API_ENDPOINTS.advertisers}/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete advertiser');
       fetchAdvertisers();
     } catch (err) {

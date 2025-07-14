@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 import './Events.css';
 
 export default function Events() {
@@ -17,7 +18,7 @@ export default function Events() {
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetch('https://aau-nightlife-production.up.railway.app/api/events')
+    fetch(API_ENDPOINTS.events)
       .then(res => res.json())
       .then(data => {
         setEvents(data);
@@ -61,7 +62,7 @@ export default function Events() {
           updatedEvents[eventIndex] = { ...updatedEvents[eventIndex], ...form };
 
           // Send updated events array to backend
-          const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+          const res = await authenticatedFetch(API_ENDPOINTS.events, {
             method: 'PUT',
             body: JSON.stringify(updatedEvents)
           });
@@ -83,7 +84,7 @@ export default function Events() {
       // Add new event
       setStatus('Adding...');
       try {
-        const res = await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+        const res = await authenticatedFetch(API_ENDPOINTS.events, {
           method: 'POST',
           body: JSON.stringify(form)
         });
@@ -92,7 +93,7 @@ export default function Events() {
           setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
           setShowForm(false);
           // Refresh events
-          const updated = await fetch('https://aau-nightlife-production.up.railway.app/api/events').then(r => r.json());
+          const updated = await fetch(API_ENDPOINTS.events).then(r => r.json());
           setEvents(updated);
         } else {
           setStatus('Failed to add event.');
@@ -108,7 +109,7 @@ export default function Events() {
     if (!window.confirm('Delete this event?')) return;
 
     try {
-      const response = await authenticatedFetch(`https://aau-nightlife-production.up.railway.app/api/events/${eventId}`, {
+      const response = await authenticatedFetch(`${API_ENDPOINTS.events}/${eventId}`, {
         method: 'DELETE'
       });
 
@@ -173,7 +174,7 @@ export default function Events() {
     setEvents(updatedEvents);
     setEditIdx(null);
     try {
-      await authenticatedFetch('https://aau-nightlife-production.up.railway.app/api/events', {
+      await authenticatedFetch(API_ENDPOINTS.events, {
         method: 'PUT',
         body: JSON.stringify(updatedEvents)
       });
