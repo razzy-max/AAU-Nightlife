@@ -182,7 +182,7 @@
   transition: all 0.4s ease;
   position: relative;
   cursor: pointer;
-  width: 320px;
+  width: 360px; /* Modest increase from 320px for better content space */
   flex-shrink: 0;
 }
 
@@ -458,8 +458,8 @@
 
   .event-card-modern {
     scroll-snap-align: center;
-    min-width: 280px;
-    max-width: 320px;
+    min-width: 320px; /* Increased proportionally from 280px */
+    max-width: 360px; /* Increased to match desktop width */
   }
 
   .event-empty-state {
@@ -474,8 +474,8 @@
   }
 
   .event-card-modern {
-    min-width: 260px;
-    max-width: 280px;
+    min-width: 300px; /* Increased proportionally for better mobile experience */
+    max-width: 340px; /* Increased to provide more content space */
   }
 
   .event-card-content-modern {
