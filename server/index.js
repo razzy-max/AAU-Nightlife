@@ -206,8 +206,15 @@ app.delete('/api/events/:id', authenticateAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Invalid event ID format' });
     }
 
-    const result = await db.collection('events').deleteOne({ _id: new ObjectId(id) });
-    console.log('Delete result:', result);
+    // Try both ObjectId and string formats
+    let result = await db.collection('events').deleteOne({ _id: new ObjectId(id) });
+    console.log('Delete result with ObjectId:', result);
+
+    // If not found with ObjectId, try with string
+    if (result.deletedCount === 0) {
+      result = await db.collection('events').deleteOne({ _id: id });
+      console.log('Delete result with string ID:', result);
+    }
 
     if (result.deletedCount === 1) {
       res.json({ success: true, message: 'Event deleted successfully' });
