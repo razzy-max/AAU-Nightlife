@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from './config';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -19,7 +20,7 @@ export default function Contact() {
 
     try {
       const res = await fetch(
-        'https://aau-nightlife-production.up.railway.app/api/contact',
+        API_ENDPOINTS.contact,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

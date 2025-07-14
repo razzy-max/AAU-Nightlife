@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL, API_ENDPOINTS } from './config';
 
 const BlogContext = createContext();
-const API_URL = 'https://aau-nightlife-production.up.railway.app';
 
 export function BlogProvider({ children }) {
   const [posts, setPosts] = useState([]);
@@ -20,7 +20,7 @@ export function BlogProvider({ children }) {
 
   // Fetch posts from server
   useEffect(() => {
-    fetch(`${API_URL}/api/blog-posts`)
+    fetch(API_ENDPOINTS.blogPosts)
       .then(res => res.json())
       .then(data => setPosts(Array.isArray(data) ? data : []));
   }, []);
@@ -28,11 +28,11 @@ export function BlogProvider({ children }) {
   // Fetch comments from server (persist per blogId)
   useEffect(() => {
     async function fetchAllComments() {
-      const res = await fetch(`${API_URL}/api/blog-posts`);
+      const res = await fetch(API_ENDPOINTS.blogPosts);
       const blogs = await res.json();
       const commentsObj = {};
       for (const blog of blogs) {
-        const resC = await fetch(`${API_URL}/api/blog-comments/${blog._id}`);
+        const resC = await fetch(`${API_ENDPOINTS.blogComments}/${blog._id}`);
         let blogComments = await resC.json();
         commentsObj[blog._id] = blogComments.reverse(); // Reverse to show newest first
       }
@@ -43,7 +43,7 @@ export function BlogProvider({ children }) {
 
   // Add new post and sync to server
   const addPost = async (post) => {
-    const res = await fetch(`${API_URL}/api/blog-posts`, {
+    const res = await fetch(API_ENDPOINTS.blogPosts, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post)
@@ -57,7 +57,7 @@ export function BlogProvider({ children }) {
 
   // Edit post and sync to server
   const editPost = async (id, updated) => {
-    const res = await fetch(`${API_URL}/api/blog-posts/${id}`, {
+    const res = await fetch(`${API_ENDPOINTS.blogPosts}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated)
@@ -70,14 +70,14 @@ export function BlogProvider({ children }) {
 
   // Remove post and sync to server
   const removePost = async (id) => {
-    await fetch(`${API_URL}/api/blog-posts/${id}`, { method: 'DELETE' });
+    await fetch(`${API_ENDPOINTS.blogPosts}/${id}`, { method: 'DELETE' });
     setPosts(prev => prev.filter(p => p._id !== id));
   };
 
   // Add new comment and sync to server
   const addComment = async (blogId, comment) => {
     try {
-      const res = await fetch(`${API_URL}/api/blog-comments`, {
+      const res = await fetch(API_ENDPOINTS.blogComments, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ blogId: String(blogId), ...comment })
@@ -98,7 +98,7 @@ export function BlogProvider({ children }) {
   // Remove comment and sync to server
   const removeComment = async (blogId, commentId) => {
     try {
-      const res = await authenticatedFetch(`${API_URL}/api/blog-comments/${commentId}`, {
+      const res = await authenticatedFetch(`${API_ENDPOINTS.blogComments}/${commentId}`, {
         method: 'DELETE'
       });
 
@@ -117,7 +117,7 @@ export function BlogProvider({ children }) {
 
   // Helper function to fetch and reverse comments for a specific blog
   const fetchCommentsForBlog = async (blogId) => {
-    const res = await fetch(`${API_URL}/api/blog-comments/${blogId}`);
+    const res = await fetch(`${API_ENDPOINTS.blogComments}/${blogId}`);
     let blogComments = await res.json();
     setComments(prev => ({ ...prev, [blogId]: blogComments.reverse() }));
   };

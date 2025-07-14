@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_ENDPOINTS } from './config';
 
 const AuthContext = createContext();
 
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
       // Then verify with server
       console.log('Checking auth status with server...');
-      const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/verify', {
+      const response = await fetch(API_ENDPOINTS.adminVerify, {
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
@@ -113,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (password) => {
     try {
       console.log('Attempting login...');
-      const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/login', {
+      const response = await fetch(API_ENDPOINTS.adminLogin, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('https://aau-nightlife-production.up.railway.app/api/admin/logout', {
+      await fetch(API_ENDPOINTS.adminLogout, {
         method: 'POST',
         credentials: 'include'
       });

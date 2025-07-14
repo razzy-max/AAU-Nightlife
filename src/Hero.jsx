@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 import './App.css';
-
-const API_URL = 'https://aau-nightlife-production.up.railway.app';
 
 export default function Hero() {
   const [heroImages, setHeroImages] = useState([]);
@@ -15,7 +14,7 @@ export default function Hero() {
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetch(`${API_URL}/api/hero-images`)
+    fetch(API_ENDPOINTS.heroImages)
       .then(res => res.json())
       .then(data => {
         setHeroImages(Array.isArray(data) ? data : []);
@@ -50,7 +49,7 @@ export default function Hero() {
     setStatus('Saving...');
     try {
       const newImages = [...heroImages, ...pendingImages];
-      const res = await authenticatedFetch(`${API_URL}/api/hero-images`, {
+      const res = await authenticatedFetch(API_ENDPOINTS.heroImages, {
         method: 'PUT',
         body: JSON.stringify(newImages)
       });
@@ -71,7 +70,7 @@ export default function Hero() {
     const updatedImages = heroImages.filter((_, i) => i !== idx);
     setHeroImages(updatedImages);
     try {
-      await authenticatedFetch(`${API_URL}/api/hero-images`, {
+      await authenticatedFetch(API_ENDPOINTS.heroImages, {
         method: 'PUT',
         body: JSON.stringify(updatedImages)
       });

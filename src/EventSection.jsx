@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from './config';
 import './EventSection.css';
 
 export default function EventSection() {
@@ -11,7 +12,7 @@ export default function EventSection() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://aau-nightlife-production.up.railway.app/api/events')
+    fetch(API_ENDPOINTS.events)
       .then(res => res.json())
       .then(data => {
         setEvents(data);
