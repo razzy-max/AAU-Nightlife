@@ -353,10 +353,24 @@ app.delete('/api/blog-comments/:id', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     const { id } = req.params;
-    await db.collection('blogComments').deleteOne({ _id: new ObjectId(id) });
-    res.json({ success: true });
+    console.log('Attempting to delete comment with ID:', id);
+
+    // Validate ObjectId format
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid comment ID format' });
+    }
+
+    const result = await db.collection('blogComments').deleteOne({ _id: new ObjectId(id) });
+    console.log('Delete result:', result);
+
+    if (result.deletedCount === 1) {
+      res.json({ success: true, message: 'Comment deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Comment not found' });
+    }
   } catch (err) {
-    res.status(500).json({ error: 'Failed to delete blog comment' });
+    console.error('Error deleting comment:', err);
+    res.status(500).json({ error: 'Failed to delete blog comment', details: err.message });
   }
 });
 

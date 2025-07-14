@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const BlogContext = createContext();
 const API_URL = 'https://aau-nightlife-production.up.railway.app';
@@ -6,6 +7,16 @@ const API_URL = 'https://aau-nightlife-production.up.railway.app';
 export function BlogProvider({ children }) {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({});
+
+  // Get authenticated fetch from AuthContext if available
+  let authenticatedFetch;
+  try {
+    const auth = useAuth();
+    authenticatedFetch = auth.authenticatedFetch;
+  } catch (error) {
+    // AuthContext not available, use regular fetch
+    authenticatedFetch = fetch;
+  }
 
   // Fetch posts from server
   useEffect(() => {
@@ -86,8 +97,22 @@ export function BlogProvider({ children }) {
 
   // Remove comment and sync to server
   const removeComment = async (blogId, commentId) => {
-    await fetch(`${API_URL}/api/blog-comments/${commentId}`, { method: 'DELETE' });
-    await fetchCommentsForBlog(blogId); // Re-fetch to update with newest on top
+    try {
+      const res = await authenticatedFetch(`${API_URL}/api/blog-comments/${commentId}`, {
+        method: 'DELETE'
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+
+      // Re-fetch comments to update the UI
+      await fetchCommentsForBlog(blogId);
+    } catch (error) {
+      console.error('Error removing comment:', error);
+      throw error; // Re-throw so the component can handle it
+    }
   };
 
   // Helper function to fetch and reverse comments for a specific blog
