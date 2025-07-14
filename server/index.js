@@ -22,7 +22,7 @@ MongoClient.connect(MONGO_URI)
   .catch(err => console.error('MongoDB connection error:', err));
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://aaunightlife.com', 'https://www.aaunightlife.com'],
+  origin: ['http://localhost:5173', 'https://aaunightlife.com', 'https://www.aaunightlife.com', 'https://aau-nightlife.vercel.app'],
   credentials: true
 }));
 app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to support base64 images
