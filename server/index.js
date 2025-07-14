@@ -338,7 +338,7 @@ app.get('/api/blog-comments/:blogId', async (req, res) => {
   }
 });
 
-app.post('/api/blog-comments', authenticateAdmin, async (req, res) => {
+app.post('/api/blog-comments', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
     // expects { blogId, ...commentData }

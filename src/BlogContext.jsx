@@ -73,7 +73,8 @@ export function BlogProvider({ children }) {
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        const errorText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
       }
 
       await fetchCommentsForBlog(blogId); // Re-fetch to update with newest on top
