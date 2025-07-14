@@ -65,13 +65,21 @@ export function BlogProvider({ children }) {
 
   // Add new comment and sync to server
   const addComment = async (blogId, comment) => {
-    const res = await fetch(`${API_URL}/api/blog-comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blogId: String(blogId), ...comment })
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`${API_URL}/api/blog-comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blogId: String(blogId), ...comment })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       await fetchCommentsForBlog(blogId); // Re-fetch to update with newest on top
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      throw error; // Re-throw so the component can handle it
     }
   };
 
@@ -89,7 +97,7 @@ export function BlogProvider({ children }) {
   };
 
   return (
-    <BlogContext.Provider value={{ posts, addPost, editPost, removePost, comments, addComment, removeComment }}>
+    <BlogContext.Provider value={{ posts, addPost, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog }}>
       {children}
     </BlogContext.Provider>
   );

@@ -31,7 +31,7 @@ function renderContentWithLinks(content) {
 
 export default function Blog() {
   const { id } = useParams();
-  const { posts, editPost, removePost, comments, addComment, removeComment } = useBlog();
+  const { posts, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog } = useBlog();
   const { isAdmin } = useAuth();
   // Find by _id for MongoDB
   const blog = posts.find(post => String(post._id) === String(id));
@@ -47,9 +47,17 @@ export default function Blog() {
   // Use _id for comments and update removeComment to use commentId
   const blogComments = comments[blog?._id] || [];
 
+  // Scroll to top only when the component first mounts or when the blog ID changes
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [id]); // Only depend on the blog ID from URL params
+
+  // Load comments for this specific blog post
+  useEffect(() => {
+    if (blog?._id) {
+      fetchCommentsForBlog(blog._id);
+    }
+  }, [blog?._id]); // Remove fetchCommentsForBlog from dependencies to prevent constant re-runs
 
   if (!blog) return <div className="blog-detail-container">Loading blog post...</div>;
 
@@ -60,10 +68,17 @@ export default function Blog() {
         name: anonymous ? 'Anonymous' : (name.trim() || 'Anonymous'),
         text: input.trim(),
       };
-      await addComment(blog._id, newComment);
-      setInput('');
-      setName('');
-      setAnonymous(false);
+      try {
+        await addComment(blog._id, newComment);
+        // Only clear the form if the comment was successfully added
+        setInput('');
+        setName('');
+        setAnonymous(false);
+      } catch (error) {
+        console.error('Failed to add comment:', error);
+        // You could add user-facing error handling here, like showing an error message
+        alert('Failed to post comment. Please try again.');
+      }
     }
   };
 
