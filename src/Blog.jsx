@@ -84,10 +84,12 @@ export default function Blog() {
 
   const handleDeleteComment = async commentId => {
     if (!window.confirm('Delete this comment?')) return;
-    await fetch(`https://aau-nightlife-production.up.railway.app/api/blog-comments/${commentId}`, {
-      method: 'DELETE'
-    });
-    removeComment(blog._id, commentId);
+    try {
+      await removeComment(blog._id, commentId);
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      alert('Failed to delete comment. Please try again.');
+    }
   };
 
   const handleFormChange = e => {
