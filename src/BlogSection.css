@@ -743,6 +743,9 @@
   padding: var(--space-xl) var(--space-md);
   position: relative;
   z-index: 2;
+  /* Ensure content doesn't overflow on smaller screens */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Modern Navigation */
@@ -836,6 +839,10 @@
   overflow: hidden;
   margin-bottom: var(--space-3xl);
   position: relative;
+  /* Ensure proper containment */
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .blog-detail-article::before {
@@ -948,6 +955,10 @@
   padding: var(--space-2xl);
   position: relative;
   overflow: hidden;
+  /* Ensure proper containment within parent container */
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .blog-comments-modern::before {
@@ -992,6 +1003,9 @@
   margin-bottom: var(--space-2xl);
   position: relative;
   z-index: 2;
+  /* Ensure form doesn't overflow */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .comment-form-header {
@@ -1107,6 +1121,9 @@
 .blog-comment-list-modern {
   position: relative;
   z-index: 2;
+  /* Ensure comment list doesn't overflow */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .comments-empty-state {
@@ -1214,6 +1231,23 @@
 .comment-delete-btn svg {
   width: 14px;
   height: 14px;
+}
+
+/* Desktop specific adjustments for better containment */
+@media (min-width: 1024px) {
+  .blog-detail-container {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .blog-comments-modern {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+}
+
+@media (min-width: 1440px) {
+  .blog-detail-container {
+    padding: var(--space-xl) var(--space-2xl);
+  }
 }
 
 /* Responsive Design for Blog Detail */
