@@ -170,7 +170,7 @@ export default function Jobs() {
     if (reqList.length === 0) return null;
 
     return (
-      <div className="job-requirements">
+      <div className="job-requirements-modern">
         <h4>Requirements:</h4>
         <ul>
           {reqList.map((req, index) => (
@@ -195,54 +195,78 @@ export default function Jobs() {
 
   return (
     <div className="modern-jobs-page">
-      {/* Hero Section */}
-      <section className="jobs-hero">
-        <div className="jobs-hero-content">
-          <h1 className="jobs-hero-title">Find Your Dream Job</h1>
-          <p className="jobs-hero-subtitle">Discover exciting career opportunities at AAU and beyond</p>
+      {/* Artistic Hero Section */}
+      <section className="jobs-hero-modern">
+        <div className="jobs-hero-background-effects">
+          <div className="jobs-floating-shape shape-1"></div>
+          <div className="jobs-floating-shape shape-2"></div>
+          <div className="jobs-floating-shape shape-3"></div>
+          <div className="jobs-floating-shape shape-4"></div>
+        </div>
 
-          {/* Search and Filter Bar */}
-          <div className="jobs-search-filter-bar">
-            <div className="jobs-search-container">
-              <svg className="jobs-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-              <input
-                type="text"
-                placeholder="Search jobs, companies, or locations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="jobs-search-input"
-              />
+        <div className="jobs-hero-content-modern">
+          <div className="jobs-hero-text-container">
+            <h1 className="jobs-hero-title-modern">
+              <span className="jobs-title-line-1">Find Your</span>
+              <span className="jobs-title-line-2">Dream Job</span>
+            </h1>
+            <p className="jobs-hero-subtitle-modern">
+              Discover exciting career opportunities at AAU and beyond
+            </p>
+          </div>
+
+          {/* Modern Search and Filter Bar */}
+          <div className="jobs-search-filter-modern">
+            <div className="jobs-search-container-modern">
+              <div className="jobs-search-input-wrapper">
+                <svg className="jobs-search-icon-modern" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search jobs, companies, or locations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="jobs-search-input-modern"
+                />
+              </div>
             </div>
 
-            <div className="jobs-filter-container">
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="jobs-type-filter"
-              >
-                <option value="">All Types</option>
-                <option value="full-time">Full Time</option>
-                <option value="part-time">Part Time</option>
-                <option value="full-time/part-time">Full Time/Part Time</option>
-                <option value="internship">Internship</option>
-                <option value="contract">Contract</option>
-                <option value="freelance">Freelance</option>
-              </select>
+            <div className="jobs-filter-container-modern">
+              <div className="jobs-select-wrapper">
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="jobs-type-filter-modern"
+                >
+                  <option value="">All Types</option>
+                  <option value="full-time">Full Time</option>
+                  <option value="part-time">Part Time</option>
+                  <option value="full-time/part-time">Full Time/Part Time</option>
+                  <option value="internship">Internship</option>
+                  <option value="contract">Contract</option>
+                  <option value="freelance">Freelance</option>
+                </select>
+                <svg className="jobs-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="6,9 12,15 18,9"></polyline>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="jobs-main">
-        <div className="jobs-container">
-          {/* Admin Controls */}
+      {/* Modern Main Content */}
+      <main className="jobs-main-modern">
+        <div className="jobs-container-modern">
+          {/* Modern Admin Controls */}
           {isAdmin && (
-            <div className="jobs-admin-controls">
-              <h2 className="jobs-admin-title">Job Management</h2>
+            <div className="jobs-admin-controls-modern">
+              <div className="jobs-admin-header">
+                <h2 className="jobs-admin-title-modern">Job Management</h2>
+                <div className="jobs-admin-badge">Admin Panel</div>
+              </div>
               <button
                 onClick={() => {
                   setShowForm(!showForm);
@@ -251,9 +275,10 @@ export default function Jobs() {
                     setForm({ title: '', sector: '', type: '', description: '', requirements: '', email: '', phone: '', location: '' });
                   }
                 }}
-                className="add-job-btn"
+                className="add-job-btn-modern"
               >
-                {showForm ? '✕ Cancel' : '+ Add New Job'}
+                <span className="jobs-btn-icon">{showForm ? '✕' : '+'}</span>
+                <span className="jobs-btn-text">{showForm ? 'Cancel' : 'Add New Job'}</span>
               </button>
             </div>
           )}
@@ -425,68 +450,74 @@ export default function Jobs() {
               </p>
             </div>
           ) : (
-            <div className="jobs-grid">
+            <div className="jobs-grid-modern">
               {filteredJobs.map((job, index) => (
-                <div key={job._id || index} className="job-card">
-                  <div className="job-header">
-                    <h3 className="job-title">{job.title}</h3>
-                    <span className="job-type-badge">{job.type}</span>
+                <div key={job._id || index} className="job-card-modern">
+                  <div className="job-card-header-modern">
+                    <div className="job-header-content">
+                      <h3 className="job-title-modern">{job.title}</h3>
+                      <span className="job-type-badge-modern">{job.type}</span>
+                    </div>
                   </div>
 
-                  <div className="job-company">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
-                    </svg>
-                    {job.sector}
-                  </div>
-
-                  {job.location && (
-                    <div className="job-location">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  <div className="job-meta-info">
+                    <div className="job-company-modern">
+                      <svg className="job-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
                       </svg>
-                      {job.location}
+                      <span className="job-company-text">{job.sector}</span>
                     </div>
-                  )}
 
-                  <div className="job-description" style={{ whiteSpace: 'pre-wrap' }}>
-                    {job.description}
+                    {job.location && (
+                      <div className="job-location-modern">
+                        <svg className="job-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        <span className="job-location-text">{job.location}</span>
+                      </div>
+                    )}
                   </div>
 
-                  {renderRequirements(job.requirements)}
-
-                  {(job.email || job.phone) && (
-                    <div className="job-contact">
-                      {job.email && (
-                        <div className="job-contact-item">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                          </svg>
-                          <a href={`mailto:${job.email}`}>{job.email}</a>
-                        </div>
-                      )}
-                      {job.phone && (
-                        <div className="job-contact-item">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                          </svg>
-                          <a href={`tel:${job.phone}`}>{job.phone}</a>
-                        </div>
-                      )}
+                  <div className="job-content-section">
+                    <div className="job-description-modern">
+                      {job.description}
                     </div>
-                  )}
+
+                    {renderRequirements(job.requirements)}
+
+                    {(job.email || job.phone) && (
+                      <div className="job-contact-modern">
+                        {job.email && (
+                          <div className="job-contact-item-modern">
+                            <svg className="contact-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                            <a href={`mailto:${job.email}`} className="contact-link">{job.email}</a>
+                          </div>
+                        )}
+                        {job.phone && (
+                          <div className="job-contact-item-modern">
+                            <svg className="contact-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <a href={`tel:${job.phone}`} className="contact-link">{job.phone}</a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {isAdmin && (
-                    <div className="job-actions">
+                    <div className="job-actions-modern">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="job-edit-btn"
+                        className="job-edit-btn-modern"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(index)}
-                        className="job-delete-btn"
+                        className="job-delete-btn-modern"
                       >
                         Delete
                       </button>
