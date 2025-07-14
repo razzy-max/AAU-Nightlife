@@ -736,6 +736,8 @@ footer {
   margin: 0 auto;
   position: relative;
   z-index: 2;
+  justify-content: center;
+  justify-items: center;
 }
 
 .feature-card {
