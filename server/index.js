@@ -194,6 +194,32 @@ app.put('/api/events', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Delete individual event endpoint
+app.delete('/api/events/:id', authenticateAdmin, async (req, res) => {
+  if (!db) return res.status(500).json({ error: 'Database not connected' });
+  try {
+    const { id } = req.params;
+    console.log('Attempting to delete event with ID:', id);
+
+    // Validate ObjectId format
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid event ID format' });
+    }
+
+    const result = await db.collection('events').deleteOne({ _id: new ObjectId(id) });
+    console.log('Delete result:', result);
+
+    if (result.deletedCount === 1) {
+      res.json({ success: true, message: 'Event deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Event not found' });
+    }
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ error: 'Failed to delete event', details: err.message });
+  }
+});
+
 // Jobs endpoints (MongoDB)
 app.get('/api/jobs', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
