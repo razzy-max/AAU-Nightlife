@@ -256,47 +256,65 @@ export default function Events() {
 
   return (
     <div className="modern-events-page">
-      {/* Hero Section */}
-      <section className="events-hero">
-        <div className="hero-content">
-          <h1 className="hero-title">Discover Amazing Events</h1>
-          <p className="hero-subtitle">Join the most exciting experiences at AAU</p>
+      {/* Artistic Hero Section */}
+      <section className="events-hero-modern">
+        <div className="hero-background-effects">
+          <div className="floating-orb orb-1"></div>
+          <div className="floating-orb orb-2"></div>
+          <div className="floating-orb orb-3"></div>
+        </div>
 
-          {/* Search and Filter Bar */}
-          <div className="search-filter-bar">
-            <div className="search-container">
-              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-              <input
-                type="text"
-                placeholder="Search events, venues, or descriptions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
+        <div className="events-hero-content">
+          <div className="hero-text-container">
+            <h1 className="events-title-modern">
+              <span className="title-line-1">Discover</span>
+              <span className="title-line-2">Amazing Events</span>
+            </h1>
+            <p className="events-subtitle-modern">
+              Join the most exciting experiences at AAU Ekpoma
+            </p>
+          </div>
+
+          {/* Modern Search and Filter Bar */}
+          <div className="search-filter-modern">
+            <div className="search-container-modern">
+              <div className="search-input-wrapper">
+                <svg className="search-icon-modern" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search events, venues, or descriptions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input-modern"
+                />
+              </div>
             </div>
 
-            <div className="filter-container">
+            <div className="filter-container-modern">
               <input
                 type="month"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="date-filter"
+                className="date-filter-modern"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="events-main">
-        <div className="container">
-          {/* Admin Controls */}
+      {/* Modern Main Content */}
+      <main className="events-main-modern">
+        <div className="events-container-modern">
+          {/* Modern Admin Controls */}
           {isAdmin && (
-            <div className="admin-controls">
-              <h2 className="admin-title">Event Management</h2>
+            <div className="admin-controls-modern">
+              <div className="admin-header">
+                <h2 className="admin-title-modern">Event Management</h2>
+                <div className="admin-badge">Admin Panel</div>
+              </div>
               <button
                 onClick={() => {
                   setShowForm(!showForm);
@@ -305,48 +323,57 @@ export default function Events() {
                     setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
                   }
                 }}
-                className="add-event-btn"
+                className="add-event-btn-modern"
               >
-                {showForm ? '✕ Cancel' : '+ Add New Event'}
+                <span className="btn-icon">{showForm ? '✕' : '+'}</span>
+                <span className="btn-text">{showForm ? 'Cancel' : 'Add New Event'}</span>
               </button>
             </div>
           )}
 
-          {/* Add Event Form */}
+          {/* Modern Add Event Form */}
           {showForm && isAdmin && (
-            <form onSubmit={handleSubmit} className="event-form">
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">Event Title</label>
+            <form onSubmit={handleSubmit} className="event-form-modern">
+              <div className="form-header-modern">
+                <h3 className="form-title-modern">
+                  {editingEventId ? 'Edit Event' : 'Create New Event'}
+                </h3>
+                <p className="form-subtitle-modern">
+                  Fill in the details below to {editingEventId ? 'update' : 'create'} an event
+                </p>
+              </div>
+              <div className="form-grid-modern">
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Event Title</label>
                   <input
                     type="text"
                     value={form.title}
                     onChange={(e) => setForm({...form, title: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input-modern"
                     placeholder="Enter event title"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Date & Time</label>
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Date & Time</label>
                   <input
                     type="datetime-local"
                     value={form.date}
                     onChange={(e) => setForm({...form, date: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input-modern"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Venue</label>
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Venue</label>
                   <input
                     type="text"
                     value={form.venue}
                     onChange={(e) => setForm({...form, venue: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input-modern"
                     placeholder="Event venue"
                   />
                 </div>
@@ -463,32 +490,37 @@ export default function Events() {
               </p>
             </div>
           ) : (
-            <div className="events-grid">
+            <div className="events-grid-modern">
               {filteredEvents.map((event) => (
-                <div key={event._id} ref={el => eventRefs.current[event._id] = el} className="event-card">
-                  {event.image && (
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="event-image"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  )}
+                <div key={event._id} ref={el => eventRefs.current[event._id] = el} className="event-card-modern">
+                  <div className="event-card-header">
+                    {event.image && (
+                      <div className="event-image-container">
+                        <img
+                          src={event.image}
+                          alt={event.title}
+                          className="event-image-modern"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        <div className="image-overlay"></div>
+                      </div>
+                    )}
 
-                  <div className="event-date-badge">
-                    {formatDate(event.date)}
+                    <div className="event-date-badge-modern">
+                      <span className="date-text">{formatDate(event.date)}</span>
+                    </div>
                   </div>
 
-                  <div className="event-content">
-                    <h3 className="event-title">{event.title}</h3>
+                  <div className="event-content-modern">
+                    <h3 className="event-title-modern">{event.title}</h3>
 
-                    <div className="event-venue">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <div className="event-venue-modern">
+                      <svg className="venue-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                       </svg>
-                      {event.venue}
+                      <span className="venue-text">{event.venue}</span>
                     </div>
 
                     <p className="event-description">
