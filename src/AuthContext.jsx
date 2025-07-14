@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { API_ENDPOINTS } from './config';
+import { API_ENDPOINTS, API_BASE_URL } from './config';
 
 const AuthContext = createContext();
 
@@ -57,6 +57,27 @@ export const AuthProvider = ({ children }) => {
     }
   }, [authChecked]);
 
+  // Function to warm up the backend (wake it from sleep)
+  const warmUpBackend = async () => {
+    try {
+      console.log('Warming up backend...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      await fetch(`${API_BASE_URL}/api/events`, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      console.log('Backend warmed up successfully');
+      return true;
+    } catch (error) {
+      console.log('Backend warm-up failed:', error.message);
+      return false;
+    }
+  };
+
   const checkAuthStatus = async () => {
     try {
       // First check localStorage for immediate UI response
@@ -113,7 +134,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (password) => {
     try {
-      console.log('Attempting login...');
+      console.log('Attempting login to:', API_ENDPOINTS.adminLogin);
+
+      // Create an AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for cold starts
+
       const response = await fetch(API_ENDPOINTS.adminLogin, {
         method: 'POST',
         headers: {
@@ -121,10 +147,16 @@ export const AuthProvider = ({ children }) => {
         },
         credentials: 'include',
         body: JSON.stringify({ password }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
+      console.log('Login response status:', response.status);
+      console.log('Login response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
-      console.log('Login response:', response.status, data);
+      console.log('Login response data:', data);
 
       if (response.ok) {
         setIsAdmin(true);
@@ -136,7 +168,13 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: data.error || 'Login failed' };
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error details:', error);
+      if (error.name === 'AbortError') {
+        return { success: false, error: 'Request timeout. The server may be starting up, please try again in a moment.' };
+      }
+      if (error.message.includes('Failed to fetch')) {
+        return { success: false, error: 'Unable to connect to server. Please check your internet connection and try again.' };
+      }
       return { success: false, error: 'Network error. Please try again.' };
     }
   };
@@ -230,6 +268,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     checkAuthStatus,
+    warmUpBackend,
     authenticatedFetch: smartFetch, // Use smart fetch instead
     fallbackFetch,
   };
