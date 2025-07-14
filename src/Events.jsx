@@ -378,14 +378,14 @@ export default function Events() {
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Event Image</label>
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Event Image</label>
                   <input
                     type="file"
                     name="image"
                     accept="image/*"
                     onChange={handleChange}
-                    className="form-input"
+                    className="form-input-modern"
                     style={{ padding: '0.5rem' }}
                   />
                   {form.image && (
@@ -398,7 +398,7 @@ export default function Events() {
                           maxHeight: '150px',
                           objectFit: 'cover',
                           borderRadius: '8px',
-                          border: '1px solid #e5e7eb'
+                          border: '1px solid rgba(255, 255, 255, 0.2)'
                         }}
                       />
                     </div>
@@ -406,8 +406,8 @@ export default function Events() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Description</label>
+              <div className="form-group-modern">
+                <label className="form-label-modern">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({...form, description: e.target.value})}
@@ -426,31 +426,31 @@ export default function Events() {
                     }
                   }}
                   required
-                  className="form-textarea"
+                  className="form-input-modern"
                   placeholder="Describe your event... (Press Enter for new line, Shift+Enter for paragraph break)"
-                  style={{ whiteSpace: 'pre-wrap' }}
+                  style={{ whiteSpace: 'pre-wrap', minHeight: '120px', resize: 'vertical' }}
                 />
               </div>
 
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">Contact Email</label>
+              <div className="form-grid-modern">
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Contact Email</label>
                   <input
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({...form, email: e.target.value})}
-                    className="form-input"
+                    className="form-input-modern"
                     placeholder="contact@example.com"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Contact Phone</label>
+                <div className="form-group-modern">
+                  <label className="form-label-modern">Contact Phone</label>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({...form, phone: e.target.value})}
-                    className="form-input"
+                    className="form-input-modern"
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
