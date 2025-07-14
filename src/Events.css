@@ -450,6 +450,8 @@
 .form-group-modern {
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 3;
 }
 
 .form-label-modern {
@@ -470,6 +472,8 @@
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 3;
 }
 
 .form-input-modern:focus {
@@ -481,6 +485,25 @@
 
 .form-input-modern::placeholder {
   color: var(--text-muted);
+}
+
+/* Modern Textarea Specific Styling */
+textarea.form-input-modern {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  font-family: inherit;
+  position: relative;
+  z-index: 3;
+}
+
+textarea.form-input-modern:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* Modern File Input Styling */
