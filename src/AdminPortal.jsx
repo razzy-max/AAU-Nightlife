@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from './config';
 
 export default function AdminPortal() {
   const [password, setPassword] = useState('');
@@ -29,7 +30,7 @@ export default function AdminPortal() {
       }
 
       // Then check server
-      const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/verify', {
+      const response = await fetch(API_ENDPOINTS.adminVerify, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -49,7 +50,7 @@ export default function AdminPortal() {
     setError('');
 
     try {
-      const response = await fetch('https://aau-nightlife-production.up.railway.app/api/admin/login', {
+      const response = await fetch(API_ENDPOINTS.adminLogin, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
