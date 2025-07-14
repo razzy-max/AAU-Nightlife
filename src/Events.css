@@ -483,6 +483,30 @@
   color: var(--text-muted);
 }
 
+/* Modern File Input Styling */
+.form-input-modern[type="file"] {
+  padding: var(--space-sm);
+  cursor: pointer;
+}
+
+.form-input-modern[type="file"]::-webkit-file-upload-button {
+  background: var(--gradient-secondary);
+  color: var(--text-primary);
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  margin-right: var(--space-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.form-input-modern[type="file"]::-webkit-file-upload-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
 .file-input-wrapper {
   position: relative;
 }
