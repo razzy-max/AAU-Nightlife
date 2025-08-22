@@ -80,7 +80,11 @@ export function BlogProvider({ children }) {
       const res = await fetch(API_ENDPOINTS.blogComments, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blogId: String(blogId), ...comment })
+        body: JSON.stringify({ 
+          blogId: String(blogId), 
+          ...comment,
+          timestamp: new Date().toISOString() 
+        })
       });
 
       if (!res.ok) {

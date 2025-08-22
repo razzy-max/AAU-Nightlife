@@ -4,6 +4,34 @@ import './BlogSection.css';
 import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
 
+// Format timestamp to show relative time or full date/time
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000); // difference in seconds
+
+  if (diff < 60) {
+    return 'Just now';
+  } else if (diff < 3600) {
+    const minutes = Math.floor(diff / 60);
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+  } else if (diff < 86400) {
+    const hours = Math.floor(diff / 3600);
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+  } else if (diff < 604800) {
+    const days = Math.floor(diff / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  } else {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+}
+
 // Helper to convert [text](url) to clickable links
 function renderContentWithLinks(content) {
   // Convert markdown-style [text](url) to anchor tags
@@ -356,7 +384,7 @@ export default function Blog() {
                     <div className="comment-header">
                       <strong className="comment-author">{c.name || 'Anonymous'}</strong>
                       <span className="comment-date">
-                        {c.timestamp ? new Date(c.timestamp).toLocaleDateString() : 'Recently'}
+                        {c.timestamp ? formatTimestamp(c.timestamp) : 'Just now'}
                       </span>
                     </div>
                     <p className="comment-text">{c.text}</p>
