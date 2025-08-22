@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function PrivacyPolicy() {
   return (
-    <div className="legal-page-container">
+  <div className="legal-page-container">
       {/* Modern Hero Section */}
       <section className="legal-hero">
         <div className="legal-hero-bg" />
@@ -47,6 +47,69 @@ export default function PrivacyPolicy() {
                 <li>Send you updates about events and opportunities</li>
                 <li>Improve our website and services</li>
               </ul>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">3. Cookies and Tracking Technologies</h2>
+            <div className="legal-section-content">
+              <p>
+                We use cookies and similar technologies to enhance your experience, analyze site usage, and deliver relevant ads and content. Cookies are small data files stored on your device. You can control or disable cookies through your browser settings, but some features may not function properly.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">4. Third-Party Services</h2>
+            <div className="legal-section-content">
+              <p>
+                We may use third-party services such as Google AdSense and analytics providers. These services may collect information sent by your browser as part of a web page request, such as cookies or your IP address. Please review their privacy policies for more details.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">5. How We Share Your Information</h2>
+            <div className="legal-section-content">
+              <p>
+                We do not sell your personal information. We may share information with trusted third parties who assist us in operating our website, conducting our business, or serving our users, as long as those parties agree to keep this information confidential. We may also release information when required by law.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">6. Your Rights and Choices</h2>
+            <div className="legal-section-content">
+              <p>
+                You have the right to access, update, or delete your personal information. You may unsubscribe from communications at any time. To exercise these rights, please contact us using the information below.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">7. Data Security</h2>
+            <div className="legal-section-content">
+              <p>
+                We implement reasonable security measures to protect your information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">8. Changes to This Privacy Policy</h2>
+            <div className="legal-section-content">
+              <p>
+                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page with an updated date.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">9. Contact Us</h2>
+            <div className="legal-section-content">
+              <p>
+                If you have any questions or concerns about this Privacy Policy or your personal information, please contact us at <a href="mailto:aau.nightlife@gmail.com">aau.nightlife@gmail.com</a>.
+              </p>
             </div>
           </div>
 

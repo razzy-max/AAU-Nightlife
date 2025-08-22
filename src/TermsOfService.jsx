@@ -53,6 +53,51 @@ export default function TermsOfService() {
           </div>
 
           <div className="legal-section">
+            <h2 className="legal-section-title">4. Intellectual Property</h2>
+            <div className="legal-section-content">
+              <p>
+                All content on AAU Nightlife Ekpoma, including text, graphics, logos, and images, is the property of AAU Nightlife Ekpoma or its content suppliers and is protected by copyright laws. You may not use, reproduce, or distribute any content without our written permission.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">5. Limitation of Liability</h2>
+            <div className="legal-section-content">
+              <p>
+                AAU Nightlife Ekpoma is provided "as is" without warranties of any kind. We are not liable for any damages or losses resulting from your use of the service, including but not limited to direct, indirect, incidental, or consequential damages.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">6. Account Termination</h2>
+            <div className="legal-section-content">
+              <p>
+                We reserve the right to suspend or terminate your access to the service at our discretion, without notice, for conduct that we believe violates these terms or is harmful to other users or the service.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">7. Changes to Terms</h2>
+            <div className="legal-section-content">
+              <p>
+                We may update these Terms of Service from time to time. Changes will be posted on this page with an updated date. Continued use of the service after changes constitutes acceptance of the new terms.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
+            <h2 className="legal-section-title">8. Contact Us</h2>
+            <div className="legal-section-content">
+              <p>
+                If you have any questions about these Terms of Service, please contact us at <a href="mailto:aau.nightlife@gmail.com">aau.nightlife@gmail.com</a>.
+              </p>
+            </div>
+          </div>
+
+          <div className="legal-section">
             <h2 className="legal-section-title">4. Content Guidelines</h2>
             <div className="legal-section-content">
               <p>All content submitted to our platform must:</p>
