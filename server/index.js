@@ -374,8 +374,12 @@ app.get('/api/blog-comments/:blogId', async (req, res) => {
 app.post('/api/blog-comments', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    // expects { blogId, ...commentData }
-    const result = await db.collection('blogComments').insertOne(req.body);
+    // Add timestamp if not provided
+    const commentData = {
+      ...req.body,
+      timestamp: req.body.timestamp || new Date().toISOString()
+    };
+    const result = await db.collection('blogComments').insertOne(commentData);
     res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...req.body });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add blog comment' });
