@@ -14,6 +14,7 @@ import { BlogProvider } from './BlogContext';
 import { AuthProvider } from './AuthContext';
 import './App.css';
 import AdvertisersSection from './AdvertisersSection';
+import CookieConsent from './components/CookieConsent';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,6 +24,7 @@ function App() {
       <BlogProvider>
         <div className="app-root">
           <AdminLogout />
+          <CookieConsent />
         <header>
           <nav className="main-nav responsive-nav">
             <div className="nav-logo">AAU Nightlife</div>
