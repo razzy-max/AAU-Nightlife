@@ -165,6 +165,10 @@ app.post('/api/events', authenticateAdmin, async (req, res) => {
       event.venue = event.category;
       delete event.category;
     }
+    // If comingSoon is true, ensure date is null/undefined
+    if (event.comingSoon) {
+      event.date = event.date || null;
+    }
     const result = await db.collection('events').insertOne(event);
     res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...event });
   } catch (err) {
@@ -184,6 +188,7 @@ app.put('/api/events', authenticateAdmin, async (req, res) => {
           ev.venue = ev.category;
           delete ev.category;
         }
+        if (ev.comingSoon) ev.date = ev.date || null;
         return ev;
       });
       await db.collection('events').insertMany(events);
