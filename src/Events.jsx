@@ -526,7 +526,7 @@ export default function Events() {
                       </div>
                     )}
 
-                    <div className="event-date-badge-modern">
+                    <div className={`event-date-badge-modern ${event.comingSoon || !event.date ? 'coming-soon' : ''}`}>
                       {event.comingSoon || !event.date ? (
                         <span className="date-text">Coming Soon</span>
                       ) : (

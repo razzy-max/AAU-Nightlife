@@ -131,7 +131,7 @@ export default function EventSection() {
                     <img src={event.image} alt={event.title} className="event-card-img-modern" />
                   )}
                   <div className="event-card-overlay"></div>
-                  <div className="event-card-date-badge">
+                  <div className={`event-card-date-badge ${event.comingSoon || !event.date ? 'coming-soon' : ''}`}>
                     {event.comingSoon || !event.date ? (
                       <div className="event-date-display coming-soon">
                         <span className="coming-text">Coming Soon</span>

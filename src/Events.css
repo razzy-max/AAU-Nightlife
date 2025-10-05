@@ -666,6 +666,12 @@ textarea.form-input-modern:focus {
   box-shadow: var(--shadow-md);
 }
 
+.event-date-badge-modern.coming-soon {
+  background: #dc2626; /* red-600 */
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(220,38,38,0.2);
+}
+
 .event-content-modern {
   padding: var(--space-xl);
   position: relative;
