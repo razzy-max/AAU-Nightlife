@@ -7,7 +7,7 @@ import './Events.css';
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+  const [form, setForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '', comingSoon: false });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,7 +70,7 @@ export default function Events() {
           if (res.ok) {
             setStatus('Event updated!');
             setEvents(updatedEvents);
-            setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+            setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '', comingSoon: false });
             setShowForm(false);
             setEditingEventId(null);
           } else {
@@ -90,7 +90,7 @@ export default function Events() {
         });
         if (res.ok) {
           setStatus('Event added!');
-          setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+          setForm({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '', comingSoon: false });
           setShowForm(false);
           // Refresh events
           const updated = await fetch(API_ENDPOINTS.events).then(r => r.json());
@@ -143,7 +143,8 @@ export default function Events() {
       description: event.description,
       email: event.email || '',
       phone: event.phone || '',
-      image: event.image || ''
+      image: event.image || '',
+      comingSoon: !!event.comingSoon
     });
     setEditingEventId(event._id);
     setShowForm(true);
@@ -151,7 +152,7 @@ export default function Events() {
 
   // Edit event
   const [editIdx, setEditIdx] = useState(null);
-  const [editForm, setEditForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '' });
+  const [editForm, setEditForm] = useState({ title: '', date: '', venue: '', description: '', email: '', phone: '', image: '', comingSoon: false });
 
   const startEdit = idx => {
     setEditIdx(idx);
@@ -164,6 +165,10 @@ export default function Events() {
         setEditForm(f => ({ ...f, image: ev.target.result }));
       };
       reader.readAsDataURL(e.target.files[0]);
+    } else if (e.target.name === 'comingSoon') {
+      setEditForm({ ...editForm, comingSoon: e.target.checked });
+      // If comingSoon is checked, clear date
+      if (e.target.checked) setEditForm(f => ({ ...f, date: '' }));
     } else if (e.target.name !== 'image') {
       setEditForm({ ...editForm, [e.target.name]: e.target.value });
     }
@@ -362,9 +367,21 @@ export default function Events() {
                     type="datetime-local"
                     value={form.date}
                     onChange={(e) => setForm({...form, date: e.target.value})}
-                    required
+                    required={!form.comingSoon}
+                    disabled={form.comingSoon}
                     className="form-input-modern"
                   />
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <input
+                        type="checkbox"
+                        name="comingSoon"
+                        checked={form.comingSoon}
+                        onChange={(e) => setForm({...form, comingSoon: e.target.checked, date: e.target.checked ? '' : form.date})}
+                      />
+                      <span>Mark as "Coming Soon" (no date required)</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="form-group-modern">
@@ -510,7 +527,11 @@ export default function Events() {
                     )}
 
                     <div className="event-date-badge-modern">
-                      <span className="date-text">{formatDate(event.date)}</span>
+                      {event.comingSoon || !event.date ? (
+                        <span className="date-text">Coming Soon</span>
+                      ) : (
+                        <span className="date-text">{formatDate(event.date)}</span>
+                      )}
                     </div>
                   </div>
 
