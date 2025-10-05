@@ -528,7 +528,12 @@ export default function Events() {
 
                     <div className={`event-date-badge-modern ${event.comingSoon || !event.date ? 'coming-soon' : ''}`}>
                       {event.comingSoon || !event.date ? (
-                        <span className="date-text">Coming Soon</span>
+                        <span className="date-text">
+                          <svg className="megaphone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M3 11v2a1 1 0 0 0 1 1h2v3a1 1 0 0 0 1.555.832L11 16h6a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-6L7.555 6.168A1 1 0 0 0 6 7v3H4a1 1 0 0 0-1 1z" fill="currentColor"/>
+                          </svg>
+                          Coming Soon
+                        </span>
                       ) : (
                         <span className="date-text">{formatDate(event.date)}</span>
                       )}
