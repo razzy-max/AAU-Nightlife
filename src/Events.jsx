@@ -233,16 +233,16 @@ export default function Events() {
     });
   };
 
-  // Helper function to render description with links and line breaks
+  // Helper function to render description with markdown-style links and line breaks
   const renderDescription = (description) => {
     if (!description) return '';
 
-    // Split by newlines and render each line
+    // Split by newlines and render each line, converting markdown links to anchors
     const lines = description.split('\n');
 
     return lines.map((line, index) => (
       <span key={index}>
-        {line}
+        {renderContentWithLinks(line)}
         {index < lines.length - 1 && <br />}
       </span>
     ));
