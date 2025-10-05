@@ -260,6 +260,12 @@
   box-shadow: 0 6px 18px rgba(220,38,38,0.2);
 }
 
+.event-card-date-badge .megaphone-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
 .event-card-date-badge .coming-soon .coming-text {
   font-size: 0.8rem;
   font-weight: 700;

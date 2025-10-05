@@ -672,6 +672,12 @@ textarea.form-input-modern:focus {
   box-shadow: 0 6px 18px rgba(220,38,38,0.2);
 }
 
+.event-date-badge-modern .megaphone-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
 .event-content-modern {
   padding: var(--space-xl);
   position: relative;
