@@ -254,6 +254,12 @@
   z-index: 2;
 }
 
+.event-card-date-badge .coming-soon .coming-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: none;
+}
+
 .event-date-display {
   display: flex;
   flex-direction: column;

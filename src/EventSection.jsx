@@ -125,14 +125,18 @@ export default function EventSection() {
             </div>
           ) : (
             visibleEvents.map(event => event && (
-              <div className="event-card-modern" key={event.title + event.date}>
+              <div className="event-card-modern" key={event._id || (event.title + (event.date || ''))}>
                 <div className="event-card-image-container">
                   {event.image && (
                     <img src={event.image} alt={event.title} className="event-card-img-modern" />
                   )}
                   <div className="event-card-overlay"></div>
                   <div className="event-card-date-badge">
-                    {event.date && (
+                    {event.comingSoon || !event.date ? (
+                      <div className="event-date-display coming-soon">
+                        <span className="coming-text">Coming Soon</span>
+                      </div>
+                    ) : (
                       <div className="event-date-display">
                         <span className="event-month">
                           {new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}
