@@ -5,6 +5,8 @@ import './Events.css';
 
 export default function Awards() {
   const [categories, setCategories] = useState([]);
+  // Track selected vote counts for paid categories by category id
+  const [selectedCounts, setSelectedCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -107,13 +109,16 @@ export default function Awards() {
     setStatus('Processing...');
     try {
       if (category.paid) {
+        const count = selectedCounts[category.id] && selectedCounts[category.id] > 0 ? selectedCounts[category.id] : 1;
+        // Here you'd normally redirect to payment gateway with the amount and count.
+        // For now, create a fake paymentRef and send votesCount to the backend.
         const fakePaymentRef = `FAKE-${Date.now()}`;
         const res = await fetch(`${API_ENDPOINTS.awards}/${category.id}/vote`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ candidateId: candidate.id, paymentRef: fakePaymentRef })
+          body: JSON.stringify({ candidateId: candidate.id, paymentRef: fakePaymentRef, votesCount: count })
         });
-        if (res.ok) setStatus('Thank you! Your paid vote was recorded.');
+        if (res.ok) setStatus(`Thank you! Your ${count} paid vote${count > 1 ? 's' : ''} were recorded.`);
         else {
           const err = await res.json().catch(() => ({}));
           setStatus(err.error || 'Payment or vote failed');
@@ -124,7 +129,7 @@ export default function Awards() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ candidateId: candidate.id })
         });
-        if (res.ok) setStatus('Vote recorded \u2014 thank you!');
+        if (res.ok) setStatus('Vote recorded — thank you!');
         else {
           const err = await res.json().catch(() => ({}));
           setStatus(err.error || 'Failed to record vote');
@@ -136,6 +141,14 @@ export default function Awards() {
     }
     // Refresh categories
     fetch(API_ENDPOINTS.awards).then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : []));
+  };
+
+  const changeCount = (categoryId, delta) => {
+    setSelectedCounts(prev => {
+      const current = prev[categoryId] || 1;
+      const next = Math.max(1, current + delta);
+      return { ...prev, [categoryId]: next };
+    });
   };
 
   if (loading) return <div className="page-center">Loading awards...</div>;
@@ -246,11 +259,25 @@ export default function Awards() {
                         <div style={{ fontWeight: 600 }}>{c.name}</div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{c.info || ''}</div>
                       </div>
-                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <div style={{ fontWeight: 700 }}>{c.votes || 0}</div>
-                        <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Vote</button>
-                        {isAdmin && <button className="submit-btn" onClick={() => deleteCandidateInline(idx, ci)}>Delete</button>}
-                      </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <div style={{ fontWeight: 700 }}>{c.votes || 0}</div>
+                            {cat.paid ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                  <button className="hero-btn" onClick={() => changeCount(cat.id, -1)}>-</button>
+                                  <div style={{ minWidth: 32, textAlign: 'center' }}>{selectedCounts[cat.id] || 1}</div>
+                                  <button className="hero-btn" onClick={() => changeCount(cat.id, 1)}>+</button>
+                                </div>
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[cat.id] || 1)}</div>
+                                <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Pay & Vote</button>
+                              </div>
+                            ) : (
+                              <>
+                                <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Vote</button>
+                              </>
+                            )}
+                            {isAdmin && <button className="submit-btn" onClick={() => deleteCandidateInline(idx, ci)}>Delete</button>}
+                          </div>
                     </div>
                   ))}
                 </div>

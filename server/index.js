@@ -14,12 +14,16 @@ const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2a$10$92IXUNpkj
 
 let db;
 
-MongoClient.connect(MONGO_URI)
-  .then(client => {
-    db = client.db();
-    console.log('Connected to MongoDB');
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
+if (MONGO_URI) {
+  MongoClient.connect(MONGO_URI)
+    .then(client => {
+      db = client.db();
+      console.log('Connected to MongoDB');
+    })
+    .catch(err => console.error('MongoDB connection error:', err));
+} else {
+  console.log('MONGO_URI not set — running with file-based fallback storage');
+}
 
 app.use(cors({
   origin: ['http://localhost:5173', 'https://aaunightlife.com', 'https://www.aaunightlife.com', 'https://aau-nightlife.vercel.app'],
@@ -46,6 +50,15 @@ function readData(filePath) {
 // Helper to write data
 function writeData(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+// Helper to get client IP (works behind proxies and direct)
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  const ip = (Array.isArray(xff) ? xff[0] : xff) || req.headers['x-real-ip'] || req.ip || req.connection?.remoteAddress || null;
+  if (!ip) return null;
+  // Normalize IPv4-mapped IPv6 addresses like ::ffff:127.0.0.1
+  return ip.replace(/^::ffff:/, '');
 }
 
 // Authentication middleware
@@ -382,8 +395,12 @@ app.get('/api/blog-posts', async (req, res) => {
   // Vote endpoint: record a vote (for paid categories expect a payment reference in body)
   app.post('/api/awards/:categoryId/vote', async (req, res) => {
     const { categoryId } = req.params;
-    const { candidateId, paymentRef } = req.body;
+    const { candidateId, paymentRef, votesCount } = req.body;
+    const votesToCast = Number(votesCount) >= 1 ? Math.floor(Number(votesCount)) : 1;
     if (!candidateId) return res.status(400).json({ error: 'candidateId required' });
+
+    // Determine client IP for one-vote-per-user enforcement on free categories
+    const ip = getClientIp(req);
 
     // Simple validation for paid categories will be handled by admin settings: category.paid === true
     if (db) {
@@ -399,11 +416,24 @@ app.get('/api/blog-posts', async (req, res) => {
           return res.status(402).json({ error: 'Payment required for this category' });
         }
 
-        // Record vote: increment candidate.votes and store vote record
-        const voteRecord = { categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null };
+        // If category is free, enforce one vote per IP
+        if (!category.paid) {
+          if (!ip) {
+            // If we cannot determine IP, be conservative and allow the vote
+            console.warn('Could not determine client IP for free-vote enforcement');
+          } else {
+            const existing = await db.collection('votes').findOne({ categoryId, ip });
+            if (existing) {
+              return res.status(409).json({ error: 'You have already voted in this free category' });
+            }
+          }
+        }
+
+        // Record vote: increment candidate.votes by votesToCast and store vote record with ip and votesCount
+        const voteRecord = { categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: votesToCast, ip: ip || null };
         await db.collection('votes').insertOne(voteRecord);
         const updateKey = `candidates.${candidateIdx}.votes`;
-        await db.collection('awards').updateOne({ id: categoryId }, { $inc: { [updateKey]: 1 } });
+        await db.collection('awards').updateOne({ id: categoryId }, { $inc: { [updateKey]: votesToCast } });
         return res.json({ success: true });
       } catch (err) {
         console.error('Failed to record vote:', err);
@@ -419,12 +449,26 @@ app.get('/api/blog-posts', async (req, res) => {
       const cand = (cat.candidates || []).find(c => c.id === candidateId);
       if (!cand) return res.status(404).json({ error: 'Candidate not found' });
       if (cat.paid && !paymentRef) return res.status(402).json({ error: 'Payment required' });
-      cand.votes = (cand.votes || 0) + 1;
-      writeData(awardsPath, data);
-      // append to votes file
+
+      // file-fallback: enforce one vote per IP for free categories
+      if (!cat.paid) {
+        const votesPath = path.join(__dirname, 'data', 'votes.json');
+        const votes = readData(votesPath);
+        if (ip) {
+          const found = votes.find(v => v.categoryId === categoryId && v.ip === ip);
+          if (found) return res.status(409).json({ error: 'You have already voted in this free category' });
+        } else {
+          console.warn('Could not determine client IP for free-vote enforcement (file fallback)');
+        }
+      }
+
       const votesPath = path.join(__dirname, 'data', 'votes.json');
       const votes = readData(votesPath);
-      votes.push({ categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null });
+      const toAdd = Number(votesCount) >= 1 ? Math.floor(Number(votesCount)) : 1;
+      cand.votes = (cand.votes || 0) + toAdd;
+      writeData(awardsPath, data);
+      // append to votes file with ip and votesCount
+      votes.push({ categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: toAdd, ip: ip || null });
       writeData(votesPath, votes);
       res.json({ success: true });
     } catch (err) {
