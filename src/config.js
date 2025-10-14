@@ -27,6 +27,10 @@ export const API_ENDPOINTS = {
   
   // Hero Images
   heroImages: `${API_BASE_URL}/api/hero-images`
+  ,
+  // Awards / Voting
+  awards: `${API_BASE_URL}/api/awards`,
+  verifyPayment: `${API_BASE_URL}/api/payments/verify`
 };
 
 export default API_BASE_URL;
