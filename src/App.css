@@ -986,11 +986,21 @@ footer > div {
 .footer-address {
   margin-top: 0.5rem;
   font-size: 0.98rem;
-  color: #bbb;
+  color: var(--text-secondary);
 }
 .footer-copy {
-  color: #bbb;
+  color: var(--text-secondary);
   font-size: 0.95rem;
+}
+.footer-copy a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+.footer-copy a:hover {
+  color: var(--accent-primary);
+  text-decoration: underline;
 }
 @media (max-width: 600px) {
   footer {
