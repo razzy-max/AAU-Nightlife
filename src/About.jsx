@@ -205,8 +205,8 @@ export default function About() {
       {/* Inline Styles */}
       <style>{`
         .about-page {
-          background: linear-gradient(135deg, #0f1123 0%, #23244a 100%);
-          color: #fff;
+          background: var(--gradient-bg);
+          color: var(--text-primary);
           font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
           min-height: 100vh;
         }
@@ -251,7 +251,7 @@ export default function About() {
         .about-hero-subtitle {
           font-size: 1.4rem;
           font-weight: 400;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           line-height: 1.6;
           max-width: 600px;
           margin: 0 auto;
@@ -260,16 +260,16 @@ export default function About() {
         /* Mission Section */
         .about-mission {
           padding: 4rem 1rem;
-          background: rgba(35, 36, 74, 0.3);
+          background: rgba(255,255,255,0.6);
         }
 
         .mission-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
+          background: rgba(255,255,255,0.98);
           border-radius: 24px;
-          padding: 3rem 2rem;
+          padding: 2.5rem 1.5rem;
           text-align: center;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(123, 255, 182, 0.1);
+          box-shadow: var(--shadow-md);
+          border: 1px solid var(--border-color);
           max-width: 800px;
           margin: 0 auto;
           position: relative;
@@ -295,14 +295,14 @@ export default function About() {
         .mission-card h2 {
           font-size: 2.2rem;
           font-weight: 700;
-          margin-bottom: 1.5rem;
-          color: #7bffb6;
+          margin-bottom: 1rem;
+          color: var(--accent-tertiary);
         }
 
         .mission-card p {
-          font-size: 1.2rem;
-          line-height: 1.7;
-          color: #d2d6f6;
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: var(--text-secondary);
         }
 
         /* Services Section */
@@ -315,7 +315,7 @@ export default function About() {
           font-size: 2.8rem;
           font-weight: 700;
           margin-bottom: 3rem;
-          color: #fff;
+          color: var(--text-primary);
           position: relative;
         }
 
@@ -339,12 +339,12 @@ export default function About() {
         }
 
         .service-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
+          background: rgba(255,255,255,0.98);
           border-radius: 20px;
-          padding: 2.5rem 1.5rem;
+          padding: 2rem 1.25rem;
           text-align: center;
           transition: all 0.3s ease;
-          border: 1px solid rgba(123, 255, 182, 0.1);
+          border: 1px solid var(--border-color);
           position: relative;
           overflow: hidden;
         }
@@ -379,12 +379,12 @@ export default function About() {
         .service-card h3 {
           font-size: 1.4rem;
           font-weight: 600;
-          margin-bottom: 1rem;
-          color: #7bffb6;
+          margin-bottom: 0.75rem;
+          color: var(--accent-tertiary);
         }
 
         .service-card p {
-          color: #d2d6f6;
+          color: var(--text-secondary);
           line-height: 1.6;
         }
 
@@ -422,11 +422,11 @@ export default function About() {
         }
 
         .story-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
+          background: rgba(255,255,255,0.98);
           border-radius: 16px;
-          padding: 2rem;
+          padding: 1.5rem;
           text-align: center;
-          border: 1px solid rgba(123, 255, 182, 0.1);
+          border: 1px solid var(--border-color);
           transition: all 0.3s ease;
         }
 
@@ -444,13 +444,13 @@ export default function About() {
         .stat-number {
           font-size: 2.5rem;
           font-weight: 800;
-          color: #7bffb6;
+          color: var(--accent-primary);
           margin-bottom: 0.5rem;
         }
 
         .stat-label {
           font-size: 1rem;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           font-weight: 500;
         }
 
@@ -467,12 +467,12 @@ export default function About() {
         }
 
         .value-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
+          background: rgba(255,255,255,0.98);
           border-radius: 20px;
-          padding: 2.5rem 1.5rem;
+          padding: 2rem 1.25rem;
           text-align: center;
           transition: all 0.3s ease;
-          border: 1px solid rgba(78, 92, 240, 0.1);
+          border: 1px solid var(--border-color);
           position: relative;
           overflow: hidden;
         }
@@ -508,18 +508,18 @@ export default function About() {
           font-size: 1.4rem;
           font-weight: 600;
           margin-bottom: 1rem;
-          color: #4e5cf0;
+          color: var(--accent-secondary);
         }
 
         .value-card p {
-          color: #d2d6f6;
+          color: var(--text-secondary);
           line-height: 1.6;
         }
 
         /* Audience Section */
         .about-audience {
           padding: 5rem 1rem;
-          background: rgba(35, 36, 74, 0.2);
+          background: rgba(255,255,255,0.6);
         }
 
         .audience-grid {
@@ -530,11 +530,11 @@ export default function About() {
         }
 
         .audience-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
-          border-radius: 24px;
-          padding: 3rem 2rem;
+          background: rgba(255,255,255,0.98);
+          border-radius: 20px;
+          padding: 2rem 1.5rem;
           text-align: center;
-          border: 1px solid rgba(123, 255, 182, 0.1);
+          border: 1px solid var(--border-color);
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
@@ -614,13 +614,13 @@ export default function About() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 2rem 1rem;
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
-          border-radius: 16px;
+          padding: 1.5rem 1rem;
+          background: rgba(255,255,255,0.98);
+          border-radius: 12px;
           text-decoration: none;
-          color: #d2d6f6;
+          color: var(--text-primary);
           transition: all 0.3s ease;
-          border: 1px solid rgba(123, 255, 182, 0.1);
+          border: 1px solid var(--border-color);
         }
 
         .contact-method:hover {
@@ -642,8 +642,8 @@ export default function About() {
         /* Footer CTA Section */
         .about-footer-cta {
           padding: 5rem 1rem;
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
-          border-top: 1px solid rgba(123, 255, 182, 0.1);
+          background: rgba(255,255,255,0.98);
+          border-top: 1px solid var(--border-color);
         }
 
         .footer-cta-content {
@@ -656,12 +656,12 @@ export default function About() {
           font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 1.5rem;
-          color: #fff;
+          color: var(--text-primary);
         }
 
         .footer-cta-content p {
           font-size: 1.2rem;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           margin-bottom: 3rem;
         }
 
@@ -701,7 +701,7 @@ export default function About() {
 
         .cta-button.secondary {
           background: linear-gradient(135deg, #7bffb6 0%, #4e5cf0 100%);
-          color: #181a2a;
+          color: var(--text-primary);
           box-shadow: 0 4px 20px rgba(123, 255, 182, 0.3);
         }
 

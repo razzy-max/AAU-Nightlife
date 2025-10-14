@@ -178,7 +178,7 @@ export default function AdminPortal() {
       <style>{`
         .admin-portal {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0f1123 0%, #23244a 100%);
+          background: var(--gradient-bg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -188,46 +188,46 @@ export default function AdminPortal() {
 
         .admin-portal-container {
           width: 100%;
-          max-width: 400px;
+          max-width: 480px;
         }
 
         .admin-login-card, .admin-success-card {
-          background: linear-gradient(135deg, #23244a 0%, #2d2d6e 100%);
+          background: rgba(255,255,255,0.98);
           border-radius: 24px;
-          padding: 2.5rem;
-          box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(123, 255, 182, 0.1);
-          color: #fff;
+          padding: 2rem;
+          box-shadow: var(--shadow-xl);
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
           text-align: center;
         }
 
         .admin-header {
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
         }
 
         .admin-logo {
-          font-size: 3rem;
-          margin-bottom: 1rem;
+          font-size: 2.6rem;
+          margin-bottom: 0.75rem;
         }
 
         .admin-header h1 {
-          font-size: 1.8rem;
+          font-size: 1.6rem;
           font-weight: 700;
-          margin-bottom: 0.5rem;
-          color: #7bffb6;
+          margin-bottom: 0.25rem;
+          color: var(--accent-primary);
         }
 
         .admin-header p {
-          color: #d2d6f6;
+          color: var(--text-secondary);
           margin: 0;
         }
 
         .admin-login-form {
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
         }
 
         .form-group {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
           text-align: left;
         }
 
@@ -235,16 +235,16 @@ export default function AdminPortal() {
           display: block;
           margin-bottom: 0.5rem;
           font-weight: 600;
-          color: #d2d6f6;
+          color: var(--text-primary);
         }
 
         .form-group input {
           width: 100%;
-          padding: 1rem;
-          border: 2px solid rgba(123, 255, 182, 0.2);
+          padding: 0.9rem;
+          border: 1px solid var(--border-color);
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.05);
-          color: #fff;
+          background: #fff;
+          color: var(--text-primary);
           font-size: 1rem;
           transition: all 0.3s ease;
           box-sizing: border-box;
@@ -252,22 +252,22 @@ export default function AdminPortal() {
 
         .form-group input:focus {
           outline: none;
-          border-color: #7bffb6;
-          box-shadow: 0 0 0 3px rgba(123, 255, 182, 0.1);
+          border-color: var(--accent-primary);
+          box-shadow: 0 0 0 4px rgba(14,165,255,0.08);
         }
 
         .form-group input::placeholder {
-          color: rgba(255, 255, 255, 0.5);
+          color: var(--text-muted);
         }
 
         .login-button {
           width: 100%;
-          padding: 1rem 2rem;
-          background: linear-gradient(135deg, #0074D9 0%, #005fa3 100%);
-          color: #fff;
+          padding: 0.9rem 1rem;
+          background: var(--gradient-secondary);
+          color: var(--text-primary);
           border: none;
           border-radius: 12px;
-          font-size: 1.1rem;
+          font-size: 1.05rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -275,12 +275,12 @@ export default function AdminPortal() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          min-height: 52px;
+          min-height: 48px;
         }
 
         .login-button:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(0, 116, 217, 0.4);
+          box-shadow: var(--shadow-lg);
         }
 
         .login-button:disabled {
@@ -290,10 +290,10 @@ export default function AdminPortal() {
         }
 
         .loading-spinner {
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top: 2px solid #fff;
+          width: 14px;
+          height: 14px;
+          border: 2px solid rgba(0, 0, 0, 0.08);
+          border-top: 2px solid var(--accent-primary);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -304,12 +304,12 @@ export default function AdminPortal() {
         }
 
         .error-message {
-          background: rgba(255, 77, 79, 0.1);
-          border: 1px solid rgba(255, 77, 79, 0.3);
+          background: rgba(255, 77, 79, 0.06);
+          border: 1px solid rgba(255, 77, 79, 0.12);
           border-radius: 8px;
           padding: 0.75rem;
           margin-bottom: 1rem;
-          color: #ff6b6b;
+          color: #b00020;
           display: flex;
           align-items: center;
           gap: 0.5rem;
@@ -317,7 +317,7 @@ export default function AdminPortal() {
         }
 
         .admin-footer {
-          border-top: 1px solid rgba(123, 255, 182, 0.1);
+          border-top: 1px solid rgba(0,0,0,0.04);
           padding-top: 1.5rem;
         }
 
