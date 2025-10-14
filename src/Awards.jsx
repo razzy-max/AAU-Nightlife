@@ -5,7 +5,7 @@ import './Events.css';
 
 export default function Awards() {
   const [categories, setCategories] = useState([]);
-  // Track selected vote counts for paid categories by category id
+  // Track selected vote counts for paid categories by candidate key ("categoryId:candidateId")
   const [selectedCounts, setSelectedCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
@@ -109,7 +109,8 @@ export default function Awards() {
     setStatus('Processing...');
     try {
       if (category.paid) {
-        const count = selectedCounts[category.id] && selectedCounts[category.id] > 0 ? selectedCounts[category.id] : 1;
+        const key = `${category.id}:${candidate.id}`;
+        const count = selectedCounts[key] && selectedCounts[key] > 0 ? selectedCounts[key] : 1;
         // Here you'd normally redirect to payment gateway with the amount and count.
         // For now, create a fake paymentRef and send votesCount to the backend.
         const fakePaymentRef = `FAKE-${Date.now()}`;
@@ -143,11 +144,12 @@ export default function Awards() {
     fetch(API_ENDPOINTS.awards).then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : []));
   };
 
-  const changeCount = (categoryId, delta) => {
+  const changeCount = (categoryId, candidateId, delta) => {
+    const key = `${categoryId}:${candidateId}`;
     setSelectedCounts(prev => {
-      const current = prev[categoryId] || 1;
+      const current = prev[key] || 1;
       const next = Math.max(1, current + delta);
-      return { ...prev, [categoryId]: next };
+      return { ...prev, [key]: next };
     });
   };
 
@@ -264,11 +266,11 @@ export default function Awards() {
                             {cat.paid ? (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                  <button className="hero-btn" onClick={() => changeCount(cat.id, -1)}>-</button>
-                                  <div style={{ minWidth: 32, textAlign: 'center' }}>{selectedCounts[cat.id] || 1}</div>
-                                  <button className="hero-btn" onClick={() => changeCount(cat.id, 1)}>+</button>
+                                  <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, -1)}>-</button>
+                                  <div style={{ minWidth: 32, textAlign: 'center' }}>{selectedCounts[`${cat.id}:${c.id}`] || 1}</div>
+                                  <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, 1)}>+</button>
                                 </div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[cat.id] || 1)}</div>
+                                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[`${cat.id}:${c.id}`] || 1)}</div>
                                 <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Pay & Vote</button>
                               </div>
                             ) : (
