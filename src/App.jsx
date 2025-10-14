@@ -13,13 +13,28 @@ import AdminLogout from './AdminLogout';
 import AdminAwards from './AdminAwards';
 import Awards from './Awards';
 import { BlogProvider } from './BlogContext';
-import { AuthProvider } from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
 import './App.css';
 import AdvertisersSection from './AdvertisersSection';
 import CookieConsent from './components/CookieConsent';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Small internal component to show admin link only when logged in
+  const AdminNavLink = ({ setMenuOpen }) => {
+    try {
+      const { isAdmin, isLoading } = useAuth();
+      if (isLoading) return null;
+      if (!isAdmin) return null;
+      return (
+        <Link to="/admin-portal" onClick={() => setMenuOpen(false)}>Admin</Link>
+      );
+    } catch (e) {
+      // If used outside provider or any error, silently fail
+      return null;
+    }
+  };
 
   return (
     <AuthProvider>
@@ -44,6 +59,7 @@ function App() {
               <Link to="/jobs" onClick={() => setMenuOpen(false)}>Jobs</Link>
               <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
               <Link to="/awards" onClick={() => setMenuOpen(false)}>Awards</Link>
+              <AdminNavLink setMenuOpen={setMenuOpen} />
               <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
             </div>
           </nav>
