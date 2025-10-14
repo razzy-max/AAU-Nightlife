@@ -94,6 +94,11 @@
   align-items: center;
 }
 
+/* Awards page smaller hero overrides */
+.awards-page .events-hero-modern { padding: calc(var(--space-2xl) / 2) var(--space-md); min-height: 36vh; }
+.awards-page .events-title-modern { font-size: clamp(1.6rem, 4.5vw, 2.4rem); margin-bottom: calc(var(--space-md) / 2); }
+.awards-page .events-subtitle-modern { font-size: clamp(0.95rem, 2.2vw, 1.15rem); max-width: 640px; }
+
 .title-line-1 {
   background: var(--gradient-accent);
   -webkit-background-clip: text;

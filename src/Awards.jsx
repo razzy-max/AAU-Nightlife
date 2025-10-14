@@ -141,7 +141,7 @@ export default function Awards() {
   if (loading) return <div className="page-center">Loading awards...</div>;
 
   return (
-    <div className="modern-events-page" style={{ paddingBottom: '4rem' }}>
+    <div className="modern-events-page awards-page" style={{ paddingBottom: '4rem' }}>
       <section className="events-hero-modern">
         <div className="events-hero-content">
           <div className="hero-text-container">
