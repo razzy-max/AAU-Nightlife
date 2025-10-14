@@ -34,6 +34,7 @@ const jobsPath = path.join(__dirname, 'data', 'jobs.json');
 const heroImagesPath = path.join(__dirname, 'data', 'heroImages.json');
 const blogPostsPath = path.join(__dirname, 'data', 'blogPosts.json');
 const blogCommentsPath = path.join(__dirname, 'data', 'blogComments.json');
+const awardsPath = path.join(__dirname, 'data', 'awards.json');
 // --- Advertisers API ---
 const advertisersPath = path.join(__dirname, 'data', 'advertisers.json');
 
@@ -301,6 +302,144 @@ app.get('/api/blog-posts', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch blog posts' });
   }
+
+  // Awards endpoints (categories, candidates, votes)
+  app.get('/api/awards', async (req, res) => {
+    // Return categories with candidates and current vote counts
+    if (db) {
+      try {
+        const categories = await db.collection('awards').find().toArray();
+        res.json(categories);
+        return;
+      } catch (err) {
+        console.error('Failed to fetch awards from db:', err);
+      }
+    }
+    // Fallback to file
+    try {
+      const data = readData(awardsPath);
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch awards' });
+    }
+  });
+
+  app.post('/api/awards', authenticateAdmin, async (req, res) => {
+    // Create or replace full awards structure (array of categories)
+    const payload = req.body;
+    if (!Array.isArray(payload)) return res.status(400).json({ error: 'Expected array of categories' });
+    if (db) {
+      try {
+        await db.collection('awards').deleteMany({});
+        if (payload.length) await db.collection('awards').insertMany(payload);
+        return res.json({ success: true });
+      } catch (err) {
+        console.error('Failed to save awards to db:', err);
+        return res.status(500).json({ error: 'Failed to save awards to db' });
+      }
+    }
+    // Fallback to file
+    try {
+      writeData(awardsPath, payload);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to save awards' });
+    }
+  });
+
+  // Add a candidate to a category
+  app.post('/api/awards/:categoryId/candidates', authenticateAdmin, async (req, res) => {
+    const { categoryId } = req.params;
+    const candidate = req.body;
+    if (!candidate || !candidate.name) return res.status(400).json({ error: 'Candidate name required' });
+    if (db) {
+      try {
+        const result = await db.collection('awards').findOneAndUpdate(
+          { id: categoryId },
+          { $push: { candidates: candidate } },
+          { returnDocument: 'after' }
+        );
+        return res.json(result.value);
+      } catch (err) {
+        console.error('Failed to add candidate:', err);
+        return res.status(500).json({ error: 'Failed to add candidate' });
+      }
+    }
+    // file fallback
+    try {
+      const data = readData(awardsPath);
+      const cat = data.find(c => c.id === categoryId);
+      if (!cat) return res.status(404).json({ error: 'Category not found' });
+      cat.candidates = cat.candidates || [];
+      cat.candidates.push(candidate);
+      writeData(awardsPath, data);
+      res.json(cat);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to add candidate' });
+    }
+  });
+
+  // Vote endpoint: record a vote (for paid categories expect a payment reference in body)
+  app.post('/api/awards/:categoryId/vote', async (req, res) => {
+    const { categoryId } = req.params;
+    const { candidateId, paymentRef } = req.body;
+    if (!candidateId) return res.status(400).json({ error: 'candidateId required' });
+
+    // Simple validation for paid categories will be handled by admin settings: category.paid === true
+    if (db) {
+      try {
+        const category = await db.collection('awards').findOne({ id: categoryId });
+        if (!category) return res.status(404).json({ error: 'Category not found' });
+
+        const candidateIdx = (category.candidates || []).findIndex(c => c.id === candidateId);
+        if (candidateIdx === -1) return res.status(404).json({ error: 'Candidate not found' });
+
+        // If category is paid, require paymentRef
+        if (category.paid && !paymentRef) {
+          return res.status(402).json({ error: 'Payment required for this category' });
+        }
+
+        // Record vote: increment candidate.votes and store vote record
+        const voteRecord = { categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null };
+        await db.collection('votes').insertOne(voteRecord);
+        const updateKey = `candidates.${candidateIdx}.votes`;
+        await db.collection('awards').updateOne({ id: categoryId }, { $inc: { [updateKey]: 1 } });
+        return res.json({ success: true });
+      } catch (err) {
+        console.error('Failed to record vote:', err);
+        return res.status(500).json({ error: 'Failed to record vote' });
+      }
+    }
+
+    // file fallback: update awards.json and append a vote to votes.json
+    try {
+      const data = readData(awardsPath);
+      const cat = data.find(c => c.id === categoryId);
+      if (!cat) return res.status(404).json({ error: 'Category not found' });
+      const cand = (cat.candidates || []).find(c => c.id === candidateId);
+      if (!cand) return res.status(404).json({ error: 'Candidate not found' });
+      if (cat.paid && !paymentRef) return res.status(402).json({ error: 'Payment required' });
+      cand.votes = (cand.votes || 0) + 1;
+      writeData(awardsPath, data);
+      // append to votes file
+      const votesPath = path.join(__dirname, 'data', 'votes.json');
+      const votes = readData(votesPath);
+      votes.push({ categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null });
+      writeData(votesPath, votes);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to record vote' });
+    }
+  });
+
+  // A simple endpoint to verify payment (to be integrated with Paystack). Admin will implement Paystack webhook or client-side verification.
+  app.post('/api/payments/verify', authenticateAdmin, async (req, res) => {
+    // Payload: { paymentRef, status }
+    const { paymentRef, status } = req.body;
+    if (!paymentRef) return res.status(400).json({ error: 'paymentRef required' });
+    // For now just acknowledge
+    res.json({ success: true, paymentRef, status: status || 'unknown' });
+  });
 });
 
 app.post('/api/blog-posts', authenticateAdmin, async (req, res) => {

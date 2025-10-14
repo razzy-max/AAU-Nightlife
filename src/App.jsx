@@ -10,6 +10,8 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import AdminPortal from './AdminPortal';
 import AdminLogout from './AdminLogout';
+import AdminAwards from './AdminAwards';
+import Awards from './Awards';
 import { BlogProvider } from './BlogContext';
 import { AuthProvider } from './AuthContext';
 import './App.css';
@@ -27,7 +29,10 @@ function App() {
           <CookieConsent />
         <header>
           <nav className="main-nav responsive-nav">
-            <div className="nav-logo">AAU Nightlife</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div className="nav-logo">AAU Nightlife</div>
+              <Link to="/awards" style={{ fontSize: '0.95rem', color: 'var(--text-primary)', textDecoration: 'none' }}>Awards</Link>
+            </div>
             <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">
               <span className="nav-toggle-bar" />
               <span className="nav-toggle-bar" />
@@ -38,6 +43,7 @@ function App() {
               <Link to="/events" onClick={() => setMenuOpen(false)}>Upcoming Events</Link>
               <Link to="/jobs" onClick={() => setMenuOpen(false)}>Jobs</Link>
               <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+              <Link to="/awards" onClick={() => setMenuOpen(false)}>Awards</Link>
               <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
             </div>
           </nav>
@@ -52,6 +58,8 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/admin-portal" element={<AdminPortal />} />
+            <Route path="/admin-awards" element={<AdminAwards />} />
+            <Route path="/awards" element={<Awards />} />
             <Route path="/blog/:id" element={<Blog />} />
           </Routes>
           <AdvertisersSection />
