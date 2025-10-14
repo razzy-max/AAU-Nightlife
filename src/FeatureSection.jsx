@@ -202,9 +202,9 @@ export default function FeatureSection() {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(22, 33, 62, 0.8);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(15,23,42,0.04);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-2xl);
           padding: var(--space-2xl);
@@ -282,9 +282,9 @@ export default function FeatureSection() {
         }
 
         .desktop-feature-card {
-          background: rgba(22, 33, 62, 0.6);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(15,23,42,0.04);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-2xl);
           box-shadow: var(--shadow-lg);

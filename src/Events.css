@@ -207,13 +207,14 @@
 
 .search-input-wrapper {
   position: relative;
-  background: rgba(22, 33, 62, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.85); /* light card bg for better contrast */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   overflow: hidden;
   transition: all 0.3s ease;
+  color: var(--text-primary);
 }
 
 .search-input-wrapper:hover {
@@ -260,9 +261,9 @@
   padding: var(--space-lg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
-  background: rgba(22, 33, 62, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
@@ -293,9 +294,10 @@
 
 /* Modern Admin Controls */
 .admin-controls-modern {
-  background: rgba(22, 33, 62, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   padding: var(--space-xl);
@@ -392,9 +394,10 @@
 
 /* Modern Form Styles */
 .event-form-modern {
-  background: rgba(22, 33, 62, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
@@ -579,15 +582,16 @@ textarea.form-input-modern:focus {
 }
 
 .event-card-modern {
-  background: rgba(22, 33, 62, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   overflow: hidden;
   transition: all 0.4s ease;
   position: relative;
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 .event-card-modern::before {

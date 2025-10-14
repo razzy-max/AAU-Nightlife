@@ -2,27 +2,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Modern Color Palette */
-  --primary-bg: #0a0b14;
-  --secondary-bg: #1a1b2e;
-  --card-bg: #16213e;
-  --card-hover: #1e2749;
-  --accent-primary: #00d4ff;
-  --accent-secondary: #7c3aed;
-  --accent-tertiary: #06ffa5;
-  --text-primary: #ffffff;
-  --text-secondary: #b8c5d6;
-  --text-muted: #8892b0;
-  --border-color: #233554;
-  --shadow-light: rgba(0, 212, 255, 0.1);
-  --shadow-medium: rgba(0, 212, 255, 0.2);
-  --shadow-heavy: rgba(0, 212, 255, 0.3);
+  /* Bright Color Palette */
+  --primary-bg: #ffffff; /* page background */
+  --secondary-bg: #f8fafc; /* subtle off-white */
+  --card-bg: #ffffff; /* card background */
+  --card-hover: #f1f8ff; /* light hover tint */
+  --accent-primary: #0ea5ff; /* bright blue */
+  --accent-secondary: #8b5cf6; /* violet */
+  --accent-tertiary: #10b981; /* green */
+  --text-primary: #0f172a; /* dark slate for text */
+  --text-secondary: #475569; /* muted text */
+  --text-muted: #6b7280;
+  --border-color: #e6eef8; /* light border */
+  --shadow-light: rgba(14,165,255,0.08);
+  --shadow-medium: rgba(14,165,255,0.12);
+  --shadow-heavy: rgba(14,165,255,0.16);
 
-  /* Modern Gradients */
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-secondary: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  --gradient-accent: linear-gradient(135deg, #06ffa5 0%, #00d4ff 100%);
-  --gradient-bg: linear-gradient(135deg, #0a0b14 0%, #1a1b2e 50%, #16213e 100%);
+  /* Bright Gradients */
+  --gradient-primary: linear-gradient(135deg, #60a5fa 0%, #8b5cf6 100%);
+  --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  --gradient-accent: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --gradient-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #eef2ff 100%);
 
   /* Modern Spacing */
   --space-xs: 0.25rem;
@@ -155,7 +155,7 @@ footer {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
-  background: #2d2d6e;
+  background: var(--accent-secondary);
   padding: 1rem 0;
 }
 .main-nav button {
@@ -169,7 +169,7 @@ footer {
   transition: background 0.2s;
 }
 .main-nav button:hover, .main-nav button:focus {
-  background: #4444aa;
+  background: rgba(255,255,255,0.06);
 }
 
 /* Modern Responsive Navbar Styles */
@@ -177,9 +177,9 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(26, 27, 46, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.7); /* lighter nav */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
   padding: var(--space-lg) var(--space-xl);
   position: sticky;
@@ -196,7 +196,7 @@ footer {
   right: 0;
   bottom: 0;
   background: var(--gradient-secondary);
-  opacity: 0.05;
+  opacity: 0.03;
   pointer-events: none;
 }
 
@@ -337,13 +337,13 @@ footer {
 
 /* Section Styles */
 .home-section h1 {
-  color: #2d2d6e;
+  color: var(--text-primary);
   font-size: 2.2rem;
   margin-bottom: 0.5rem;
 }
 
 .events-section h2, .jobs-section h2, .contact-section h2 {
-  color: #2d2d6e;
+  color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
@@ -354,7 +354,7 @@ footer {
   gap: var(--space-lg);
   margin-top: var(--space-xl);
   padding: var(--space-xl);
-  background: rgba(22, 33, 62, 0.4);
+  background: rgba(15, 23, 42, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
@@ -543,22 +543,22 @@ footer {
   position: relative;
 }
 .landing-nav a:hover, .landing-nav .cta-nav {
-  color: #7bffb6;
+  color: var(--accent-tertiary);
   opacity: 1;
 }
 .landing-nav .cta-nav {
-  background: #7bffb6;
-  color: #181a2a;
+  background: var(--accent-tertiary);
+  color: var(--text-primary);
   border-radius: 24px;
   padding: 0.5rem 1.4rem;
   font-weight: 700;
   margin-left: 1rem;
-  box-shadow: 0 2px 16px #7bffb633;
+  box-shadow: 0 2px 16px rgba(123,255,182,0.18);
   transition: background 0.2s, color 0.2s;
 }
 .landing-nav .cta-nav:hover {
   background: #fff;
-  color: #181a2a;
+  color: var(--text-primary);
 }
 
 .hero-section {
@@ -741,9 +741,9 @@ footer {
 }
 
 .feature-card {
-  background: rgba(22, 33, 62, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-lg);
@@ -816,11 +816,11 @@ footer {
   max-width: 180px;
   flex: 1 1 0;
   padding: 1.1rem 0.7rem;
-  background: #23243a;
+  background: rgba(255,255,255,0.98);
   border-radius: 14px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  box-shadow: var(--shadow-md);
   text-align: center;
-  color: #fff;
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   align-items: center;

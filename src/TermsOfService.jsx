@@ -205,9 +205,9 @@ export default function TermsOfService() {
           display: inline-flex;
           align-items: center;
           padding: var(--space-sm) var(--space-lg);
-          background: rgba(22, 33, 62, 0.6);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(15,23,42,0.04);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-2xl);
           font-size: 0.9rem;
@@ -225,9 +225,9 @@ export default function TermsOfService() {
         }
 
         .legal-section {
-          background: rgba(22, 33, 62, 0.4);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(15,23,42,0.03);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-xl);
           padding: var(--space-xl);
