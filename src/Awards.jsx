@@ -158,6 +158,9 @@ export default function Awards() {
   return (
     <div className="modern-events-page awards-page" style={{ paddingBottom: '4rem' }}>
       <section className="events-hero-modern">
+        <div className="floating-trophy trophy-1"></div>
+        <div className="floating-trophy trophy-2"></div>
+        <div className="floating-trophy trophy-3"></div>
         <div className="events-hero-content">
           <div className="hero-text-container">
             <h1 className="events-title-modern">Awards & Voting</h1>
@@ -236,7 +239,7 @@ export default function Awards() {
           {status && <div className={`status-message ${status.toLowerCase().includes('error') ? 'error' : 'success'}`}>{status}</div>}
 
           {/* Public categories and voting grid */}
-          <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+          <div className="awards-categories-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
             {loading && <div className="page-center">Loading categories...</div>}
             {!loading && categories.length === 0 && <div>No categories yet.</div>}
 
