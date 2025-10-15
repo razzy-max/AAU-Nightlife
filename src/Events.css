@@ -403,9 +403,26 @@
 @media (max-width: 600px) {
   /* Reduce container side padding for tighter fit */
   .events-container-modern {
-    padding: 0 0.5rem;
+  /* Force narrow square +/- buttons and override global min-width on small screens */
+  .candidate-counter .hero-btn {
+    min-width: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    font-size: 0.85rem !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
-
+  }
+  /* Make the Pay & Vote button compact but still tappable */
+  .candidate-controls .hero-btn.secondary {
+    min-width: 84px !important;
+    width: auto !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.85rem !important;
+  }
   /* Shrink admin and action buttons */
   .add-event-btn-modern,
   .hero-btn,
