@@ -172,7 +172,7 @@ export default function Awards() {
 
 
 
-
+        
         <div className="events-container-modern">
           {/* Admin controls like Events page */}
           {isAdmin && (
@@ -241,7 +241,7 @@ export default function Awards() {
             {!loading && categories.length === 0 && <div>No categories yet.</div>}
 
             {categories.map((cat, idx) => (
-              <div key={cat.id} className="award-card" style={{ border: '1px solid var(--border-color)', padding: '0.75rem', borderRadius: 8, background: 'var(--card-bg)' }}>
+              <div key={cat.id} style={{ border: '1px solid var(--border-color)', padding: '0.75rem', borderRadius: 8, background: 'var(--card-bg)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <strong style={{ fontSize: '1.1rem' }}>{cat.title}</strong>
@@ -263,23 +263,22 @@ export default function Awards() {
                 <div style={{ marginTop: '0.5rem' }}>
                   {(cat.candidates || []).length === 0 && <div style={{ color: 'var(--text-secondary)' }}>No candidates</div>}
                   {(cat.candidates || []).map((c, ci) => (
-                    <div key={c.id} className="award-candidate-row" style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', alignItems: 'center' }}>
-                      <div className="award-candidate-info">
-                      
+                    <div key={c.id} className="candidate-row" style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', alignItems: 'center' }}>
+                      <div>
                         <div style={{ fontWeight: 600 }}>{c.name}</div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{c.info || ''}</div>
                       </div>
-                          <div className="award-candidate-controls" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <div className="award-candidate-votes" style={{ fontWeight: 700 }}>{c.votes || 0}</div>
+                      <div className="candidate-controls" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <div style={{ fontWeight: 700 }}>{c.votes || 0}</div>
                             {cat.paid ? (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                  <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, -1)}>-</button>
-                                  <div style={{ minWidth: 32, textAlign: 'center' }}>{selectedCounts[`${cat.id}:${c.id}`] || 1}</div>
-                                  <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, 1)}>+</button>
-                                </div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[`${cat.id}:${c.id}`] || 1)}</div>
-                                <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Pay & Vote</button>
+                                  <div className="candidate-counter" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, -1)}>-</button>
+                                    <div className="counter-value" style={{ minWidth: 28, textAlign: 'center' }}>{selectedCounts[`${cat.id}:${c.id}`] || 1}</div>
+                                    <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, 1)}>+</button>
+                                  </div>
+                                  <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[`${cat.id}:${c.id}`] || 1)}</div>
+                                  <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Pay & Vote</button>
                               </div>
                             ) : (
                               <>
