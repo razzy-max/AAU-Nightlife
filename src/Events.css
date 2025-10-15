@@ -297,35 +297,6 @@
   padding: 0 var(--space-sm); /* reduce side padding */
 }
 
-/* Awards card responsive tweaks */
-.award-card {
-  overflow: visible; /* allow internal wrapping */
-}
-.award-candidate-row {
-  gap: 0.75rem;
-  flex-wrap: wrap; /* allow name and controls to wrap on small screens */
-}
-.award-candidate-info {
-  min-width: 40%; /* keep name readable, allows controls to wrap */
-}
-.award-candidate-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  min-width: 45%;
-  justify-content: flex-end;
-}
-.award-candidate-votes {
-  margin-right: 0.5rem;
-}
-
-@media (max-width: 640px) {
-  .award-candidate-info { min-width: 100%; margin-bottom: 0.5rem; }
-  .award-candidate-controls { min-width: 100%; justify-content: flex-start; }
-  .award-candidate-controls .hero-btn { padding: 0.4rem 0.6rem; }
-  .award-card { padding: 0.75rem 0.5rem; }
-}
-
 /* Modern Admin Controls */
 .admin-controls-modern {
   background: rgba(255, 255, 255, 0.9);
@@ -427,6 +398,53 @@
 }
 
 /* Modern Form Styles */
+
+/* Mobile adjustments specifically to keep Awards layout on one line and reduce button crowding */
+@media (max-width: 600px) {
+  /* Reduce container side padding for tighter fit */
+  .events-container-modern {
+    padding: 0 0.5rem;
+  }
+
+  /* Shrink admin and action buttons */
+  .add-event-btn-modern,
+  .hero-btn,
+  .submit-btn,
+  .cancel-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1;
+    border-radius: 8px;
+  }
+
+  /* Make secondary hero buttons slightly wider but compact */
+  .hero-btn.secondary { padding: 0.35rem 0.8rem; }
+
+  /* Reduce badge and admin header spacing */
+  .admin-controls-modern { padding: 0.5rem; }
+  .admin-header { gap: 0.5rem; }
+
+  /* Tighten category cards and candidate rows */
+  .events-container-modern > div,
+  .events-container-modern > .admin-controls-modern,
+  .events-container-modern .event-form-modern {
+    padding: 0.5rem;
+  }
+
+  /* Ensure flex rows can wrap so controls don't overflow */
+  .events-container-modern [style*="display: flex"] {
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    align-items: center !important;
+  }
+
+  /* Smaller hero/title on awards mobile */
+  .awards-page .events-hero-modern { padding: 1.25rem 0.75rem; min-height: 26vh; }
+  .awards-page .events-title-modern { font-size: 1.4rem; }
+
+  /* Counter display smaller */
+  .events-container-modern div { font-size: 0.95rem; }
+}
 .event-form-modern {
   background: rgba(255, 255, 255, 0.95);
   color: var(--text-primary);
