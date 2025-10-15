@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const { MongoClient, ObjectId } = require('mongodb');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -31,6 +32,15 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to support base64 images
 app.use(cookieParser());
+
+// Rate limiting for voting endpoints to prevent abuse
+const voteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 votes per windowMs
+  message: 'Too many votes from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Data file paths
 const eventsPath = path.join(__dirname, 'data', 'events.json');
@@ -393,9 +403,9 @@ app.get('/api/blog-posts', async (req, res) => {
   });
 
   // Vote endpoint: record a vote (for paid categories expect a payment reference in body)
-  app.post('/api/awards/:categoryId/vote', async (req, res) => {
+  app.post('/api/awards/:categoryId/vote', voteLimiter, async (req, res) => {
     const { categoryId } = req.params;
-    const { candidateId, paymentRef, votesCount } = req.body;
+    const { candidateId, paymentRef, votesCount, sessionId } = req.body;
     const votesToCast = Number(votesCount) >= 1 ? Math.floor(Number(votesCount)) : 1;
     if (!candidateId) return res.status(400).json({ error: 'candidateId required' });
 
@@ -416,7 +426,7 @@ app.get('/api/blog-posts', async (req, res) => {
           return res.status(402).json({ error: 'Payment required for this category' });
         }
 
-        // If category is free, enforce one vote per IP
+        // If category is free, enforce one vote per IP and session
         if (!category.paid) {
           if (!ip) {
             // If we cannot determine IP, be conservative and allow the vote
@@ -427,10 +437,17 @@ app.get('/api/blog-posts', async (req, res) => {
               return res.status(409).json({ error: 'You have already voted in this free category' });
             }
           }
+          // Additional session-based check if sessionId provided
+          if (sessionId) {
+            const sessionVote = await db.collection('votes').findOne({ categoryId, sessionId });
+            if (sessionVote) {
+              return res.status(409).json({ error: 'You have already voted in this free category' });
+            }
+          }
         }
 
-        // Record vote: increment candidate.votes by votesToCast and store vote record with ip and votesCount
-        const voteRecord = { categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: votesToCast, ip: ip || null };
+        // Record vote: increment candidate.votes by votesToCast and store vote record with ip, sessionId and votesCount
+        const voteRecord = { categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: votesToCast, ip: ip || null, sessionId: sessionId || null };
         await db.collection('votes').insertOne(voteRecord);
         const updateKey = `candidates.${candidateIdx}.votes`;
         await db.collection('awards').updateOne({ id: categoryId }, { $inc: { [updateKey]: votesToCast } });
@@ -450,7 +467,7 @@ app.get('/api/blog-posts', async (req, res) => {
       if (!cand) return res.status(404).json({ error: 'Candidate not found' });
       if (cat.paid && !paymentRef) return res.status(402).json({ error: 'Payment required' });
 
-      // file-fallback: enforce one vote per IP for free categories
+      // file-fallback: enforce one vote per IP and session for free categories
       if (!cat.paid) {
         const votesPath = path.join(__dirname, 'data', 'votes.json');
         const votes = readData(votesPath);
@@ -460,6 +477,11 @@ app.get('/api/blog-posts', async (req, res) => {
         } else {
           console.warn('Could not determine client IP for free-vote enforcement (file fallback)');
         }
+        // Additional session check
+        if (sessionId) {
+          const sessionFound = votes.find(v => v.categoryId === categoryId && v.sessionId === sessionId);
+          if (sessionFound) return res.status(409).json({ error: 'You have already voted in this free category' });
+        }
       }
 
       const votesPath = path.join(__dirname, 'data', 'votes.json');
@@ -467,8 +489,8 @@ app.get('/api/blog-posts', async (req, res) => {
       const toAdd = Number(votesCount) >= 1 ? Math.floor(Number(votesCount)) : 1;
       cand.votes = (cand.votes || 0) + toAdd;
       writeData(awardsPath, data);
-      // append to votes file with ip and votesCount
-      votes.push({ categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: toAdd, ip: ip || null });
+      // append to votes file with ip, sessionId and votesCount
+      votes.push({ categoryId, candidateId, timestamp: new Date().toISOString(), paymentRef: paymentRef || null, votesCount: toAdd, ip: ip || null, sessionId: sessionId || null });
       writeData(votesPath, votes);
       res.json({ success: true });
     } catch (err) {
