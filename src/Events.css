@@ -297,6 +297,35 @@
   padding: 0 var(--space-sm); /* reduce side padding */
 }
 
+/* Awards card responsive tweaks */
+.award-card {
+  overflow: visible; /* allow internal wrapping */
+}
+.award-candidate-row {
+  gap: 0.75rem;
+  flex-wrap: wrap; /* allow name and controls to wrap on small screens */
+}
+.award-candidate-info {
+  min-width: 40%; /* keep name readable, allows controls to wrap */
+}
+.award-candidate-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 45%;
+  justify-content: flex-end;
+}
+.award-candidate-votes {
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .award-candidate-info { min-width: 100%; margin-bottom: 0.5rem; }
+  .award-candidate-controls { min-width: 100%; justify-content: flex-start; }
+  .award-candidate-controls .hero-btn { padding: 0.4rem 0.6rem; }
+  .award-card { padding: 0.75rem 0.5rem; }
+}
+
 /* Modern Admin Controls */
 .admin-controls-modern {
   background: rgba(255, 255, 255, 0.9);
