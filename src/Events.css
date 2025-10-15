@@ -185,7 +185,7 @@
 }
 
 /* Awards page smaller hero overrides */
-.awards-page .events-hero-modern { padding: calc(var(--space-sm) / 2) var(--space-md); min-height: 24vh; }
+.awards-page .events-hero-modern { padding: calc(var(--space-sm) / 2) var(--space-md); min-height: 24vh; margin-bottom: 0; }
 .awards-page .events-title-modern { font-size: clamp(1.6rem, 4.5vw, 2.4rem); margin-bottom: 0; }
 .awards-page .events-subtitle-modern { font-size: clamp(0.95rem, 2.2vw, 1.15rem); max-width: 640px; }
 
@@ -378,7 +378,7 @@
 
 /* Modern Main Content */
 .events-main-modern {
-  padding: var(--space-2xl) 0; /* tighten main vertical padding */
+  padding: calc(var(--space-lg) / 2) 0; /* further reduce main vertical padding for awards page */
 }
 
 .events-container-modern {
