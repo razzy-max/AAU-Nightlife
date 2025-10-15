@@ -3,6 +3,57 @@ import { useAuth } from './AuthContext';
 import { API_ENDPOINTS } from './config';
 import './Events.css';
 
+// Simple CAPTCHA component
+const SimpleCaptcha = ({ onVerify, onReset }) => {
+  const [num1, setNum1] = useState(Math.floor(Math.random() * 10) + 1);
+  const [num2, setNum2] = useState(Math.floor(Math.random() * 10) + 1);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+
+  const generateNew = () => {
+    setNum1(Math.floor(Math.random() * 10) + 1);
+    setNum2(Math.floor(Math.random() * 10) + 1);
+    setUserAnswer('');
+    setIsVerified(false);
+    onReset && onReset();
+  };
+
+  const checkAnswer = () => {
+    if (parseInt(userAnswer) === num1 + num2) {
+      setIsVerified(true);
+      onVerify && onVerify();
+    } else {
+      generateNew();
+    }
+  };
+
+  useEffect(() => {
+    generateNew();
+  }, []);
+
+  return (
+    <div style={{ margin: '0.5rem 0', padding: '0.5rem', border: '1px solid var(--border-color)', borderRadius: 4, background: 'var(--card-bg)' }}>
+      <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>Solve: {num1} + {num2} = ?</div>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <input
+          type="number"
+          value={userAnswer}
+          onChange={(e) => setUserAnswer(e.target.value)}
+          placeholder="Answer"
+          style={{ width: 60, padding: '0.25rem' }}
+          disabled={isVerified}
+        />
+        {!isVerified ? (
+          <button onClick={checkAnswer} className="hero-btn" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>Verify</button>
+        ) : (
+          <span style={{ color: 'green', fontSize: '0.8rem' }}>✓ Verified</span>
+        )}
+        <button onClick={generateNew} className="hero-btn secondary" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>New</button>
+      </div>
+    </div>
+  );
+};
+
 export default function Awards() {
   const [categories, setCategories] = useState([]);
   // Track selected vote counts for paid categories by candidate key ("categoryId:candidateId")
@@ -12,6 +63,12 @@ export default function Awards() {
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [form, setForm] = useState({ title: '', description: '', id: '', paid: false, price: 50, candidates: [] });
+  const [votedCategories, setVotedCategories] = useState(new Set()); // Track voted free categories in this session
+  const [votingInProgress, setVotingInProgress] = useState(new Set()); // Track ongoing votes to prevent rapid clicks
+  const [sessionId] = useState(() => `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`); // Unique session ID
+  const [showCaptcha, setShowCaptcha] = useState(false); // Show CAPTCHA for free voting
+  const [captchaVerified, setCaptchaVerified] = useState(false); // Track CAPTCHA verification
+  const [pendingVote, setPendingVote] = useState(null); // Store pending vote data
 
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
@@ -20,6 +77,12 @@ export default function Awards() {
       .then(r => r.json())
       .then(d => { setCategories(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(err => { console.error(err); setLoading(false); });
+
+    // Load voted categories from localStorage to persist across page reloads
+    const voted = localStorage.getItem('votedCategories');
+    if (voted) {
+      setVotedCategories(new Set(JSON.parse(voted)));
+    }
   }, []);
 
   // Admin: save full categories array
@@ -106,7 +169,36 @@ export default function Awards() {
   };
 
   const handleVote = async (category, candidate) => {
+    // Prevent rapid clicks
+    if (votingInProgress.has(category.id)) {
+      return;
+    }
+
+    // For free categories, check if already voted in this session
+    if (!category.paid && votedCategories.has(category.id)) {
+      setStatus('You have already voted in this free category.');
+      return;
+    }
+
+    // For free categories, show confirmation dialog and CAPTCHA
+    if (!category.paid) {
+      const confirmed = window.confirm(`Are you sure you want to vote for "${candidate.name}" in "${category.title}"? You can only vote once in free categories.`);
+      if (!confirmed) return;
+
+      // Show CAPTCHA
+      setPendingVote({ category, candidate });
+      setShowCaptcha(true);
+      setCaptchaVerified(false);
+      return;
+    }
+
+    await processVote(category, candidate);
+  };
+
+  const processVote = async (category, candidate) => {
+    setVotingInProgress(prev => new Set(prev).add(category.id));
     setStatus('Processing...');
+
     try {
       if (category.paid) {
         const key = `${category.id}:${candidate.id}`;
@@ -128,10 +220,19 @@ export default function Awards() {
         const res = await fetch(`${API_ENDPOINTS.awards}/${category.id}/vote`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ candidateId: candidate.id })
+          body: JSON.stringify({ candidateId: candidate.id, sessionId })
         });
-        if (res.ok) setStatus('Vote recorded — thank you!');
-        else {
+        if (res.ok) {
+          setStatus('Vote recorded — thank you!');
+          // Mark as voted in this session and persist to localStorage
+          const newVoted = new Set(votedCategories).add(category.id);
+          setVotedCategories(newVoted);
+          localStorage.setItem('votedCategories', JSON.stringify([...newVoted]));
+          // Reset CAPTCHA state
+          setShowCaptcha(false);
+          setCaptchaVerified(false);
+          setPendingVote(null);
+        } else {
           const err = await res.json().catch(() => ({}));
           setStatus(err.error || 'Failed to record vote');
         }
@@ -139,9 +240,29 @@ export default function Awards() {
     } catch (err) {
       console.error(err);
       setStatus('An error occurred while voting.');
+    } finally {
+      setVotingInProgress(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(category.id);
+        return newSet;
+      });
     }
     // Refresh categories
     fetch(API_ENDPOINTS.awards).then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : []));
+  };
+
+  const handleCaptchaVerify = () => {
+    setCaptchaVerified(true);
+  };
+
+  const handleCaptchaReset = () => {
+    setCaptchaVerified(false);
+  };
+
+  const submitVoteWithCaptcha = () => {
+    if (captchaVerified && pendingVote) {
+      processVote(pendingVote.category, pendingVote.candidate);
+    }
   };
 
   const changeCount = (categoryId, candidateId, delta) => {
@@ -238,6 +359,52 @@ export default function Awards() {
 
           {status && <div className={`status-message ${status.toLowerCase().includes('error') ? 'error' : 'success'}`}>{status}</div>}
 
+          {/* CAPTCHA Modal for free voting */}
+          {showCaptcha && pendingVote && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'var(--card-bg)',
+                padding: '1rem',
+                borderRadius: 8,
+                border: '1px solid var(--border-color)',
+                maxWidth: 400,
+                width: '90%'
+              }}>
+                <h3 style={{ marginBottom: '1rem' }}>Verify You're Human</h3>
+                <p style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
+                  Before voting for "{pendingVote.candidate.name}" in "{pendingVote.category.title}", please solve this simple math problem:
+                </p>
+                <SimpleCaptcha onVerify={handleCaptchaVerify} onReset={handleCaptchaReset} />
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  <button
+                    onClick={() => { setShowCaptcha(false); setPendingVote(null); }}
+                    className="cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={submitVoteWithCaptcha}
+                    disabled={!captchaVerified}
+                    className="submit-btn"
+                  >
+                    Submit Vote
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Public categories and voting grid */}
           <div className="awards-categories-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
             {loading && <div className="page-center">Loading categories...</div>}
@@ -285,7 +452,13 @@ export default function Awards() {
                               </div>
                             ) : (
                               <>
-                                <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Vote</button>
+                                <button
+                                  className="hero-btn secondary"
+                                  onClick={() => handleVote(cat, c)}
+                                  disabled={votedCategories.has(cat.id) || votingInProgress.has(cat.id)}
+                                >
+                                  {votedCategories.has(cat.id) ? 'Already Voted' : votingInProgress.has(cat.id) ? 'Voting...' : 'Vote'}
+                                </button>
                               </>
                             )}
                             {isAdmin && <button className="submit-btn" onClick={() => deleteCandidateInline(idx, ci)}>Delete</button>}
