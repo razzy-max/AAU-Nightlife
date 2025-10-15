@@ -20,6 +20,96 @@
   overflow: hidden;
 }
 
+/* Awards page floating trophy silhouettes */
+.awards-page .events-hero-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.awards-page .floating-trophy {
+  position: absolute;
+  width: 80px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  opacity: 0.08;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: trophy-float 8s ease-in-out infinite;
+  z-index: 1;
+}
+
+.awards-page .floating-trophy::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  opacity: 0.1;
+  border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+  animation: trophy-handle 8s ease-in-out infinite;
+}
+
+.awards-page .trophy-1 {
+  width: 60px;
+  height: 75px;
+  top: 15%;
+  left: 15%;
+  animation-delay: 0s;
+}
+
+.awards-page .trophy-2 {
+  width: 90px;
+  height: 112px;
+  top: 70%;
+  right: 10%;
+  animation-delay: 3s;
+}
+
+.awards-page .trophy-3 {
+  width: 70px;
+  height: 87px;
+  bottom: 25%;
+  left: 70%;
+  animation-delay: 6s;
+}
+
+@keyframes trophy-float {
+  0%, 100% {
+    transform: translateY(0px) scale(1) rotate(0deg);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translateY(-15px) scale(1.05) rotate(2deg);
+    opacity: 0.12;
+  }
+}
+
+@keyframes trophy-handle {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0px) scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3px) scale(1.1);
+    opacity: 0.15;
+  }
+}
+
+/* Hide floating trophies on mobile for cleaner look */
+@media (max-width: 768px) {
+  .awards-page .floating-trophy {
+    display: none;
+  }
+}
+
 .hero-background-effects {
   position: absolute;
   top: 0;
@@ -403,74 +493,219 @@
 @media (max-width: 600px) {
   /* Reduce container side padding for tighter fit */
   .events-container-modern {
+    padding: 0 0.75rem;
+  }
+
   /* Force narrow square +/- buttons and override global min-width on small screens */
   .candidate-counter .hero-btn {
-    min-width: 32px !important;
-    width: 32px !important;
-    height: 32px !important;
+    min-width: 36px !important;
+    width: 36px !important;
+    height: 36px !important;
     padding: 0 !important;
-    font-size: 0.85rem !important;
-    border-radius: 6px !important;
+    font-size: 1rem !important;
+    border-radius: 8px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    touch-action: manipulation;
   }
-  }
+
   /* Make the Pay & Vote button compact but still tappable */
   .candidate-controls .hero-btn.secondary {
-    min-width: 84px !important;
+    min-width: 90px !important;
     width: auto !important;
-    padding: 0.25rem 0.5rem !important;
-    font-size: 0.85rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    min-height: 44px !important;
+    touch-action: manipulation;
   }
+
   /* Shrink admin and action buttons */
   .add-event-btn-modern,
   .hero-btn,
   .submit-btn,
   .cancel-btn {
-    padding: 0.35rem 0.6rem;
-    font-size: 0.85rem;
-    line-height: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.2;
     border-radius: 8px;
+    min-height: 44px;
+    touch-action: manipulation;
   }
 
   /* Make secondary hero buttons slightly wider but compact */
-  .hero-btn.secondary { padding: 0.35rem 0.8rem; }
+  .hero-btn.secondary {
+    padding: 0.5rem 1rem;
+    min-height: 44px;
+  }
 
   /* Reduce badge and admin header spacing */
-  .admin-controls-modern { padding: 0.5rem; }
-  .admin-header { gap: 0.5rem; }
+  .admin-controls-modern {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .admin-header {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
 
   /* Tighten category cards and candidate rows */
   .events-container-modern > div,
   .events-container-modern > .admin-controls-modern,
   .events-container-modern .event-form-modern {
-    padding: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  /* Reduce card padding on mobile to prevent button overflow */
+  .events-container-modern > div > div[style*="border: 1px solid"] {
+    padding: 0.5rem !important;
   }
 
   /* Ensure flex rows can wrap so controls don't overflow */
   .events-container-modern [style*="display: flex"] {
     flex-wrap: wrap !important;
-    gap: 0.25rem !important;
+    gap: 0.5rem !important;
     align-items: center !important;
   }
 
   /* Smaller hero/title on awards mobile */
-  .awards-page .events-hero-modern { padding: 1.25rem 0.75rem; min-height: 26vh; }
-  .awards-page .events-title-modern { font-size: 1.4rem; }
+  .awards-page .events-hero-modern {
+    padding: 1rem 1rem;
+    min-height: 24vh;
+  }
+  .awards-page .events-title-modern {
+    font-size: 1.6rem;
+    margin-bottom: 0.25rem;
+  }
 
   /* Counter display smaller */
-  .events-container-modern div { font-size: 0.95rem; }
+  .events-container-modern div {
+    font-size: 0.95rem;
+  }
+
+  /* Improve category card spacing on mobile */
+  .awards-categories-grid {
+    gap: 0.75rem !important;
+    margin-top: 0.75rem !important;
+  }
+
+  .events-container-modern > div > div[style*="display: grid"] {
+    gap: 0.75rem !important;
+    margin-top: 0.75rem !important;
+  }
+
+  /* Better candidate row layout */
+  .candidate-row {
+    padding: 0.5rem 0 !important;
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .candidate-row > div:first-child {
+    flex: 1;
+    min-width: 0;
+    flex-basis: 100% !important;
+  }
+
+  .candidate-controls {
+    flex-shrink: 0;
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin-left: 0 !important;
+  }
+
+  /* Improve form grid on mobile */
+  .form-grid-modern {
+    gap: 1rem;
+  }
+
+  .form-group-modern {
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* Tight candidate controls for very small screens */
 @media (max-width: 420px) {
-  .candidate-row { display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; }
-  .candidate-controls { display: flex; align-items: center; gap: 0.25rem; }
-  .candidate-counter .hero-btn { padding: 0.18rem 0.35rem; font-size: 0.8rem; }
-  .candidate-counter .counter-value { min-width: 22px; font-size: 0.85rem; }
-  .hero-btn.secondary { padding: 0.25rem 0.5rem; font-size: 0.85rem; }
-  .candidate-row > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .candidate-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+  }
+  .candidate-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    min-width: 120px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .candidate-counter .hero-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+  }
+  .candidate-counter .counter-value {
+    min-width: 28px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .hero-btn.secondary {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    min-height: 40px;
+    margin-top: 0.25rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .candidate-row > div:first-child {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+  .candidate-row > div:first-child div {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  /* Stack admin buttons vertically on very small screens */
+  .admin-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  /* Reduce form padding further */
+  .event-form-modern {
+    padding: 0.75rem;
+  }
+
+  .form-grid-modern {
+    gap: 0.75rem;
+  }
+
+  /* Make vote buttons full width on very small screens */
+  .candidate-controls .hero-btn.secondary {
+    width: 100%;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+  }
+
+  /* Adjust counter layout for very small screens */
+  .candidate-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
 }
 .event-form-modern {
   background: rgba(255, 255, 255, 0.95);

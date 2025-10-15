@@ -391,7 +391,7 @@ export default function About() {
         /* Story Section */
         .about-story {
           padding: 5rem 1rem;
-          background: rgba(35, 36, 74, 0.2);
+          background: rgba(255, 255, 255, 0.8);
         }
 
         .story-content {
@@ -411,7 +411,7 @@ export default function About() {
         .story-text p {
           font-size: 1.1rem;
           line-height: 1.7;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           margin-bottom: 1.5rem;
         }
 
@@ -571,7 +571,7 @@ export default function About() {
         .audience-card p {
           font-size: 1.1rem;
           line-height: 1.7;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           margin-bottom: 2rem;
         }
 
@@ -599,7 +599,7 @@ export default function About() {
 
         .contact-content p {
           font-size: 1.2rem;
-          color: #d2d6f6;
+          color: var(--text-secondary);
           margin-bottom: 3rem;
         }
 
