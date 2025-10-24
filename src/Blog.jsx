@@ -293,6 +293,11 @@ export default function Blog() {
                     <span className="blog-file-icon">🎥</span>
                     <span>Choose Video</span>
                   </label>
+                  {form.video && (
+                    <div className="file-preview">
+                      <video src={form.video} className="file-preview-video" controls />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="blog-form-group blog-form-group-full">
@@ -366,6 +371,11 @@ export default function Blog() {
                     <span className="blog-file-icon">🎥</span>
                     <span>Change Video</span>
                   </label>
+                  {editForm.video && (
+                    <div className="file-preview">
+                      <video src={editForm.video} className="file-preview-video" controls />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="blog-form-group blog-form-group-full">
