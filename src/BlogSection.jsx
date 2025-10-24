@@ -6,18 +6,12 @@ import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
 
 export default function BlogSection() {
-  const blogContext = useBlog();
-  console.log('BlogSection - full blog context:', blogContext);
-  const { posts, addPost } = blogContext;
-  console.log('BlogSection - addPost function:', addPost);
-  console.log('BlogSection - addPost type:', typeof addPost);
+  const { posts, addPost } = useBlog();
   const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
   // Admin authentication now handled by AuthContext
 
-  // Debug logging
-  console.log('BlogSection component - isAdmin:', isAdmin, 'authLoading:', authLoading);
 
   const handleFormChange = e => {
     if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
@@ -33,32 +27,15 @@ export default function BlogSection() {
 
   const handlePostSubmit = async e => {
     e.preventDefault();
-    console.log('Submitting form with data:', form);
-    console.log('addPost function available:', typeof addPost);
-    console.log('addPost function:', addPost);
-
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
-
-    console.log('New post object:', newPost);
-
-    if (!addPost || typeof addPost !== 'function') {
-      console.error('addPost function is not available or not a function');
-      console.error('addPost value:', addPost);
-      alert('Error: Blog context not properly initialized. Please refresh the page.');
-      return;
-    }
-
     try {
-      console.log('Calling addPost function...');
-      const created = await addPost(newPost); // get the backend response
-      console.log('Post created successfully:', created);
+      await addPost(newPost);
       setForm({ title: '', image: '', content: '', video: '' });
       setShowForm(false);
-      alert('Post created successfully!');
     } catch (error) {
       console.error('Failed to create post:', error);
-      alert(`Failed to create post: ${error.message}`);
+      alert('Failed to create post. Please try again.');
     }
   };
 
