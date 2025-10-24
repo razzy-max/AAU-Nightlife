@@ -6,10 +6,7 @@ import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
 
 export default function BlogSection() {
-  const blogContext = useBlog();
-  console.log('BlogSection context:', blogContext);
-  const { posts, addPost } = blogContext;
-  console.log('addPost function:', addPost);
+  const { posts, addPost } = useBlog();
   const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
