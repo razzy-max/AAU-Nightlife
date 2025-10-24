@@ -52,6 +52,9 @@ export function BlogProvider({ children }) {
       const created = await res.json();
       setPosts(prev => [created, ...prev]);
       return created;
+    } else {
+      const errorText = await res.text();
+      throw new Error(`Failed to create post: ${res.status} - ${errorText}`);
     }
   };
 
@@ -65,6 +68,9 @@ export function BlogProvider({ children }) {
     if (res.ok) {
       const updatedPost = await res.json();
       setPosts(prev => prev.map(p => String(p._id) === String(id) ? updatedPost : p));
+    } else {
+      const errorText = await res.text();
+      throw new Error(`Failed to update post: ${res.status} - ${errorText}`);
     }
   };
 
