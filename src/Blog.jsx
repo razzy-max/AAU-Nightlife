@@ -66,11 +66,11 @@ export default function Blog() {
   const [input, setInput] = useState('');
   const [name, setName] = useState('');
   const [anonymous, setAnonymous] = useState(false);
-  const [form, setForm] = useState({ title: '', image: '', content: '' });
+  const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
   const [showForm, setShowForm] = useState(false);
   // Edit post (like events: show inline form, update state, then backend, then refresh)
   const [editMode, setEditMode] = useState(false);
-  const [editForm, setEditForm] = useState({ title: '', image: '', content: '' });
+  const [editForm, setEditForm] = useState({ title: '', image: '', content: '', video: '' });
   const navigate = useNavigate();
   // Use _id for comments and update removeComment to use commentId
   const blogComments = comments[blog?._id] || [];
@@ -121,10 +121,10 @@ export default function Blog() {
   };
 
   const handleFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
+    if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = ev => {
-        setForm(f => ({ ...f, image: ev.target.result }));
+        setForm(f => ({ ...f, [e.target.name]: ev.target.result }));
       };
       reader.readAsDataURL(e.target.files[0]);
     } else {
@@ -137,7 +137,7 @@ export default function Blog() {
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
     await addPost(newPost);
-    setForm({ title: '', image: '', content: '' });
+    setForm({ title: '', image: '', content: '', video: '' });
     setShowForm(false);
   };
 
@@ -153,10 +153,10 @@ export default function Blog() {
   };
 
   const handleEditFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
+    if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = ev => {
-        setEditForm(f => ({ ...f, image: ev.target.result }));
+        setEditForm(f => ({ ...f, [e.target.name]: ev.target.result }));
       };
       reader.readAsDataURL(e.target.files[0]);
     } else {
@@ -252,6 +252,10 @@ export default function Blog() {
               <input type="file" name="image" accept="image/*" onChange={handleFormChange} required />
             </label>
             <label>
+              Video (optional):
+              <input type="file" name="video" accept="video/*" onChange={handleFormChange} />
+            </label>
+            <label>
               Content:
               <textarea name="content" value={form.content} onChange={handleFormChange} required></textarea>
             </label>
@@ -268,6 +272,10 @@ export default function Blog() {
             <label>
               Image:
               <input type="file" name="image" accept="image/*" onChange={handleEditFormChange} />
+            </label>
+            <label>
+              Video (optional):
+              <input type="file" name="video" accept="video/*" onChange={handleEditFormChange} />
             </label>
             <label>
               Content:
@@ -312,6 +320,18 @@ export default function Blog() {
               ) : (
                 <br key={idx} />
               )
+            )}
+            {blog.video && (
+              <div className="blog-video-container">
+                <video
+                  className="blog-detail-video"
+                  controls
+                  src={blog.video}
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
             )}
           </div>
         </article>
