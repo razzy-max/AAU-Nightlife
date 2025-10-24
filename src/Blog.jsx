@@ -148,7 +148,7 @@ export default function Blog() {
   };
 
   const startEdit = () => {
-    setEditForm({ title: blog.title, image: blog.image, content: blog.content });
+    setEditForm({ title: blog.title, image: blog.image, content: blog.content, video: blog.video || '' });
     setEditMode(true);
   };
 
@@ -242,47 +242,154 @@ export default function Blog() {
         )}
 
         {showForm && (
-          <form className="blog-form" onSubmit={handlePostSubmit} style={{marginBottom: '2rem'}}>
-            <label>
-              Title:
-              <input type="text" name="title" value={form.title} onChange={handleFormChange} required />
-            </label>
-            <label>
-              Image:
-              <input type="file" name="image" accept="image/*" onChange={handleFormChange} required />
-            </label>
-            <label>
-              Video (optional):
-              <input type="file" name="video" accept="video/*" onChange={handleFormChange} />
-            </label>
-            <label>
-              Content:
-              <textarea name="content" value={form.content} onChange={handleFormChange} required></textarea>
-            </label>
-            <button type="submit">Add Blog Post</button>
+          <form className="blog-form-modern" onSubmit={handlePostSubmit} style={{marginBottom: '2rem'}}>
+            <div className="blog-form-header">
+              <h3 className="blog-form-title">Create New Blog Post</h3>
+              <p className="blog-form-subtitle">Share your thoughts with the community</p>
+            </div>
+            <div className="blog-form-grid">
+              <div className="blog-form-group blog-form-group-full">
+                <label className="blog-form-label">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={form.title}
+                  onChange={handleFormChange}
+                  className="blog-form-input"
+                  placeholder="Enter blog post title"
+                  required
+                />
+              </div>
+              <div className="blog-form-group">
+                <label className="blog-form-label">Image</label>
+                <div className="blog-file-input-wrapper">
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleFormChange}
+                    className="blog-file-input"
+                    id="blog-image-input"
+                    required
+                  />
+                  <label htmlFor="blog-image-input" className="blog-file-label">
+                    <span className="blog-file-icon">📷</span>
+                    <span>Choose Image</span>
+                  </label>
+                </div>
+              </div>
+              <div className="blog-form-group">
+                <label className="blog-form-label">Video (Optional)</label>
+                <div className="blog-file-input-wrapper">
+                  <input
+                    type="file"
+                    name="video"
+                    accept="video/*"
+                    onChange={handleFormChange}
+                    className="blog-file-input"
+                    id="blog-video-input"
+                  />
+                  <label htmlFor="blog-video-input" className="blog-file-label">
+                    <span className="blog-file-icon">🎥</span>
+                    <span>Choose Video</span>
+                  </label>
+                </div>
+              </div>
+              <div className="blog-form-group blog-form-group-full">
+                <label className="blog-form-label">Content</label>
+                <textarea
+                  name="content"
+                  value={form.content}
+                  onChange={handleFormChange}
+                  className="blog-form-textarea"
+                  placeholder="Write your blog post content here..."
+                  rows={6}
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <button type="submit" className="blog-form-submit">
+              <span className="blog-submit-icon">✨</span>
+              <span>Add Blog Post</span>
+            </button>
           </form>
         )}
 
         {editMode && (
-          <form className="blog-form" onSubmit={handleEditSubmit} style={{marginBottom: '2rem'}}>
-            <label>
-              Title:
-              <input type="text" name="title" value={editForm.title} onChange={handleEditFormChange} required />
-            </label>
-            <label>
-              Image:
-              <input type="file" name="image" accept="image/*" onChange={handleEditFormChange} />
-            </label>
-            <label>
-              Video (optional):
-              <input type="file" name="video" accept="video/*" onChange={handleEditFormChange} />
-            </label>
-            <label>
-              Content:
-              <textarea name="content" value={editForm.content} onChange={handleEditFormChange} required></textarea>
-            </label>
-            <button type="submit">Save Changes</button>
-            <button type="button" onClick={() => setEditMode(false)} style={{marginLeft:8}}>Cancel</button>
+          <form className="blog-form-modern" onSubmit={handleEditSubmit} style={{marginBottom: '2rem'}}>
+            <div className="blog-form-header">
+              <h3 className="blog-form-title">Edit Blog Post</h3>
+              <p className="blog-form-subtitle">Update your blog post content</p>
+            </div>
+            <div className="blog-form-grid">
+              <div className="blog-form-group blog-form-group-full">
+                <label className="blog-form-label">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editForm.title}
+                  onChange={handleEditFormChange}
+                  className="blog-form-input"
+                  placeholder="Enter blog post title"
+                  required
+                />
+              </div>
+              <div className="blog-form-group">
+                <label className="blog-form-label">Image</label>
+                <div className="blog-file-input-wrapper">
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleEditFormChange}
+                    className="blog-file-input"
+                    id="blog-edit-image-input"
+                  />
+                  <label htmlFor="blog-edit-image-input" className="blog-file-label">
+                    <span className="blog-file-icon">📷</span>
+                    <span>Change Image</span>
+                  </label>
+                </div>
+              </div>
+              <div className="blog-form-group">
+                <label className="blog-form-label">Video (Optional)</label>
+                <div className="blog-file-input-wrapper">
+                  <input
+                    type="file"
+                    name="video"
+                    accept="video/*"
+                    onChange={handleEditFormChange}
+                    className="blog-file-input"
+                    id="blog-edit-video-input"
+                  />
+                  <label htmlFor="blog-edit-video-input" className="blog-file-label">
+                    <span className="blog-file-icon">🎥</span>
+                    <span>Change Video</span>
+                  </label>
+                </div>
+              </div>
+              <div className="blog-form-group blog-form-group-full">
+                <label className="blog-form-label">Content</label>
+                <textarea
+                  name="content"
+                  value={editForm.content}
+                  onChange={handleEditFormChange}
+                  className="blog-form-textarea"
+                  placeholder="Write your blog post content here..."
+                  rows={6}
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'flex-end' }}>
+              <button type="button" onClick={() => setEditMode(false)} className="blog-detail-admin-btn edit" style={{ background: '#6b7280', color: 'white' }}>
+                <span>Cancel</span>
+              </button>
+              <button type="submit" className="blog-form-submit">
+                <span className="blog-submit-icon">💾</span>
+                <span>Save Changes</span>
+              </button>
+            </div>
           </form>
         )}
         {/* Modern Blog Content */}

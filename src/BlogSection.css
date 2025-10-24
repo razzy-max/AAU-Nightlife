@@ -737,6 +737,15 @@
   }
 }
 
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 .blog-detail-container {
   max-width: 900px;
   margin: 0 auto;
@@ -896,13 +905,16 @@
 .blog-detail-title-modern {
   font-size: clamp(1.8rem, 4vw, 3rem);
   font-weight: 800;
-  color: var(--text-primary);
+  color: #334155;
   margin-bottom: var(--space-lg);
   line-height: 1.2;
-  background: var(--gradient-accent);
+  background: linear-gradient(135deg, #7c3aed 0%, #06ffa5 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(124, 58, 237, 0.5), 0 0 80px rgba(6, 255, 165, 0.3);
 }
 
 .blog-detail-date {
