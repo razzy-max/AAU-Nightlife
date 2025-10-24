@@ -43,17 +43,26 @@ export function BlogProvider({ children }) {
 
   // Add new post and sync to server
   const addPost = async (post) => {
+    console.log('addPost called with:', post);
+    console.log('API endpoint:', API_ENDPOINTS.blogPosts);
+
     const res = await fetch(API_ENDPOINTS.blogPosts, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post)
     });
+
+    console.log('Response status:', res.status);
+    console.log('Response ok:', res.ok);
+
     if (res.ok) {
       const created = await res.json();
+      console.log('Created post:', created);
       setPosts(prev => [created, ...prev]);
       return created;
     } else {
       const errorText = await res.text();
+      console.error('Error response:', errorText);
       throw new Error(`Failed to create post: ${res.status} - ${errorText}`);
     }
   };

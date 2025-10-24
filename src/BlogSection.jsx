@@ -29,15 +29,22 @@ export default function BlogSection() {
 
   const handlePostSubmit = async e => {
     e.preventDefault();
+    console.log('Submitting form with data:', form);
+
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
+
+    console.log('New post object:', newPost);
+
     try {
       const created = await addPost(newPost); // get the backend response
+      console.log('Post created successfully:', created);
       setForm({ title: '', image: '', content: '', video: '' });
       setShowForm(false);
+      alert('Post created successfully!');
     } catch (error) {
       console.error('Failed to create post:', error);
-      alert('Failed to create post. Please try again.');
+      alert(`Failed to create post: ${error.message}`);
     }
   };
 
