@@ -8,6 +8,8 @@ export function BlogProvider({ children }) {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({});
 
+  console.log('BlogProvider initialized');
+
   // Get authenticated fetch from AuthContext if available
   let authenticatedFetch;
   try {
@@ -141,8 +143,11 @@ export function BlogProvider({ children }) {
     setComments(prev => ({ ...prev, [blogId]: blogComments.reverse() }));
   };
 
+  const contextValue = { posts, addPost, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog };
+  console.log('BlogProvider providing context value:', contextValue);
+
   return (
-    <BlogContext.Provider value={{ posts, addPost, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog }}>
+    <BlogContext.Provider value={contextValue}>
       {children}
     </BlogContext.Provider>
   );
