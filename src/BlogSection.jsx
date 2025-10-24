@@ -9,17 +9,17 @@ export default function BlogSection() {
   const { posts, addPost } = useBlog();
   const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', image: '', content: '' });
+  const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
   // Admin authentication now handled by AuthContext
 
   // Debug logging
   console.log('BlogSection component - isAdmin:', isAdmin, 'authLoading:', authLoading);
 
   const handleFormChange = e => {
-    if (e.target.name === 'image' && e.target.files && e.target.files[0]) {
+    if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = ev => {
-        setForm(f => ({ ...f, image: ev.target.result }));
+        setForm(f => ({ ...f, [e.target.name]: ev.target.result }));
       };
       reader.readAsDataURL(e.target.files[0]);
     } else {
@@ -32,7 +32,7 @@ export default function BlogSection() {
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
     const created = await addPost(newPost); // get the backend response
-    setForm({ title: '', image: '', content: '' });
+    setForm({ title: '', image: '', content: '', video: '' });
     setShowForm(false);
   };
 
@@ -114,6 +114,34 @@ export default function BlogSection() {
                     <span className="blog-file-icon">📸</span>
                     <span>Choose Image</span>
                   </label>
+                  {form.image && (
+                    <div className="file-preview">
+                      <img src={form.image} alt="Preview" className="file-preview-image" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="blog-form-group">
+                <label className="blog-form-label">Video (Optional)</label>
+                <div className="blog-file-input-wrapper">
+                  <input
+                    type="file"
+                    name="video"
+                    accept="video/*"
+                    onChange={handleFormChange}
+                    className="blog-file-input"
+                    id="blog-video"
+                  />
+                  <label htmlFor="blog-video" className="blog-file-label">
+                    <span className="blog-file-icon">🎥</span>
+                    <span>Choose Video</span>
+                  </label>
+                  {form.video && (
+                    <div className="file-preview">
+                      <video src={form.video} className="file-preview-video" controls />
+                    </div>
+                  )}
                 </div>
               </div>
 
