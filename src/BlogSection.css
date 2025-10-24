@@ -271,6 +271,8 @@
   font-family: inherit;
   transition: all 0.3s ease;
   resize: vertical;
+  position: relative;
+  z-index: 3;
 }
 
 .blog-form-input:focus,
@@ -328,6 +330,8 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-color);
+  position: relative;
+  z-index: 1;
 }
 
 .file-preview-image {
