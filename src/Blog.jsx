@@ -174,8 +174,13 @@ export default function Blog() {
     // Always update excerpt from new content
     const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
     const updated = { ...blog, ...editForm, excerpt };
-    await editPost(blog._id, updated);
-    setEditMode(false);
+    try {
+      await editPost(blog._id, updated);
+      setEditMode(false);
+    } catch (error) {
+      console.error('Failed to update post:', error);
+      alert('Failed to update post. Please try again.');
+    }
   };
 
   if (!blog) {
@@ -281,6 +286,11 @@ export default function Blog() {
                     <span className="blog-file-icon">📷</span>
                     <span>Choose Image</span>
                   </label>
+                  {form.image && (
+                    <div className="file-preview">
+                      <img src={form.image} alt="Preview" className="file-preview-image" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="blog-form-group">
@@ -359,6 +369,11 @@ export default function Blog() {
                     <span className="blog-file-icon">📷</span>
                     <span>Change Image</span>
                   </label>
+                  {editForm.image && (
+                    <div className="file-preview">
+                      <img src={editForm.image} alt="Preview" className="file-preview-image" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="blog-form-group">
