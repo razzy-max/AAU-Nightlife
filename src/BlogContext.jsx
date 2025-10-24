@@ -8,8 +8,6 @@ export function BlogProvider({ children }) {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({});
 
-  console.log('BlogProvider initialized');
-
   // Get authenticated fetch from AuthContext if available
   let authenticatedFetch;
   try {
@@ -45,26 +43,17 @@ export function BlogProvider({ children }) {
 
   // Add new post and sync to server
   const addPost = async (post) => {
-    console.log('addPost called with:', post);
-    console.log('API endpoint:', API_ENDPOINTS.blogPosts);
-
     const res = await fetch(API_ENDPOINTS.blogPosts, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(post)
     });
-
-    console.log('Response status:', res.status);
-    console.log('Response ok:', res.ok);
-
     if (res.ok) {
       const created = await res.json();
-      console.log('Created post:', created);
       setPosts(prev => [created, ...prev]);
       return created;
     } else {
       const errorText = await res.text();
-      console.error('Error response:', errorText);
       throw new Error(`Failed to create post: ${res.status} - ${errorText}`);
     }
   };
@@ -143,11 +132,8 @@ export function BlogProvider({ children }) {
     setComments(prev => ({ ...prev, [blogId]: blogComments.reverse() }));
   };
 
-  const contextValue = { posts, addPost, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog };
-  console.log('BlogProvider providing context value:', contextValue);
-
   return (
-    <BlogContext.Provider value={contextValue}>
+    <BlogContext.Provider value={{ posts, addPost, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog }}>
       {children}
     </BlogContext.Provider>
   );
