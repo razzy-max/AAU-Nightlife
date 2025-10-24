@@ -28,26 +28,50 @@ export default function BlogSection() {
 
   const handlePostSubmit = async e => {
     e.preventDefault();
-    setStatus('Creating post...');
-
-    const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    const newPost = { ...form, excerpt, timestamp: Date.now() };
+    setStatus('Adding...');
 
     try {
-      await addPost(newPost);
-      setStatus('Post created successfully!');
-      setForm({ title: '', image: '', content: '', video: '' });
-      setShowForm(false);
-      setTimeout(() => setStatus(''), 3000);
+      const res = await fetch(API_ENDPOINTS.blogPosts, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+
+      if (res.ok) {
+        setStatus('Post added!');
+        setForm({ title: '', image: '', content: '', video: '' });
+        setShowForm(false);
+        // Refresh posts
+        const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
+        // Force page refresh to update the list
+        window.location.reload();
+      } else {
+        setStatus('Failed to add post.');
+      }
     } catch (error) {
-      console.error('Failed to create post:', error);
-      setStatus('Failed to create post. Please try again.');
-      setTimeout(() => setStatus(''), 3000);
+      setStatus(error.message || 'Failed to add post.');
     }
   };
 
   // Sort posts by timestamp descending (newest first)
   const blogPosts = [...posts].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+  // Refresh posts after form submission
+  const refreshPosts = async () => {
+    try {
+      const res = await fetch(API_ENDPOINTS.blogPosts);
+      const data = await res.json();
+      // Update posts through context if available
+      if (typeof addPost === 'function') {
+        // Context approach
+      } else {
+        // Direct state update fallback
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Failed to refresh posts:', error);
+    }
+  };
 
   return (
     <section className="blog-section-modern">
