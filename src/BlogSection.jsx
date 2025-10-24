@@ -10,6 +10,7 @@ export default function BlogSection() {
   console.log('BlogSection - full blog context:', blogContext);
   const { posts, addPost } = blogContext;
   console.log('BlogSection - addPost function:', addPost);
+  console.log('BlogSection - addPost type:', typeof addPost);
   const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
@@ -33,11 +34,18 @@ export default function BlogSection() {
   const handlePostSubmit = async e => {
     e.preventDefault();
     console.log('Submitting form with data:', form);
+    console.log('addPost function available:', typeof addPost);
 
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
 
     console.log('New post object:', newPost);
+
+    if (!addPost) {
+      console.error('addPost function is not available');
+      alert('Error: Blog context not properly initialized. Please refresh the page.');
+      return;
+    }
 
     try {
       const created = await addPost(newPost); // get the backend response
