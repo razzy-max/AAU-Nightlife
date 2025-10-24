@@ -10,6 +10,7 @@ export default function BlogSection() {
   const { isAdmin, isLoading: authLoading } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
+  const [status, setStatus] = useState('');
   // Admin authentication now handled by AuthContext
 
 
@@ -27,15 +28,21 @@ export default function BlogSection() {
 
   const handlePostSubmit = async e => {
     e.preventDefault();
+    setStatus('Creating post...');
+
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
+
     try {
       await addPost(newPost);
+      setStatus('Post created successfully!');
       setForm({ title: '', image: '', content: '', video: '' });
       setShowForm(false);
+      setTimeout(() => setStatus(''), 3000);
     } catch (error) {
       console.error('Failed to create post:', error);
-      alert('Failed to create post. Please try again.');
+      setStatus('Failed to create post. Please try again.');
+      setTimeout(() => setStatus(''), 3000);
     }
   };
 
@@ -167,6 +174,13 @@ export default function BlogSection() {
               <span>Publish Post</span>
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Status Message */}
+      {status && (
+        <div className={`status-message ${status.includes('Error') || status.includes('Failed') ? 'error' : 'success'}`}>
+          {status}
         </div>
       )}
 
