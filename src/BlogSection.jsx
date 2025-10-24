@@ -31,9 +31,14 @@ export default function BlogSection() {
     e.preventDefault();
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
-    const created = await addPost(newPost); // get the backend response
-    setForm({ title: '', image: '', content: '', video: '' });
-    setShowForm(false);
+    try {
+      const created = await addPost(newPost); // get the backend response
+      setForm({ title: '', image: '', content: '', video: '' });
+      setShowForm(false);
+    } catch (error) {
+      console.error('Failed to create post:', error);
+      alert('Failed to create post. Please try again.');
+    }
   };
 
   // Sort posts by timestamp descending (newest first)

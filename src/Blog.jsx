@@ -136,9 +136,14 @@ export default function Blog() {
     e.preventDefault();
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
-    await addPost(newPost);
-    setForm({ title: '', image: '', content: '', video: '' });
-    setShowForm(false);
+    try {
+      await addPost(newPost);
+      setForm({ title: '', image: '', content: '', video: '' });
+      setShowForm(false);
+    } catch (error) {
+      console.error('Failed to create post:', error);
+      alert('Failed to create post. Please try again.');
+    }
   };
 
   const handleDeletePost = async () => {
