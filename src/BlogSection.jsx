@@ -35,19 +35,22 @@ export default function BlogSection() {
     e.preventDefault();
     console.log('Submitting form with data:', form);
     console.log('addPost function available:', typeof addPost);
+    console.log('addPost function:', addPost);
 
     const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
     const newPost = { ...form, excerpt, timestamp: Date.now() };
 
     console.log('New post object:', newPost);
 
-    if (!addPost) {
-      console.error('addPost function is not available');
+    if (!addPost || typeof addPost !== 'function') {
+      console.error('addPost function is not available or not a function');
+      console.error('addPost value:', addPost);
       alert('Error: Blog context not properly initialized. Please refresh the page.');
       return;
     }
 
     try {
+      console.log('Calling addPost function...');
       const created = await addPost(newPost); // get the backend response
       console.log('Post created successfully:', created);
       setForm({ title: '', image: '', content: '', video: '' });
