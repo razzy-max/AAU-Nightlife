@@ -60,7 +60,7 @@ function renderContentWithLinks(content) {
 export default function Blog() {
   const { id } = useParams();
   const { posts, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog } = useBlog();
-  const { isAdmin } = useAuth();
+  const { isAdmin, authenticatedFetch } = useAuth();
   // Find by _id for MongoDB
   const blog = posts.find(post => String(post._id) === String(id));
   const [input, setInput] = useState('');
@@ -71,6 +71,7 @@ export default function Blog() {
   // Edit post (like events: show inline form, update state, then backend, then refresh)
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', image: '', content: '', video: '' });
+  const [status, setStatus] = useState('');
   const navigate = useNavigate();
   // Use _id for comments and update removeComment to use commentId
   const blogComments = comments[blog?._id] || [];
@@ -113,7 +114,28 @@ export default function Blog() {
   const handleDeleteComment = async commentId => {
     if (!window.confirm('Delete this comment?')) return;
     try {
-      await removeComment(blog._id, commentId);
+      // Try authenticated fetch first, fallback to regular fetch
+      let res;
+      try {
+        res = await authenticatedFetch(`${API_ENDPOINTS.blogComments}/${commentId}`, {
+          method: 'DELETE'
+        });
+      } catch (authError) {
+        console.log('Authenticated fetch failed, trying regular fetch...');
+        res = await fetch(`${API_ENDPOINTS.blogComments}/${commentId}`, {
+          method: 'DELETE'
+        });
+      }
+
+      if (res.ok) {
+        // Refresh comments
+        const updated = await fetch(`${API_ENDPOINTS.blogComments}/${blog._id}`).then(r => r.json());
+        // Update comments state through context
+        window.location.reload();
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to delete comment: ${res.status} - ${errorText}`);
+      }
     } catch (error) {
       console.error('Failed to delete comment:', error);
       alert('Failed to delete comment. Please try again.');
@@ -134,22 +156,71 @@ export default function Blog() {
 
   const handlePostSubmit = async e => {
     e.preventDefault();
-    const excerpt = form.content.slice(0, 90) + (form.content.length > 90 ? '...' : '');
-    const newPost = { ...form, id: Date.now(), excerpt, timestamp: Date.now() };
+    setStatus('Adding...');
+
     try {
-      await addPost(newPost);
-      setForm({ title: '', image: '', content: '', video: '' });
-      setShowForm(false);
+      // Try authenticated fetch first, fallback to regular fetch
+      let res;
+      try {
+        res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+      } catch (authError) {
+        console.log('Authenticated fetch failed, trying regular fetch...');
+        res = await fetch(API_ENDPOINTS.blogPosts, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+      }
+
+      if (res.ok) {
+        setStatus('Post added!');
+        setForm({ title: '', image: '', content: '', video: '' });
+        setShowForm(false);
+        // Refresh posts
+        const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
+        // Update posts state through context
+        window.location.reload();
+      } else {
+        const errorText = await res.text();
+        setStatus(`Failed to add post: ${res.status} - ${errorText}`);
+      }
     } catch (error) {
-      console.error('Failed to create post:', error);
-      alert('Failed to create post. Please try again.');
+      console.error('Error adding post:', error);
+      setStatus(`Failed to add post: ${error.message}`);
     }
   };
 
   const handleDeletePost = async () => {
     if (!window.confirm('Delete this blog post?')) return;
-    await removePost(blog._id);
-    navigate('/');
+
+    try {
+      // Try authenticated fetch first, fallback to regular fetch
+      let res;
+      try {
+        res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+          method: 'DELETE'
+        });
+      } catch (authError) {
+        console.log('Authenticated fetch failed, trying regular fetch...');
+        res = await fetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+          method: 'DELETE'
+        });
+      }
+
+      if (res.ok) {
+        navigate('/');
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to delete post: ${res.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+      alert('Failed to delete post. Please try again.');
+    }
   };
 
   const startEdit = () => {
@@ -174,9 +245,33 @@ export default function Blog() {
     // Always update excerpt from new content
     const excerpt = editForm.content.slice(0, 90) + (editForm.content.length > 90 ? '...' : '');
     const updated = { ...blog, ...editForm, excerpt };
+
     try {
-      await editPost(blog._id, updated);
-      setEditMode(false);
+      // Try authenticated fetch first, fallback to regular fetch
+      let res;
+      try {
+        res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+      } catch (authError) {
+        console.log('Authenticated fetch failed, trying regular fetch...');
+        res = await fetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+      }
+
+      if (res.ok) {
+        setEditMode(false);
+        // Refresh the page to show updated content
+        window.location.reload();
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to update post: ${res.status} - ${errorText}`);
+      }
     } catch (error) {
       console.error('Failed to update post:', error);
       alert('Failed to update post. Please try again.');
