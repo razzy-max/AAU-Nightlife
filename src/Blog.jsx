@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 
 // Format timestamp to show relative time or full date/time
 function formatTimestamp(timestamp) {
