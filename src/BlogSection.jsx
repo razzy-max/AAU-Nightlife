@@ -41,11 +41,22 @@ export default function BlogSection() {
     setStatus('Adding...');
 
     try {
-      const res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
+      // Try authenticated fetch first, fallback to regular fetch
+      let res;
+      try {
+        res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+      } catch (authError) {
+        console.log('Authenticated fetch failed, trying regular fetch...');
+        res = await fetch(API_ENDPOINTS.blogPosts, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        });
+      }
 
       if (res.ok) {
         setStatus('Post added!');
@@ -55,10 +66,12 @@ export default function BlogSection() {
         const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
         setPosts(updated);
       } else {
-        setStatus('Failed to add post.');
+        const errorText = await res.text();
+        setStatus(`Failed to add post: ${res.status} - ${errorText}`);
       }
     } catch (error) {
-      setStatus(error.message || 'Failed to add post.');
+      console.error('Error adding post:', error);
+      setStatus(`Failed to add post: ${error.message}`);
     }
   };
 
