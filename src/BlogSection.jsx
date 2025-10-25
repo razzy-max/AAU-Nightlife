@@ -6,13 +6,22 @@ import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
 
 export default function BlogSection() {
-  const { posts, addPost } = useBlog();
-  const { isAdmin, isLoading: authLoading } = useAuth();
-  const [showForm, setShowForm] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
   const [status, setStatus] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
   // Admin authentication now handled by AuthContext
 
+  useEffect(() => {
+    fetch(API_ENDPOINTS.blogPosts)
+      .then(res => res.json())
+      .then(data => {
+        setPosts(Array.isArray(data) ? data : []);
+        setLoading(false);
+      });
+  }, []);
 
   const handleFormChange = e => {
     if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
@@ -31,7 +40,7 @@ export default function BlogSection() {
     setStatus('Adding...');
 
     try {
-      const res = await fetch(API_ENDPOINTS.blogPosts, {
+      const res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -43,8 +52,7 @@ export default function BlogSection() {
         setShowForm(false);
         // Refresh posts
         const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
-        // Force page refresh to update the list
-        window.location.reload();
+        setPosts(updated);
       } else {
         setStatus('Failed to add post.');
       }
@@ -56,22 +64,6 @@ export default function BlogSection() {
   // Sort posts by timestamp descending (newest first)
   const blogPosts = [...posts].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-  // Refresh posts after form submission
-  const refreshPosts = async () => {
-    try {
-      const res = await fetch(API_ENDPOINTS.blogPosts);
-      const data = await res.json();
-      // Update posts through context if available
-      if (typeof addPost === 'function') {
-        // Context approach
-      } else {
-        // Direct state update fallback
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('Failed to refresh posts:', error);
-    }
-  };
 
   return (
     <section className="blog-section-modern">
