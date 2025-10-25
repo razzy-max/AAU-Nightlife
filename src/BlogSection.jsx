@@ -4,6 +4,7 @@ import './App.css';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
 import { useAuth } from './AuthContext';
+import { API_ENDPOINTS } from './config';
 
 export default function BlogSection() {
   const [posts, setPosts] = useState([]);
