@@ -81,8 +81,8 @@ export default function BlogSection() {
     }
   };
 
-  // Sort posts by timestamp descending (newest first)
-  const blogPosts = [...posts].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  // Posts are already sorted by server (newest first)
+  const blogPosts = posts;
 
 
   return (

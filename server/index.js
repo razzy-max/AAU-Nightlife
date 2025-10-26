@@ -320,7 +320,7 @@ app.put('/api/hero-images', authenticateAdmin, async (req, res) => {
 app.get('/api/blog-posts', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    const posts = await db.collection('blogPosts').find().toArray();
+    const posts = await db.collection('blogPosts').find().sort({ timestamp: -1 }).toArray();
     res.json(posts);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch blog posts' });
