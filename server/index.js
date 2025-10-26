@@ -511,8 +511,12 @@ app.get('/api/blog-posts', async (req, res) => {
 app.post('/api/blog-posts', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
-    const result = await db.collection('blogPosts').insertOne(req.body);
-    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...req.body });
+    const postData = {
+      ...req.body,
+      timestamp: new Date().toISOString()
+    };
+    const result = await db.collection('blogPosts').insertOne(postData);
+    res.status(201).json(result.ops ? result.ops[0] : { _id: result.insertedId, ...postData });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add blog post' });
   }
