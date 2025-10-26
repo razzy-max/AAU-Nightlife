@@ -212,15 +212,18 @@ export const AuthProvider = ({ children }) => {
     try {
       // First try authenticated fetch
       const response = await authenticatedFetch(url, options);
-      if (response.ok || response.status !== 401) {
+      if (response.ok) {
+        return response;
+      } else if (response.status === 401) {
+        console.log('401 Unauthorized, trying fallback...');
+        return fallbackFetch(url, options);
+      } else {
         return response;
       }
     } catch (error) {
       console.log('Authenticated fetch failed, trying fallback...');
+      return fallbackFetch(url, options);
     }
-
-    // If authenticated fetch fails with 401, try fallback
-    return fallbackFetch(url, options);
   };
 
   const value = {
