@@ -30,7 +30,7 @@ app.use(cors({
   origin: ['http://localhost:5173', 'https://aaunightlife.com', 'https://www.aaunightlife.com', 'https://aau-nightlife.vercel.app'],
   credentials: true
 }));
-app.use(express.json({ limit: '5mb' })); // Increase JSON body size limit to support base64 images
+app.use(express.json({ limit: '50mb' })); // Increase JSON body size limit to support base64 images and videos
 app.use(cookieParser());
 
 // Rate limiting for voting endpoints to prevent abuse
