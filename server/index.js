@@ -511,6 +511,10 @@ app.get('/api/blog-posts', async (req, res) => {
 app.post('/api/blog-posts', authenticateAdmin, async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   try {
+    // Check if video is too large (MongoDB document limit is 16MB)
+    if (req.body.video && req.body.video.length > 20 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Video file is too large. Please use a video smaller than 15MB.' });
+    }
     const postData = {
       ...req.body,
       timestamp: new Date().toISOString()
