@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './App.css';
 import './BlogSection.css';
@@ -12,6 +12,7 @@ export default function BlogSection() {
   const [form, setForm] = useState({ title: '', image: '', content: '', video: '' });
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [loadedVideos, setLoadedVideos] = useState(new Set());
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
   // Admin authentication now handled by AuthContext
 
@@ -23,6 +24,32 @@ export default function BlogSection() {
         setLoading(false);
       });
   }, []);
+
+  // Lazy loading for videos in blog cards
+  useEffect(() => {
+    if (posts.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const postId = entry.target.dataset.postId;
+            if (postId) {
+              setLoadedVideos(prev => new Set([...prev, postId]));
+              observer.unobserve(entry.target);
+            }
+          }
+        });
+      },
+      { rootMargin: '100px' } // Load videos 100px before they come into view
+    );
+
+    // Observe all blog cards that have videos
+    const videoCards = document.querySelectorAll('[data-post-id][data-has-video]');
+    videoCards.forEach(card => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [posts]);
 
   const handleFormChange = e => {
     if ((e.target.name === 'image' || e.target.name === 'video') && e.target.files && e.target.files[0]) {
@@ -230,9 +257,28 @@ export default function BlogSection() {
           </div>
         ) : (
           blogPosts.map((post, index) => (
-            <div className={`blog-card-modern ${index === 0 ? 'featured' : ''}`} key={post._id || post.id}>
+            <div
+              className={`blog-card-modern ${index === 0 ? 'featured' : ''}`}
+              key={post._id || post.id}
+              data-post-id={post._id || post.id}
+              data-has-video={post.video ? 'true' : 'false'}
+            >
               <div className="blog-card-image-container">
-                <img src={post.image} alt={post.title} className="blog-card-img-modern" />
+                {post.video && loadedVideos.has(post._id || post.id) ? (
+                  <video
+                    className="blog-card-img-modern"
+                    style={{ objectFit: 'cover', width: '100%', height: '200px' }}
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                  >
+                    <source src={post.video} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img src={post.image} alt={post.title} className="blog-card-img-modern" />
+                )}
                 <div className="blog-card-overlay"></div>
                 {index === 0 && <div className="featured-badge">Featured</div>}
               </div>
