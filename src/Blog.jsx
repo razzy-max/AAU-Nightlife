@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BlogSection.css';
 import { useBlog } from './BlogContext';
@@ -62,6 +62,8 @@ export default function Blog() {
   const { id } = useParams();
   const { posts, editPost, removePost, comments, addComment, removeComment, fetchCommentsForBlog } = useBlog();
   const { isAdmin, authenticatedFetch } = useAuth();
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef(null);
   // Find by _id for MongoDB
   const blog = posts.find(post => String(post._id) === String(id));
   const [input, setInput] = useState('');
@@ -88,6 +90,29 @@ export default function Blog() {
       fetchCommentsForBlog(blog._id);
     }
   }, [blog?._id]); // Remove fetchCommentsForBlog from dependencies to prevent constant re-runs
+
+  // Lazy loading for video using Intersection Observer
+  useEffect(() => {
+    if (!blog?.video || videoLoaded) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVideoLoaded(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { rootMargin: '50px' } // Load video 50px before it comes into view
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [blog?.video, videoLoaded]);
 
   if (!blog) return <div className="blog-detail-container">Loading blog post...</div>;
 
@@ -555,15 +580,34 @@ export default function Blog() {
               )
             )}
             {blog.video && (
-              <div className="blog-video-container">
-                <video
-                  className="blog-detail-video"
-                  controls
-                  src={blog.video}
-                  style={{ maxWidth: '100%', height: 'auto' }}
-                >
-                  Your browser does not support the video tag.
-                </video>
+              <div className="blog-video-container" ref={videoRef}>
+                {videoLoaded ? (
+                  <video
+                    className="blog-detail-video"
+                    controls
+                    src={blog.video}
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                    loading="lazy"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <div className="video-placeholder" style={{
+                    width: '100%',
+                    height: '300px',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '8px',
+                    color: '#666'
+                  }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '48px', marginBottom: '10px' }}>🎥</div>
+                      <div>Loading video...</div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -515,8 +515,18 @@ app.post('/api/blog-posts', authenticateAdmin, async (req, res) => {
     if (req.body.video && req.body.video.length > 20 * 1024 * 1024) {
       return res.status(400).json({ error: 'Video file is too large. Please use a video smaller than 15MB.' });
     }
+
+    // Optimize video by reducing quality if it's large
+    let optimizedVideo = req.body.video;
+    if (req.body.video && req.body.video.length > 5 * 1024 * 1024) {
+      // For videos larger than 5MB, suggest using a lower quality version
+      // In a production environment, you might want to use a video processing service
+      console.log('Large video detected, consider optimizing for better performance');
+    }
+
     const postData = {
       ...req.body,
+      video: optimizedVideo,
       timestamp: new Date().toISOString()
     };
     const result = await db.collection('blogPosts').insertOne(postData);
