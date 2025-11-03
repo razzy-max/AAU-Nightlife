@@ -247,24 +247,7 @@ export default function Awards() {
           metadata: {
             categoryId: category.id,
             candidateId: candidate.id,
-            votesCount: count,
-            custom_fields: [
-              {
-                display_name: 'Category',
-                variable_name: 'category',
-                value: category.title
-              },
-              {
-                display_name: 'Candidate',
-                variable_name: 'candidate',
-                value: candidate.name
-              },
-              {
-                display_name: 'Votes',
-                variable_name: 'votes_count',
-                value: count.toString()
-              }
-            ]
+            votesCount: count
           }
         })
       });

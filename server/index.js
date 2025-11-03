@@ -508,18 +508,24 @@ app.get('/api/blog-posts', async (req, res) => {
       const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY || 'sk_test_your_paystack_secret_key_here'}`,
+          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY || 'REMOVED_SECRET'}`,
         }
       });
 
       const paystackData = await paystackResponse.json();
+      console.log('Paystack verification response:', paystackData);
 
       if (paystackData.status && paystackData.data.status === 'success') {
         // Payment successful, extract metadata
         const { metadata } = paystackData.data;
-        const categoryId = metadata?.custom_fields?.find(field => field.variable_name === 'category')?.value;
-        const candidateId = metadata?.custom_fields?.find(field => field.variable_name === 'candidate')?.value;
-        const votesCount = parseInt(metadata?.custom_fields?.find(field => field.variable_name === 'votes_count')?.value) || 1;
+        console.log('Payment metadata:', metadata);
+
+        // Extract from custom_fields or directly from metadata
+        const categoryId = metadata?.categoryId || metadata?.custom_fields?.find(field => field.variable_name === 'category')?.value;
+        const candidateId = metadata?.candidateId || metadata?.custom_fields?.find(field => field.variable_name === 'candidate')?.value;
+        const votesCount = parseInt(metadata?.votesCount || metadata?.custom_fields?.find(field => field.variable_name === 'votes_count')?.value) || 1;
+
+        console.log('Extracted data:', { categoryId, candidateId, votesCount });
 
         if (categoryId && candidateId) {
           // Record the vote in database
@@ -557,7 +563,7 @@ app.get('/api/blog-posts', async (req, res) => {
           }
         }
 
-        res.status(400).json({ error: 'Invalid payment metadata' });
+        res.status(400).json({ error: 'Invalid payment metadata - missing categoryId or candidateId' });
       } else {
         res.status(400).json({ error: 'Payment verification failed', paystackData });
       }
