@@ -193,13 +193,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fallback fetch for when server auth is not working
+  // Fallback fetch for when server auth is not working (development only)
   const fallbackFetch = async (url, options = {}) => {
     console.log('Using fallback fetch with emergency bypass for:', url);
     const defaultOptions = {
       headers: {
         'Content-Type': 'application/json',
-        'X-Admin-Bypass': 'emergency-access', // Emergency bypass header
+        // Only use emergency bypass in development
+        ...(process.env.NODE_ENV !== 'production' && { 'X-Admin-Bypass': 'emergency-access' }),
         ...options.headers,
       },
       ...options,

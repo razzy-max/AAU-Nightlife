@@ -75,10 +75,10 @@ function getClientIp(req) {
 function authenticateAdmin(req, res, next) {
   const token = req.cookies.adminToken || req.headers.authorization?.replace('Bearer ', '');
 
-  // Temporary bypass for development/testing
+  // Emergency bypass only in development
   const bypassHeader = req.headers['x-admin-bypass'];
-  if (bypassHeader === 'emergency-access') {
-    console.log('Using emergency admin bypass');
+  if (process.env.NODE_ENV !== 'production' && bypassHeader === 'emergency-access') {
+    console.log('Using emergency admin bypass (development only)');
     req.admin = { role: 'admin', emergency: true };
     return next();
   }
