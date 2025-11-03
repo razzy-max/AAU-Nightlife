@@ -283,7 +283,9 @@ export default function Awards() {
       const data = await response.json();
 
       if (data.success) {
-        setStatus(`Thank you! Your ${votesCount} paid vote${votesCount > 1 ? 's' : ''} were recorded.`);
+        // Use the actual votesCount from the server response instead of the URL parameter
+        const actualVotesCount = data.votesCount || votesCount;
+        setStatus(`Thank you! Your ${actualVotesCount} paid vote${actualVotesCount > 1 ? 's' : ''} ${actualVotesCount === 1 ? 'was' : 'were'} recorded.`);
         // Refresh categories to show updated vote counts
         fetch(API_ENDPOINTS.awards).then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : []));
       } else {

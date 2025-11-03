@@ -553,7 +553,7 @@ app.get('/api/blog-posts', async (req, res) => {
                 res.json({
                   success: true,
                   message: 'Payment verified and vote recorded',
-                  votesCount,
+                  votesCount: votesCount,
                   categoryId,
                   candidateId
                 });
