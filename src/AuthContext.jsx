@@ -113,7 +113,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (password) => {
     try {
-      console.log('Attempting login...');
+      console.log('Attempting login with password:', password ? '[PROVIDED]' : '[EMPTY]');
+      console.log('Login endpoint:', API_ENDPOINTS.adminLogin);
+
       const response = await fetch(API_ENDPOINTS.adminLogin, {
         method: 'POST',
         headers: {
@@ -123,16 +125,25 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ password }),
       });
 
+      console.log('Login response status:', response.status);
+      console.log('Login response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
-      console.log('Login response:', response.status, data);
+      console.log('Login response data:', data);
 
       if (response.ok) {
+        console.log('Login successful, setting admin state...');
         setIsAdmin(true);
         localStorage.setItem('aau_admin', 'true');
         // Also store a timestamp for session management
         localStorage.setItem('aau_admin_login_time', Date.now().toString());
+
+        // Verify cookie was set by checking document.cookie
+        console.log('Current cookies after login:', document.cookie);
+
         return { success: true };
       } else {
+        console.log('Login failed with error:', data.error);
         return { success: false, error: data.error || 'Login failed' };
       }
     } catch (error) {
@@ -169,8 +180,10 @@ export const AuthProvider = ({ children }) => {
 
     try {
       console.log('Making authenticated request to:', url);
+      console.log('Request cookies before call:', document.cookie);
       const response = await fetch(url, defaultOptions);
       console.log('Response status:', response.status);
+      console.log('Response cookies after call:', document.cookie);
 
       // If we get a 401, try to handle it gracefully
       if (response.status === 401) {
