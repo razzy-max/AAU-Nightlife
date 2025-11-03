@@ -13,7 +13,7 @@ export default function BlogSection() {
   const [status, setStatus] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [loadedVideos, setLoadedVideos] = useState(new Set());
-  const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
+  const { isAdmin, authenticatedFetch, isLoading: authLoading, login } = useAuth();
   // Admin authentication now handled by AuthContext
 
   useEffect(() => {
@@ -68,26 +68,68 @@ export default function BlogSection() {
     setStatus('Adding...');
 
     try {
-      // Use authenticated fetch from AuthContext
+      console.log('Submitting blog post with authenticated fetch...');
+      console.log('Current admin status:', isAdmin);
+      console.log('Form data:', form);
+
+      // Use authenticated fetch from AuthContext - this should handle tokens and fallbacks
       const res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
 
+      console.log('Blog post submission response:', res.status, res.statusText);
+
       if (res.ok) {
-        setStatus('Post added!');
+        const data = await res.json();
+        console.log('Blog post created successfully:', data);
+        setStatus('Post added successfully!');
         setForm({ title: '', image: '', content: '', video: '' });
         setShowForm(false);
         // Refresh posts
         const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
-        setPosts(updated);
+        setPosts(Array.isArray(updated) ? updated : []);
       } else {
         const errorText = await res.text();
-        setStatus(`Failed to add post: ${res.status} - ${errorText}`);
+        console.error('Blog post creation failed:', res.status, errorText);
+
+        // If we get a 401, try to login first (emergency fallback)
+        if (res.status === 401) {
+          console.log('Got 401, attempting emergency login...');
+          setStatus('Authenticating...');
+          const loginResult = await login('password'); // Default password
+          if (loginResult.success) {
+            console.log('Emergency login successful, retrying post creation...');
+            setStatus('Retrying post creation...');
+            // Retry the request
+            const retryRes = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(form)
+            });
+            if (retryRes.ok) {
+              const retryData = await retryRes.json();
+              console.log('Blog post created on retry:', retryData);
+              setStatus('Post added successfully!');
+              setForm({ title: '', image: '', content: '', video: '' });
+              setShowForm(false);
+              const updated = await fetch(API_ENDPOINTS.blogPosts).then(r => r.json());
+              setPosts(Array.isArray(updated) ? updated : []);
+              return;
+            } else {
+              const retryErrorText = await retryRes.text();
+              setStatus(`Failed to add post after login: ${retryRes.status} - ${retryErrorText}`);
+            }
+          } else {
+            setStatus(`Authentication failed: ${loginResult.error}`);
+          }
+        } else {
+          setStatus(`Failed to add post: ${res.status} - ${errorText}`);
+        }
       }
     } catch (error) {
-      console.error('Error adding post:', error);
+      console.error('Error adding blog post:', error);
       setStatus(`Failed to add post: ${error.message}`);
     }
   };

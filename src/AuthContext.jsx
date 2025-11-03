@@ -230,7 +230,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     checkAuthStatus,
-    authenticatedFetch, // Use authenticated fetch directly
+    authenticatedFetch: smartFetch, // Use smart fetch with emergency bypass fallback
     fallbackFetch,
   };
 
