@@ -68,28 +68,12 @@ export default function BlogSection() {
     setStatus('Adding...');
 
     try {
-      // Try multiple approaches to bypass auth issues
-      let res;
-
-      // Approach 1: Try with emergency bypass header
-      try {
-        res = await fetch(API_ENDPOINTS.blogPosts, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Bypass': 'emergency-access'
-          },
-          body: JSON.stringify(form)
-        });
-      } catch (error) {
-        console.log('Emergency bypass failed, trying regular fetch...');
-        // Approach 2: Regular fetch
-        res = await fetch(API_ENDPOINTS.blogPosts, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form)
-        });
-      }
+      // Use authenticated fetch from AuthContext
+      const res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
 
       if (res.ok) {
         setStatus('Post added!');

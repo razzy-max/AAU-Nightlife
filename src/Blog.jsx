@@ -185,22 +185,12 @@ export default function Blog() {
     setStatus('Adding...');
 
     try {
-      // Try authenticated fetch first, fallback to regular fetch
-      let res;
-      try {
-        res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form)
-        });
-      } catch (authError) {
-        console.log('Authenticated fetch failed, trying regular fetch...');
-        res = await fetch(API_ENDPOINTS.blogPosts, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form)
-        });
-      }
+      // Use authenticated fetch from AuthContext
+      const res = await authenticatedFetch(API_ENDPOINTS.blogPosts, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
 
       if (res.ok) {
         setStatus('Post added!');
@@ -224,18 +214,10 @@ export default function Blog() {
     if (!window.confirm('Delete this blog post?')) return;
 
     try {
-      // Try authenticated fetch first, fallback to regular fetch
-      let res;
-      try {
-        res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
-          method: 'DELETE'
-        });
-      } catch (authError) {
-        console.log('Authenticated fetch failed, trying regular fetch...');
-        res = await fetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
-          method: 'DELETE'
-        });
-      }
+      // Use authenticated fetch from AuthContext
+      const res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+        method: 'DELETE'
+      });
 
       if (res.ok) {
         navigate('/');
@@ -273,22 +255,12 @@ export default function Blog() {
     const updated = { ...blog, ...editForm, excerpt };
 
     try {
-      // Try authenticated fetch first, fallback to regular fetch
-      let res;
-      try {
-        res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated)
-        });
-      } catch (authError) {
-        console.log('Authenticated fetch failed, trying regular fetch...');
-        res = await fetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated)
-        });
-      }
+      // Use authenticated fetch from AuthContext
+      const res = await authenticatedFetch(`${API_ENDPOINTS.blogPosts}/${blog._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
 
       if (res.ok) {
         setEditMode(false);
