@@ -233,13 +233,14 @@ export default function Awards() {
         headers: {
           'Authorization': `Bearer ${PAYSTACK_CONFIG.secretKey}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           email: 'user@example.com', // In production, get from user input
           amount: amount,
           currency: 'NGN',
           reference: `VOTE-${category.id}-${candidate.id}-${Date.now()}`,
-          callback_url: `${window.location.origin}/awards?payment_success=true`,
+          callback_url: `${window.location.origin}/awards?payment_success=true&reference=VOTE-${category.id}-${candidate.id}-${Date.now()}`,
           metadata: {
             categoryId: category.id,
             candidateId: candidate.id,
