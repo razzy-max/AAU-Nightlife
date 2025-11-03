@@ -231,7 +231,7 @@ export default function Awards() {
       const response = await fetch(API_ENDPOINTS.paystackInitialize, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${PAYSTACK_CONFIG.publicKey}`,
+          'Authorization': `Bearer ${PAYSTACK_CONFIG.secretKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
