@@ -80,12 +80,11 @@ export default function AdminPortal() {
 
   const handleLogout = async () => {
     try {
-      await fetch(API_ENDPOINTS.adminLogout, {
+      await fetch('https://aau-nightlife-production.up.railway.app/api/admin/logout', {
         method: 'POST',
         credentials: 'include'
       });
       localStorage.removeItem('aau_admin');
-      localStorage.removeItem('aau_admin_login_time');
       setIsAuthenticated(false);
       navigate('/', { replace: true });
     } catch (error) {
