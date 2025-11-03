@@ -234,7 +234,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     checkAuthStatus,
-    authenticatedFetch: smartFetch, // Use smart fetch instead
+    authenticatedFetch, // Use authenticated fetch directly
     fallbackFetch,
   };
 
