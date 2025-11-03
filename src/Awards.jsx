@@ -228,6 +228,9 @@ export default function Awards() {
     setStatus('Initializing payment...');
 
     try {
+      console.log('Paystack config:', PAYSTACK_CONFIG);
+      console.log('Secret key:', PAYSTACK_CONFIG.secretKey);
+
       const response = await fetch(API_ENDPOINTS.paystackInitialize, {
         method: 'POST',
         headers: {
