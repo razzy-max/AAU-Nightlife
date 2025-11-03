@@ -498,13 +498,73 @@ app.get('/api/blog-posts', async (req, res) => {
     }
   });
 
-  // A simple endpoint to verify payment (to be integrated with Paystack). Admin will implement Paystack webhook or client-side verification.
-  app.post('/api/payments/verify', authenticateAdmin, async (req, res) => {
-    // Payload: { paymentRef, status }
-    const { paymentRef, status } = req.body;
-    if (!paymentRef) return res.status(400).json({ error: 'paymentRef required' });
-    // For now just acknowledge
-    res.json({ success: true, paymentRef, status: status || 'unknown' });
+  // Paystack payment verification endpoint
+  app.post('/api/payments/verify', async (req, res) => {
+    const { reference } = req.body;
+    if (!reference) return res.status(400).json({ error: 'Payment reference required' });
+
+    try {
+      // Verify payment with Paystack
+      const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY || 'sk_test_your_paystack_secret_key_here'}`,
+        }
+      });
+
+      const paystackData = await paystackResponse.json();
+
+      if (paystackData.status && paystackData.data.status === 'success') {
+        // Payment successful, extract metadata
+        const { metadata } = paystackData.data;
+        const categoryId = metadata?.custom_fields?.find(field => field.variable_name === 'category')?.value;
+        const candidateId = metadata?.custom_fields?.find(field => field.variable_name === 'candidate')?.value;
+        const votesCount = parseInt(metadata?.custom_fields?.find(field => field.variable_name === 'votes_count')?.value) || 1;
+
+        if (categoryId && candidateId) {
+          // Record the vote in database
+          if (db) {
+            const category = await db.collection('awards').findOne({ id: categoryId });
+            if (category) {
+              const candidateIdx = (category.candidates || []).findIndex(c => c.id === candidateId);
+              if (candidateIdx !== -1) {
+                // Record vote
+                const voteRecord = {
+                  categoryId,
+                  candidateId,
+                  timestamp: new Date().toISOString(),
+                  paymentRef: reference,
+                  votesCount: votesCount,
+                  amount: paystackData.data.amount / 100, // Convert from kobo to naira
+                  paystackData: paystackData.data
+                };
+                await db.collection('votes').insertOne(voteRecord);
+
+                // Update candidate vote count
+                const updateKey = `candidates.${candidateIdx}.votes`;
+                await db.collection('awards').updateOne({ id: categoryId }, { $inc: { [updateKey]: votesCount } });
+
+                res.json({
+                  success: true,
+                  message: 'Payment verified and vote recorded',
+                  votesCount,
+                  categoryId,
+                  candidateId
+                });
+                return;
+              }
+            }
+          }
+        }
+
+        res.status(400).json({ error: 'Invalid payment metadata' });
+      } else {
+        res.status(400).json({ error: 'Payment verification failed', paystackData });
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      res.status(500).json({ error: 'Payment verification failed' });
+    }
   });
 });
 

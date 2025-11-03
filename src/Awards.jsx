@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
-import { API_ENDPOINTS } from './config';
+import { API_ENDPOINTS, PAYSTACK_CONFIG } from './config';
 import './Events.css';
 
 // Simple CAPTCHA component
@@ -69,6 +69,8 @@ export default function Awards() {
   const [showCaptcha, setShowCaptcha] = useState(false); // Show CAPTCHA for free voting
   const [captchaVerified, setCaptchaVerified] = useState(false); // Track CAPTCHA verification
   const [pendingVote, setPendingVote] = useState(null); // Store pending vote data
+  const [paymentInProgress, setPaymentInProgress] = useState(false); // Track payment processing
+  const [paymentData, setPaymentData] = useState(null); // Store payment initialization data
 
   const { isAdmin, authenticatedFetch, isLoading: authLoading } = useAuth();
 
@@ -82,6 +84,27 @@ export default function Awards() {
     const voted = localStorage.getItem('votedCategories');
     if (voted) {
       setVotedCategories(new Set(JSON.parse(voted)));
+    }
+
+    // Check for payment success callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment_success');
+    const reference = urlParams.get('reference');
+
+    if (paymentSuccess === 'true' && reference) {
+      // Extract payment details from reference
+      const parts = reference.split('-');
+      if (parts.length >= 4 && parts[0] === 'VOTE') {
+        const categoryId = parts[1];
+        const candidateId = parts[2];
+        const votesCount = parseInt(parts[3]) || 1;
+
+        // Verify payment and record vote
+        verifyPaymentAndVote(reference, categoryId, candidateId, votesCount);
+
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     }
   }, []);
 
@@ -195,27 +218,105 @@ export default function Awards() {
     await processVote(category, candidate);
   };
 
+  // Initialize Paystack payment
+  const initializePayment = async (category, candidate) => {
+    const key = `${category.id}:${candidate.id}`;
+    const count = selectedCounts[key] && selectedCounts[key] > 0 ? selectedCounts[key] : 1;
+    const amount = (category.price || 50) * count * 100; // Paystack expects amount in kobo (multiply by 100)
+
+    setPaymentInProgress(true);
+    setStatus('Initializing payment...');
+
+    try {
+      const response = await fetch(API_ENDPOINTS.paystackInitialize, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${PAYSTACK_CONFIG.publicKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'user@example.com', // In production, get from user input
+          amount: amount,
+          currency: 'NGN',
+          reference: `VOTE-${category.id}-${candidate.id}-${Date.now()}`,
+          callback_url: `${window.location.origin}/awards?payment_success=true`,
+          metadata: {
+            categoryId: category.id,
+            candidateId: candidate.id,
+            votesCount: count,
+            custom_fields: [
+              {
+                display_name: 'Category',
+                variable_name: 'category',
+                value: category.title
+              },
+              {
+                display_name: 'Candidate',
+                variable_name: 'candidate',
+                value: candidate.name
+              },
+              {
+                display_name: 'Votes',
+                variable_name: 'votes_count',
+                value: count.toString()
+              }
+            ]
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        setPaymentData(data.data);
+        // Redirect to Paystack payment page
+        window.location.href = data.data.authorization_url;
+      } else {
+        setStatus('Failed to initialize payment. Please try again.');
+      }
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      setStatus('Payment initialization failed. Please try again.');
+    } finally {
+      setPaymentInProgress(false);
+    }
+  };
+
+  // Verify payment and record vote
+  const verifyPaymentAndVote = async (reference, categoryId, candidateId, votesCount) => {
+    try {
+      setStatus('Verifying payment...');
+
+      const response = await fetch(API_ENDPOINTS.verifyPayment, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus(`Thank you! Your ${votesCount} paid vote${votesCount > 1 ? 's' : ''} were recorded.`);
+        // Refresh categories to show updated vote counts
+        fetch(API_ENDPOINTS.awards).then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : []));
+      } else {
+        setStatus(data.error || 'Payment verification failed. Please contact support if you were charged.');
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      setStatus('Payment verification failed. Please try again.');
+    }
+  };
+
   const processVote = async (category, candidate) => {
     setVotingInProgress(prev => new Set(prev).add(category.id));
     setStatus('Processing...');
 
     try {
       if (category.paid) {
-        const key = `${category.id}:${candidate.id}`;
-        const count = selectedCounts[key] && selectedCounts[key] > 0 ? selectedCounts[key] : 1;
-        // Here you'd normally redirect to payment gateway with the amount and count.
-        // For now, create a fake paymentRef and send votesCount to the backend.
-        const fakePaymentRef = `FAKE-${Date.now()}`;
-        const res = await fetch(`${API_ENDPOINTS.awards}/${category.id}/vote`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ candidateId: candidate.id, paymentRef: fakePaymentRef, votesCount: count })
-        });
-        if (res.ok) setStatus(`Thank you! Your ${count} paid vote${count > 1 ? 's' : ''} were recorded.`);
-        else {
-          const err = await res.json().catch(() => ({}));
-          setStatus(err.error || 'Payment or vote failed');
-        }
+        // Initialize Paystack payment instead of fake payment
+        await initializePayment(category, candidate);
+        return; // Payment flow will continue after redirect
       } else {
         const res = await fetch(`${API_ENDPOINTS.awards}/${category.id}/vote`, {
           method: 'POST',
@@ -448,7 +549,13 @@ export default function Awards() {
                                     <button className="hero-btn" onClick={() => changeCount(cat.id, c.id, 1)}>+</button>
                                   </div>
                                   <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total: ₦{(cat.price || 50) * (selectedCounts[`${cat.id}:${c.id}`] || 1)}</div>
-                                  <button className="hero-btn secondary" onClick={() => handleVote(cat, c)}>Pay & Vote</button>
+                                  <button
+                                    className="hero-btn secondary"
+                                    onClick={() => handleVote(cat, c)}
+                                    disabled={paymentInProgress}
+                                  >
+                                    {paymentInProgress ? 'Processing...' : 'Pay & Vote'}
+                                  </button>
                               </div>
                             ) : (
                               <>
