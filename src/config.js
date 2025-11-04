@@ -39,8 +39,7 @@ export const API_ENDPOINTS = {
 
 // Paystack Configuration
 export const PAYSTACK_CONFIG = {
-  publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || 'pk_live_23f8650090898b284b0d9b8ea85614e7138772b9',
-  secretKey: process.env.PAYSTACK_SECRET_KEY || 'REMOVED_SECRET'
+  publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || 'pk_live_23f8650090898b284b0d9b8ea85614e7138772b9'
 };
 
 export default API_BASE_URL;

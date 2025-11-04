@@ -508,7 +508,7 @@ app.get('/api/blog-posts', async (req, res) => {
       const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY || 'REMOVED_SECRET'}`,
+          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         }
       });
 
