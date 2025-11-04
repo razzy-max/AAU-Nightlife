@@ -498,6 +498,78 @@ app.get('/api/blog-posts', async (req, res) => {
     }
   });
 
+  // Paystack payment initialization endpoint
+  app.post('/api/payments/initialize', async (req, res) => {
+    const { categoryId, candidateId, votesCount, email } = req.body;
+
+    if (!categoryId || !candidateId) {
+      return res.status(400).json({ error: 'Category ID and Candidate ID are required' });
+    }
+
+    if (!process.env.PAYSTACK_SECRET_KEY) {
+      return res.status(500).json({ error: 'Paystack secret key not configured' });
+    }
+
+    try {
+      // Get category details to calculate amount
+      let category;
+      if (db) {
+        category = await db.collection('awards').findOne({ id: categoryId });
+      } else {
+        // Fallback to file
+        const awards = readData(awardsPath);
+        category = awards.find(c => c.id === categoryId);
+      }
+
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+
+      if (!category.paid) {
+        return res.status(400).json({ error: 'This category does not require payment' });
+      }
+
+      const count = Number(votesCount) >= 1 ? Math.floor(Number(votesCount)) : 1;
+      const amount = (category.price || 50) * count * 100; // Paystack expects amount in kobo
+
+      // Initialize payment with Paystack
+      const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email || 'user@example.com',
+          amount: amount,
+          currency: 'NGN',
+          reference: `VOTE-${categoryId}-${candidateId}-${Date.now()}`,
+          callback_url: `${req.protocol}://${req.get('host')}/awards?payment_success=true&reference=VOTE-${categoryId}-${candidateId}-${Date.now()}`,
+          metadata: {
+            categoryId,
+            candidateId,
+            votesCount: count
+          }
+        })
+      });
+
+      const paystackData = await paystackResponse.json();
+
+      if (paystackData.status) {
+        res.json({
+          success: true,
+          authorization_url: paystackData.data.authorization_url,
+          reference: paystackData.data.reference
+        });
+      } else {
+        res.status(400).json({ error: paystackData.message || 'Failed to initialize payment' });
+      }
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      res.status(500).json({ error: 'Payment initialization failed' });
+    }
+  });
+
   // Paystack payment verification endpoint
   app.post('/api/payments/verify', async (req, res) => {
     const { reference } = req.body;

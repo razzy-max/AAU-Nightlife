@@ -222,44 +222,31 @@ export default function Awards() {
   const initializePayment = async (category, candidate) => {
     const key = `${category.id}:${candidate.id}`;
     const count = selectedCounts[key] && selectedCounts[key] > 0 ? selectedCounts[key] : 1;
-    const amount = (category.price || 50) * count * 100; // Paystack expects amount in kobo (multiply by 100)
 
     setPaymentInProgress(true);
     setStatus('Initializing payment...');
 
     try {
-      console.log('Paystack config:', PAYSTACK_CONFIG);
-      console.log('Secret key:', PAYSTACK_CONFIG.secretKey);
-
       const response = await fetch(API_ENDPOINTS.paystackInitialize, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${PAYSTACK_CONFIG.secretKey}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify({
-          email: 'user@example.com', // In production, get from user input
-          amount: amount,
-          currency: 'NGN',
-          reference: `VOTE-${category.id}-${candidate.id}-${Date.now()}`,
-          callback_url: `${window.location.origin}/awards?payment_success=true&reference=VOTE-${category.id}-${candidate.id}-${Date.now()}`,
-          metadata: {
-            categoryId: category.id,
-            candidateId: candidate.id,
-            votesCount: count
-          }
+          categoryId: category.id,
+          candidateId: candidate.id,
+          votesCount: count,
+          email: 'user@example.com' // In production, get from user input
         })
       });
 
       const data = await response.json();
 
-      if (data.status) {
-        setPaymentData(data.data);
+      if (data.success) {
         // Redirect to Paystack payment page
-        window.location.href = data.data.authorization_url;
+        window.location.href = data.authorization_url;
       } else {
-        setStatus('Failed to initialize payment. Please try again.');
+        setStatus(data.error || 'Failed to initialize payment. Please try again.');
       }
     } catch (error) {
       console.error('Payment initialization error:', error);

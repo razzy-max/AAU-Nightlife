@@ -33,8 +33,8 @@ export const API_ENDPOINTS = {
   verifyPayment: `${API_BASE_URL}/api/payments/verify`,
 
   // Paystack
-  paystackInitialize: 'https://api.paystack.co/transaction/initialize',
-  paystackVerify: 'https://api.paystack.co/transaction/verify'
+  paystackInitialize: `${API_BASE_URL}/api/payments/initialize`,
+  paystackVerify: `${API_BASE_URL}/api/payments/verify`
 };
 
 // Paystack Configuration
