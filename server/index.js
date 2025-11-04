@@ -503,6 +503,14 @@ app.get('/api/blog-posts', async (req, res) => {
     const { reference } = req.body;
     if (!reference) return res.status(400).json({ error: 'Payment reference required' });
 
+    // Debug: Check if environment variable is loaded
+    console.log('PAYSTACK_SECRET_KEY loaded:', process.env.PAYSTACK_SECRET_KEY ? 'YES' : 'NO');
+    console.log('PAYSTACK_SECRET_KEY value:', process.env.PAYSTACK_SECRET_KEY);
+
+    if (!process.env.PAYSTACK_SECRET_KEY) {
+      return res.status(500).json({ error: 'Paystack secret key not configured' });
+    }
+
     try {
       // Verify payment with Paystack
       const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
