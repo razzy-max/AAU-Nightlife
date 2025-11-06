@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'aau-nightlife-secret-key-2024';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'; // Default: 'password'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://aaunightlife.com';
 
 let db;
 
@@ -533,6 +534,8 @@ app.get('/api/blog-posts', async (req, res) => {
       const amount = (category.price || 50) * count * 100; // Paystack expects amount in kobo
 
       // Initialize payment with Paystack
+      const ts = Date.now();
+      const reference = `VOTE-${categoryId}-${candidateId}-${ts}`;
       const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
         method: 'POST',
         headers: {
@@ -543,8 +546,8 @@ app.get('/api/blog-posts', async (req, res) => {
           email: email || 'user@example.com',
           amount: amount,
           currency: 'NGN',
-          reference: `VOTE-${categoryId}-${candidateId}-${Date.now()}`,
-          callback_url: `${req.protocol}://${req.get('host')}/awards?payment_success=true&reference=VOTE-${categoryId}-${candidateId}-${Date.now()}`,
+          reference: reference,
+          callback_url: `${FRONTEND_URL}/awards?payment_success=true&reference=${reference}`,
           metadata: {
             categoryId,
             candidateId,
@@ -865,6 +868,16 @@ app.delete('/api/advertisers/:id', authenticateAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete advertiser' });
   }
+});
+
+/**
+ * Safety net: if Paystack or any client ends up calling the backend domain
+ * at /awards (e.g., https://aau-nightlife-backend.onrender.com/awards?...),
+ * redirect them to the real frontend route instead of returning 404.
+ */
+app.get('/awards', (req, res) => {
+  const query = req.originalUrl.includes('?') ? req.originalUrl.substring(req.originalUrl.indexOf('?')) : '';
+  res.redirect(301, `${FRONTEND_URL}/awards${query}`);
 });
 
 app.listen(PORT, () => {
